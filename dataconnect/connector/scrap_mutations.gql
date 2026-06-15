@@ -1,0 +1,559 @@
+# ═══════════════════════════════════════
+# Scrap/Regrind Report Mutations & Queries
+# ═══════════════════════════════════════
+
+mutation CreateScrapCleaningReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $machineCondition: Int!,
+  $groundCondition: Int!,
+  $totalScore: Int!,
+  $percentage: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  scrapCleaningReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    machineCondition: $machineCondition
+    groundCondition: $groundCondition
+    totalScore: $totalScore
+    percentage: $percentage
+    createdBy: $createdBy
+  })
+}
+
+query ListScrapCleaningReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapCleaningReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    machineCondition
+    groundCondition
+    totalScore
+    percentage
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateScrapToolsCountReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $totalToolsGiven: Int!,
+  $totalToolsAvailable: Int!,
+  $percentageAvailable: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  scrapToolsCountReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    totalToolsGiven: $totalToolsGiven
+    totalToolsAvailable: $totalToolsAvailable
+    percentageAvailable: $percentageAvailable
+    createdBy: $createdBy
+  })
+}
+
+query ListScrapToolsCountReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapToolsCountReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    totalToolsGiven
+    totalToolsAvailable
+    percentageAvailable
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateScrapMachineHealthReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalMaintenanceDurationHours: Float!,
+  $createdBy: String!,
+  $submittedAt: Timestamp
+) @auth(level: PUBLIC) {
+  scrapMachineHealthReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalMaintenanceDurationHours: $totalMaintenanceDurationHours
+    createdBy: $createdBy
+    submittedAt: $submittedAt
+  })
+}
+
+mutation CreateScrapMaintenanceEntry(
+  $reportId: ScrapMachineHealthReport_Key!,
+  $maintenanceItem: String!,
+  $startTime: Timestamp!,
+  $endTime: Timestamp!,
+  $personDoingMaintenance: String!,
+  $description: String!,
+  $durationHours: Float!
+) @auth(level: PUBLIC) {
+  scrapMaintenanceEntry_insert(data: {
+    report: $reportId
+    maintenanceItem: $maintenanceItem
+    startTime: $startTime
+    endTime: $endTime
+    personDoingMaintenance: $personDoingMaintenance
+    description: $description
+    durationHours: $durationHours
+  })
+}
+
+query ListScrapMachineHealthReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapMachineHealthReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalMaintenanceDurationHours
+    createdBy
+    submittedAt
+    timestamp
+    scrapMaintenanceEntries_on_report {
+      maintenanceItem
+      startTime
+      endTime
+      personDoingMaintenance
+      description
+      durationHours
+    }
+  }
+}
+
+mutation CreateScrapProductionDetailsReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalProductionWeight: Float!,
+  $createdBy: String!,
+  $submittedAt: Timestamp
+) @auth(level: PUBLIC) {
+  scrapProductionDetailsReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalProductionWeight: $totalProductionWeight
+    createdBy: $createdBy
+    submittedAt: $submittedAt
+  })
+}
+
+mutation CreateScrapProductionLineItem(
+  $reportId: ScrapProductionDetailsReport_Key!,
+  $product: String!,
+  $weightPerBag: Float!,
+  $totalBags: Int!,
+  $totalWeight: Float!
+) @auth(level: PUBLIC) {
+  scrapProductionLineItem_insert(data: {
+    report: $reportId
+    product: $product
+    weightPerBag: $weightPerBag
+    totalBags: $totalBags
+    totalWeight: $totalWeight
+  })
+}
+
+query ListScrapProductionDetailsReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapProductionDetailsReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalProductionWeight
+    createdBy
+    submittedAt
+    timestamp
+    scrapProductionLineItems_on_report {
+      product
+      weightPerBag
+      totalBags
+      totalWeight
+    }
+  }
+}
+
+query GetScrapProductionDetailsReport(
+  $machineNumber: String!,
+  $date: Date!,
+  $shift: String!
+) @auth(level: PUBLIC) {
+  scrapProductionDetailsReports(
+    where: {
+      machineNumber: { eq: $machineNumber }
+      date: { eq: $date }
+      shift: { eq: $shift }
+    }
+    limit: 1
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalProductionWeight
+    createdBy
+    submittedAt
+    scrapProductionLineItems_on_report {
+      product
+      weightPerBag
+      totalBags
+      totalWeight
+    }
+  }
+}
+
+mutation CreateScrapProductionWeightReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalProductionWeight: Float!,
+  $maintenanceWeight: Float!,
+  $totalWeight: Float!,
+  $targetWeight: Float!,
+  $efficiencyPercentage: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  scrapProductionWeightReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalProductionWeight: $totalProductionWeight
+    maintenanceWeight: $maintenanceWeight
+    totalWeight: $totalWeight
+    targetWeight: $targetWeight
+    efficiencyPercentage: $efficiencyPercentage
+    createdBy: $createdBy
+  })
+}
+
+query ListScrapProductionWeightReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapProductionWeightReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalProductionWeight
+    maintenanceWeight
+    totalWeight
+    targetWeight
+    efficiencyPercentage
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateScrapWritingEfficiency(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $submittedAt: Timestamp,
+  $shiftEndTime: Timestamp!,
+  $score: Int!,
+  $operatorId: String!
+) @auth(level: PUBLIC) {
+  scrapWritingEfficiency_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    submittedAt: $submittedAt
+    shiftEndTime: $shiftEndTime
+    score: $score
+    operatorId: $operatorId
+  })
+}
+
+query ListScrapReportWritingEfficiency(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapWritingEfficiencies(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    submittedAt
+    shiftEndTime
+    score
+    operatorId
+    timestamp
+  }
+}
+
+mutation CreateScrapQualityReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $product: String!,
+  $qualityRating: Int!,
+  $comments: String,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  scrapQualityReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    product: $product
+    qualityRating: $qualityRating
+    comments: $comments
+    createdBy: $createdBy
+  })
+}
+
+query ListScrapQualityReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  scrapQualityReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    product
+    qualityRating
+    comments
+    createdBy
+    timestamp
+  }
+}
+
+# ═══════════════════════════════════════
+# Scrap Salary Mutations & Queries
+# ═══════════════════════════════════════
+
+mutation CreateScrapSalaryCalculation(
+  $operatorId: String!,
+  $operatorName: String!,
+  $year: Int!,
+  $month: Int!,
+  $a: Float!,
+  $b: Float!,
+  $e: Float!,
+  $f: Float!,
+  $g: Float!,
+  $wA: Float!,
+  $wB: Float!,
+  $wE: Float!,
+  $wF: Float!,
+  $wG: Float!,
+  $multiplier: Float!,
+  $fixedSalary: Float!,
+  $calculatedSalary: Float!
+) @auth(level: PUBLIC) {
+  scrapSalaryCalculation_insert(data: {
+    operatorId: $operatorId
+    operatorName: $operatorName
+    year: $year
+    month: $month
+    a: $a
+    b: $b
+    e: $e
+    f: $f
+    g: $g
+    wA: $wA
+    wB: $wB
+    wE: $wE
+    wF: $wF
+    wG: $wG
+    multiplier: $multiplier
+    fixedSalary: $fixedSalary
+    calculatedSalary: $calculatedSalary
+  })
+}
+
+query GetScrapSalaryCalculation(
+  $operatorId: String!,
+  $year: Int!,
+  $month: Int!
+) @auth(level: PUBLIC) {
+  scrapSalaryCalculations(
+    where: {
+      operatorId: { eq: $operatorId }
+      year: { eq: $year }
+      month: { eq: $month }
+    }
+    limit: 1
+  ) {
+    id
+    operatorId
+    operatorName
+    year
+    month
+    a
+    b
+    e
+    f
+    g
+    wA
+    wB
+    wE
+    wF
+    wG
+    multiplier
+    fixedSalary
+    calculatedSalary
+    timestamp
+  }
+}
+
+query GetScrapSalaryWeightages @auth(level: PUBLIC) {
+  masterSalaryWeightages(where: { category: { eq: "scrap" } }) {
+    id
+    variable
+    label
+    category
+    percentage
+  }
+}
+
+query GetScrapMonthlyAggregates(
+  $machineNumber: String!,
+  $startDate: Date!,
+  $endDate: Date!
+) @auth(level: PUBLIC) {
+  scrapCleaningReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+  ) {
+    percentage
+  }
+  scrapToolsCountReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+  ) {
+    percentageAvailable
+  }
+  scrapProductionWeightReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+  ) {
+    efficiencyPercentage
+  }
+  scrapWritingEfficiencies(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+  ) {
+    score
+  }
+  scrapQualityReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+  ) {
+    qualityRating
+  }
+}

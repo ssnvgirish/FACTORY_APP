@@ -1,0 +1,203 @@
+# ═══════════════════════════════════════
+# Salary Calculation Mutations & Queries
+# ═══════════════════════════════════════
+
+mutation CreateSalaryCalculation(
+  $operatorId: String!,
+  $operatorName: String!,
+  $year: Int!,
+  $month: Int!,
+  $a: Float!,
+  $b: Float!,
+  $c: Float!,
+  $d: Float!,
+  $e: Float!,
+  $f: Float!,
+  $wA: Float!,
+  $wB: Float!,
+  $wC: Float!,
+  $wD: Float!,
+  $wE: Float!,
+  $wF: Float!,
+  $multiplier: Float!,
+  $fixedSalary: Float!,
+  $calculatedSalary: Float!
+) @auth(level: PUBLIC) {
+  salaryCalculation_insert(data: {
+    operatorId: $operatorId
+    operatorName: $operatorName
+    year: $year
+    month: $month
+    a: $a
+    b: $b
+    c: $c
+    d: $d
+    e: $e
+    f: $f
+    wA: $wA
+    wB: $wB
+    wC: $wC
+    wD: $wD
+    wE: $wE
+    wF: $wF
+    multiplier: $multiplier
+    fixedSalary: $fixedSalary
+    calculatedSalary: $calculatedSalary
+  })
+}
+
+mutation UpdateSalaryCalculation(
+  $id: SalaryCalculation_Key!,
+  $operatorId: String!,
+  $operatorName: String!,
+  $year: Int!,
+  $month: Int!,
+  $a: Float!,
+  $b: Float!,
+  $c: Float!,
+  $d: Float!,
+  $e: Float!,
+  $f: Float!,
+  $wA: Float!,
+  $wB: Float!,
+  $wC: Float!,
+  $wD: Float!,
+  $wE: Float!,
+  $wF: Float!,
+  $multiplier: Float!,
+  $fixedSalary: Float!,
+  $calculatedSalary: Float!
+) @auth(level: PUBLIC) {
+  salaryCalculation_update(key: $id, data: {
+    operatorId: $operatorId
+    operatorName: $operatorName
+    year: $year
+    month: $month
+    a: $a
+    b: $b
+    c: $c
+    d: $d
+    e: $e
+    f: $f
+    wA: $wA
+    wB: $wB
+    wC: $wC
+    wD: $wD
+    wE: $wE
+    wF: $wF
+    multiplier: $multiplier
+    fixedSalary: $fixedSalary
+    calculatedSalary: $calculatedSalary
+  })
+}
+
+query GetSalaryCalculation(
+  $operatorId: String!,
+  $year: Int!,
+  $month: Int!
+) @auth(level: PUBLIC) {
+  salaryCalculations(
+    where: {
+      operatorId: { eq: $operatorId }
+      year: { eq: $year }
+      month: { eq: $month }
+    }
+    limit: 1
+  ) {
+    id
+    operatorId
+    operatorName
+    year
+    month
+    a
+    b
+    c
+    d
+    e
+    f
+    wA
+    wB
+    wC
+    wD
+    wE
+    wF
+    multiplier
+    fixedSalary
+    calculatedSalary
+    timestamp
+  }
+}
+
+query ListSalaryCalculations(
+  $operatorId: String,
+  $year: Int,
+  $month: Int
+) @auth(level: PUBLIC) {
+  salaryCalculations(
+    where: {
+      _and: [
+        { operatorId: { eq: $operatorId } }
+        { year: { eq: $year } }
+        { month: { eq: $month } }
+      ]
+    }
+    orderBy: [{ year: DESC }, { month: DESC }]
+  ) {
+    id
+    operatorId
+    operatorName
+    year
+    month
+    a
+    b
+    c
+    d
+    e
+    f
+    wA
+    wB
+    wC
+    wD
+    wE
+    wF
+    multiplier
+    fixedSalary
+    calculatedSalary
+    timestamp
+  }
+}
+
+query ListAllSalaryCalculationsForMonth(
+  $year: Int!,
+  $month: Int!
+) @auth(level: PUBLIC) {
+  salaryCalculations(
+    where: {
+      year: { eq: $year }
+      month: { eq: $month }
+    }
+    orderBy: [{ operatorName: ASC }]
+  ) {
+    id
+    operatorId
+    operatorName
+    year
+    month
+    a
+    b
+    c
+    d
+    e
+    f
+    wA
+    wB
+    wC
+    wD
+    wE
+    wF
+    multiplier
+    fixedSalary
+    calculatedSalary
+    timestamp
+  }
+}

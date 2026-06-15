@@ -1,0 +1,11 @@
+specVersion: "v1alpha"
+serviceId: "prabitha-operations-service"
+location: "asia-south1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdcdb"
+      cloudSql:
+        instanceId: "prabitha-operations-service"
+connectorDirs: ["./connector"]

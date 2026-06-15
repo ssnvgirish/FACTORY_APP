@@ -1,0 +1,165 @@
+There are 5 types of roles for users for Scrap regrind section
+1)	Machine Operator
+2)	Frames Senior Operator / Sheet Senior Operator
+3)	Plant Manager
+4)	Admin
+
+Types of Machines 
+1)	Crusher Machine 1
+2)	Crusher Machine 2
+3)	Crusher Machine 3
+4)	Pulverizer Machine 1 
+5)	Pulverizer Machine 2
+6)	Pulverizer Machine 3
+7)	Shredder
+Types of products
+1)	Frames Brown Color Scrap
+2)	Sheets Brown Color Scrap
+3)	Sheets Ivory Color Scrap
+4)	Sheets NFC Color Scrap
+5)	Sheets Orange Color Scrap
+6)	Mix scrap
+
+App login permissions details
+1)	Machine Operator: Should be able to enter all the details in the reports which are marked as ‘Evaluation by: Machine operator’. They should not have access to the reports and details of other machines. Once they enter the details and submit the report, they should not be able to edit them.
+2)	Frames / Sheet Senior Operator: Should be able to enter all the details in the reports which are marked as ‘Evaluation by: Senior operator’. They should be able to view and edit data of all machines. They should be able to view all the reports of all machines. 
+3)	Plant manager: Should be able to view and edit all the reports and data of all machines. 
+4)	Admin: Should be able to view and edit all the reports and data of all machines. Should have option to create login ids for users and assign them roles (single or multiple). Should be able to edit data in reference tables and charts. Should have provision to add or edit details in drop down menus, reference tables and data. 
+
+
+ 
+These are the type of data to be collected for Scrap regrading manufacturing machine.
+
+1)	Machine cleaning report.
+Evaluation by: Frame Senior operator 
+Evaluation for: Machine operator
+Evaluation frequency: Weekly (Every Monday)
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Scrap Section})
+•	Machine condition (Frame Senior operator gives score on the scale of 1 to 10 to operator based on how well he has maintained the machine.)
+•	Ground condition (Frame Senior operator gives score on the scale of 1 to 10 to operator based on how well he has maintained the ground near the machine.)
+•	Total of all 2 scores (to be auto calculated)
+•	Percentage of totals (to be auto calculated)
+
+The monthly average of value obtained in percentage of totals has to be assigned to ‘a’ which will be used for salary multiplier calculation.
+
+2)	Tools count report
+Evaluation by: Frame Senior operator
+Evaluation for: Machine operator
+Evaluation frequency: Weekly (Every Monday)
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Scrap Section})
+•	Total number of tools given (Number entry)
+•	Total number of tools available (Number entry)
+•	Percentage of tools available (to be auto calculated)
+
+The monthly average of value obtained in percentage of totals has to be assigned to ‘b’ which will be used for salary multiplier calculation.
+3)	Machine Health report
+Evaluation by: Machine operator 
+Evaluation for: Machine operator
+Evaluation frequency: Daily
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Crusher Machine 1, Crusher Machine 2, Crusher Machine 3, Pulverizer Machine 1, Pulverizer Machine 2, Pulverizer Machine 3, Shredder})
+•	Shift (Drop down menu of items {Day shift; Night shift})
+•	Maintenance item (Drop down menu of items {Blade gap adjustment; Blade replacement; Generator maintenance; Motors maintenance; Panel Board maintenance; Machine electrical parts maintenance; Machine mechanical parts maintenance; Others})
+•	Start time of maintenance
+•	End time of maintenance
+•	Person doing the maintenance
+•	Description of maintenance
+•	Total duration of maintenance (to be auto calculated based on start time and end time)
+
+There may be multiple maintenance entries in one shift. There should be option to enter the same.
+
+Total maintenance duration of the shift in hours (to be auto calculated. Sum of duration of all maintenance entries). This value to be assigned to ‘c’
+
+4)	Production details report
+Evaluation by: Machine operator 
+Evaluation for: Machine operator
+Evaluation frequency: Daily
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Pulverizer Machine 1, Pulverizer Machine 2, Pulverizer Machine 3})
+•	Shift (Drop down menu of items {Day shift; Night shift})
+•	Product (drop down menu of items {Frames Brown Color Scrap; Sheets Brown Color Scrap; Sheets Ivory Color Scrap; Sheets NFC Color Scrap; Sheets Orange Color Scrap; Mix scrap})
+•	Weight per bag (Number entry)
+•	Total number of Bags (Number entry)
+•	Total weight (to be auto calculated {Weight per bag x Total number of bags})
+On same date multiple product production will happen. So once there should be option to add parameters from ‘Product’ to ‘Total weight’, multiple times and then submit the full days production details at once.
+
+Total production weight of each machine should be assigned to ‘d’. 
+
+5)	Production weight calculation report
+Evaluation by: Machine operator 
+Evaluation for: Machine operator
+Evaluation frequency: Daily
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Pulverizer Machine 1, Pulverizer Machine 2, Pulverizer Machine 3})
+•	Shift (Drop down menu of items {Day shift; Night shift})
+•	Total production weight of the shift (The value considered as ‘d’. This has to be auto populated.)
+•	Maintenance weight of the shift (To be obtained from machine health report – value assigned for ‘c’ x target production weight per hour {mentioned in table below}) (to be auto populated).
+•	Total production weight (Equals to Total production weight + maintenance weight of the shift)
+•	Target weight (to be auto calculated based on conditions mentioned below).
+•	Percentage efficiency of production (percentage of total production weight with respect to target weight)
+
+The monthly average of value obtained in percentage efficiency has to be assigned to ‘e’ which will be used for salary multiplier calculation.
+
+Conditions for target weight
+a)	Weight target for one hour of production of each section is mentioned in table below.
+b)	General shift timings are 9 AM to 9PM for day shift and 9PM to 9AM for night shift. One shift is for 12 hours.
+c)	From the details entered in ‘Production details report’, time duration of production of each section can be derived. 
+d)	Multiply the time duration of each section with the per hour weight target mentioned in the table mentioned in point a.
+e)	Sum of all the totals of target time duration obtained is the target weight of the shift.
+
+6)	Report writing efficiency
+Evaluation by: Auto calculation
+Evaluation for: Machine operator
+Evaluation frequency: Daily
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Pulverizer Machine 1, Pulverizer Machine 2, Pulverizer Machine 3})
+•	Shift (Drop down menu of items {Day shift; Night shift})
+•	Time stamp of all report’s data entry.
+
+Based on time stamp, rating has to be given to the Machine operator. Conditions for rating are mentioned below.
+If the details of all the items required till now are entered 
+•	Within 1 hour of end of the shift, then rating is 5 out of 5.
+•	After 1 hour and before 6 hours of the end of the shift, then score is 4 out of 5. 
+•	After 6 hours and before 12 hours of the end of the shift, then score is 3 out of 5.
+•	After 12 hours and before 24 hours of the end of the shift, then score is 2 out of 5
+•	If details not entered or entered after 24 hours of the end of the shift, then score is 0 out of 5.
+
+The monthly average of rating given has to be assigned to ‘f’ which will be used for salary multiplier calculation.
+
+7)	Scrap Quality Report
+Evaluation by: Frame and Sheet Machine Operator
+Evaluation for: Machine operator
+Evaluation frequency: Daily
+Parameters to record
+•	Date
+•	Machine number (Drop down menu of items {Frame Machine 1; Frame Machine 2; Sheet Machine 3; Sheet Machine 4; Sheet Machine 5})
+•	Shift (Drop down menu of items {Day shift; Night shift})
+•	Product (drop down menu of items {Frames Brown Color Scrap; Sheets Brown Color Scrap; Sheets Ivory Color Scrap; Sheets NFC Color Scrap; Sheets Orange Color Scrap; Mix scrap})
+•	Quality Rating (Number selection 1 to 10).
+•	Monthly average of Quality rating has to be calculated based on the product used by Frame / Sheet machine operator.  
+•	Average of all products has to be calculated.
+
+ The monthly average of rating of all products has to be assigned to ‘g’ which will be used for salary multiplier calculation.
+
+Salary multiplier
+
+All the above-mentioned reports final data will be used to calculate salary multiplier. The formula for the same is mentioned below.
+
+
+
+
+
+
+
+Value a, b, c, d, e, f are defined in the reports. Multiplying these values with weightage will give us multiplier for each item. Sum of all these individual multipliers is the total salary multiplier. 
+Salary calculation
+Salary of the operator = Fixed salary x Salary multiplier 
+(Fixed salary will be entered by admin. It will be same for the entire year. Admin should have the option to change it whenever required.)

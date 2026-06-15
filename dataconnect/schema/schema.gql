@@ -1,0 +1,554 @@
+# ═══════════════════════════════════════
+# Users
+# ═══════════════════════════════════════
+
+type User @table {
+  uid: String! @unique
+  name: String!
+  phone: String!
+  password: String!
+  email: String!
+  roles: [String!]!
+  assignedMachines: [String!]!
+  fixedSalary: Float!
+  isActive: Boolean! @default(value: true)
+  createdAt: Timestamp @default(expr: "request.time")
+}
+
+# ═══════════════════════════════════════
+# Master / Reference Tables
+# ═══════════════════════════════════════
+
+type MasterMachine @table {
+  name: String! @unique
+  type: String!             # "frame", "sheet", "scrap"
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterShift @table {
+  name: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterRole @table {
+  code: String! @unique
+  displayName: String!
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterFrameSection @table {
+  name: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterFrameDensity @table {
+  value: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterFrameColor @table {
+  name: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterSheetThickness @table {
+  value: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterSheetDensity @table {
+  value: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterSheetColor @table {
+  name: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterMaintenanceItem @table {
+  name: String! @unique
+  category: String!          # "frame", "scrap"
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+type MasterScrapProduct @table {
+  name: String! @unique
+  sortOrder: Int! @default(value: 0)
+  isActive: Boolean! @default(value: true)
+}
+
+# ── Lookup / Weight / Target Tables ──
+
+type MasterFrameWeight @table {
+  section: String!
+  density: String!
+  weightPerFoot: Float!
+}
+
+type MasterSheetWeight @table {
+  thickness: String!
+  density: String!
+  weightPerSqft: Float!
+}
+
+type MasterFrameTarget @table {
+  section: String! @unique
+  targetKgPerHour: Float!
+}
+
+type MasterSheetTarget @table {
+  thickness: String! @unique
+  targetFeetPerHour: Float!
+}
+
+type MasterSalaryWeightage @table {
+  variable: String!
+  label: String!
+  category: String!          # "frame_sheet", "scrap"
+  percentage: Float!
+}
+
+type MasterScrapTarget @table {
+  product: String! @unique
+  targetKgPerHour: Float!
+}
+
+# ═══════════════════════════════════════
+# Frame Reports
+# ═══════════════════════════════════════
+
+type FrameCleaningReport @table {
+  date: Date!
+  machineNumber: String!
+  machineCondition: Int!
+  groundCondition: Int!
+  mouldCondition: Int!
+  totalScore: Int!
+  percentage: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FrameToolsCountReport @table {
+  date: Date!
+  machineNumber: String!
+  totalToolsGiven: Int! @default(value: 0)
+  totalToolsAvailable: Int! @default(value: 0)
+  percentageAvailable: Float! @default(value: 0)
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FrameHealthRatingItem @table {
+  report: FrameHealthReport!
+  item: String!
+  rating: Int!
+}
+
+type FrameHealthReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalScore: Int!
+  percentage: Float!
+  createdBy: String!
+  submittedAt: Timestamp
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FrameProductionLineItem @table {
+  report: FrameProductionDetailsReport!
+  section: String!
+  density: String!
+  color: String!
+  length: Float!
+  quantity: Int!
+  perPieceWeight: Float!
+  totalWeight: Float!
+  manualWeightPerFoot: Float
+}
+
+type FrameProductionDetailsReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalQuantity: Int!
+  totalWeight: Float!
+  createdBy: String!
+  submittedAt: Timestamp
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FrameProductionWeightReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  productionWeight: Float!
+  maintenanceWeight: Float!
+  totalProductionWeight: Float!
+  targetWeight: Float!
+  efficiencyPercentage: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FramePackingLineItem @table {
+  report: FrameShiftPackingReport!
+  section: String!
+  density: String!
+  color: String!
+  length: Float!
+  productionQuantity: Int!
+  perPieceWeight: Float!
+  packed: Int!
+  rejectedQuality: Int!
+}
+
+type FrameShiftPackingReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalRejectedWeight: Float!
+  qualityAcceptancePercentage: Float!
+  packingEfficiency: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FrameWritingEfficiency @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  submittedAt: Timestamp
+  shiftEndTime: Timestamp!
+  score: Int!
+  operatorId: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type FrameCustomerRejectionItem @table {
+  report: FrameCustomerRejectionReport!
+  section: String!
+  density: String!
+  color: String!
+  length: Float!
+  quantity: Int!
+  perPieceWeight: Float!
+  totalWeight: Float!
+}
+
+type FrameCustomerRejectionReport @table {
+  originalProductionDate: Date!
+  rejectionDate: Date
+  machineNumber: String!
+  shift: String!
+  totalRejectedWeight: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+# ═══════════════════════════════════════
+# Sheet Reports
+# ═══════════════════════════════════════
+
+type SheetCleaningReport @table {
+  date: Date!
+  machineNumber: String!
+  machineCondition: Int!
+  groundCondition: Int!
+  mouldCondition: Int!
+  totalScore: Int!
+  percentage: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetToolsCountReport @table {
+  date: Date!
+  machineNumber: String!
+  totalToolsGiven: Int! @default(value: 0)
+  totalToolsAvailable: Int! @default(value: 0)
+  percentageAvailable: Float! @default(value: 0)
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetHealthRatingItem @table {
+  report: SheetHealthReport!
+  item: String!
+  rating: Int!
+}
+
+type SheetHealthReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalScore: Int!
+  percentage: Float!
+  createdBy: String!
+  submittedAt: Timestamp
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetProductionLineItem @table {
+  report: SheetProductionDetailsReport!
+  thickness: String!
+  density: String!
+  color: String!
+  length: Float!
+  width: Float!
+  quantity: Int!
+  sqft: Float!
+  perPieceWeight: Float!
+  totalWeight: Float!
+  totalRunningFeet: Float!
+  timeOfChange: Timestamp
+  manualWeightPerSqft: Float
+}
+
+type SheetProductionDetailsReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalQuantity: Int!
+  totalWeight: Float!
+  totalRunningFeet: Float!
+  createdBy: String!
+  submittedAt: Timestamp
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetRunningFeetReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  productionRunningFeet: Float!
+  maintenanceRunningFeet: Float!
+  totalProductionRunningFeet: Float!
+  targetRunningFeet: Float!
+  efficiencyPercentage: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetPackingLineItem @table {
+  report: SheetShiftPackingReport!
+  thickness: String!
+  density: String!
+  color: String!
+  length: Float!
+  width: Float!
+  productionQuantity: Int!
+  perPieceWeight: Float!
+  runningFeetPerItem: Float!
+  packed: Int!
+  onlySanding: Int!
+  sandingAndPacked: Int!
+  rejectedQuality: Int!
+}
+
+type SheetShiftPackingReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalRejectedRunningFeet: Float!
+  qualityAcceptancePercentage: Float!
+  packingEfficiency: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetWritingEfficiency @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  submittedAt: Timestamp
+  shiftEndTime: Timestamp!
+  score: Int!
+  operatorId: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type SheetCustomerRejectionItem @table {
+  report: SheetCustomerRejectionReport!
+  thickness: String!
+  density: String!
+  color: String!
+  length: Float!
+  width: Float!
+  quantity: Int!
+  sqft: Float!
+  perPieceWeight: Float!
+  totalWeight: Float!
+  totalRunningFeet: Float!
+}
+
+type SheetCustomerRejectionReport @table {
+  originalProductionDate: Date!
+  machineNumber: String!
+  shift: String!
+  totalRejectedRunningFeet: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+# ═══════════════════════════════════════
+# Salary
+# ═══════════════════════════════════════
+
+type SalaryCalculation @table {
+  operatorId: String!
+  operatorName: String!
+  year: Int!
+  month: Int!
+  a: Float!
+  b: Float!
+  c: Float!
+  d: Float!
+  e: Float!
+  f: Float!
+  wA: Float!
+  wB: Float!
+  wC: Float!
+  wD: Float!
+  wE: Float!
+  wF: Float!
+  multiplier: Float!
+  fixedSalary: Float!
+  calculatedSalary: Float!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+# ═══════════════════════════════════════
+# Scrap/Regrind Reports
+# ═══════════════════════════════════════
+
+type ScrapCleaningReport @table {
+  date: Date!
+  machineNumber: String!
+  machineCondition: Int!
+  groundCondition: Int!
+  totalScore: Int!
+  percentage: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type ScrapToolsCountReport @table {
+  date: Date!
+  machineNumber: String!
+  totalToolsGiven: Int!
+  totalToolsAvailable: Int!
+  percentageAvailable: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type ScrapMaintenanceEntry @table {
+  report: ScrapMachineHealthReport!
+  maintenanceItem: String!
+  startTime: Timestamp!
+  endTime: Timestamp!
+  personDoingMaintenance: String!
+  description: String!
+  durationHours: Float!
+}
+
+type ScrapMachineHealthReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalMaintenanceDurationHours: Float!
+  createdBy: String!
+  submittedAt: Timestamp
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type ScrapProductionLineItem @table {
+  report: ScrapProductionDetailsReport!
+  product: String!
+  weightPerBag: Float!
+  totalBags: Int!
+  totalWeight: Float!
+}
+
+type ScrapProductionDetailsReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalProductionWeight: Float!
+  createdBy: String!
+  submittedAt: Timestamp
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type ScrapProductionWeightReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  totalProductionWeight: Float!
+  maintenanceWeight: Float!
+  totalWeight: Float!
+  targetWeight: Float!
+  efficiencyPercentage: Float!
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type ScrapWritingEfficiency @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  submittedAt: Timestamp
+  shiftEndTime: Timestamp!
+  score: Int!
+  operatorId: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+type ScrapQualityReport @table {
+  date: Date!
+  machineNumber: String!
+  shift: String!
+  product: String!
+  qualityRating: Int!
+  comments: String
+  createdBy: String!
+  timestamp: Timestamp @default(expr: "request.time")
+}
+
+# ═══════════════════════════════════════
+# Scrap Salary
+# ═══════════════════════════════════════
+
+type ScrapSalaryCalculation @table {
+  operatorId: String!
+  operatorName: String!
+  year: Int!
+  month: Int!
+  a: Float!
+  b: Float!
+  e: Float!
+  f: Float!
+  g: Float!
+  wA: Float!
+  wB: Float!
+  wE: Float!
+  wF: Float!
+  wG: Float!
+  multiplier: Float!
+  fixedSalary: Float!
+  calculatedSalary: Float!
+  timestamp: Timestamp @default(expr: "request.time")
+}

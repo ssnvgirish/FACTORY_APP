@@ -1,0 +1,530 @@
+# ═══════════════════════════════════════
+# Frame Report Mutations
+# ═══════════════════════════════════════
+
+mutation CreateFrameCleaningReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $machineCondition: Int!,
+  $groundCondition: Int!,
+  $mouldCondition: Int!,
+  $totalScore: Int!,
+  $percentage: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  frameCleaningReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    machineCondition: $machineCondition
+    groundCondition: $groundCondition
+    mouldCondition: $mouldCondition
+    totalScore: $totalScore
+    percentage: $percentage
+    createdBy: $createdBy
+  })
+}
+
+query ListFrameCleaningReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameCleaningReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    machineCondition
+    groundCondition
+    mouldCondition
+    totalScore
+    percentage
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateFrameToolsCountReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $totalToolsGiven: Int!,
+  $totalToolsAvailable: Int!,
+  $percentageAvailable: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  frameToolsCountReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    totalToolsGiven: $totalToolsGiven
+    totalToolsAvailable: $totalToolsAvailable
+    percentageAvailable: $percentageAvailable
+    createdBy: $createdBy
+  })
+}
+
+query ListFrameToolsCountReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameToolsCountReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    totalToolsGiven
+    totalToolsAvailable
+    percentageAvailable
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateFrameHealthReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalScore: Int!,
+  $percentage: Float!,
+  $createdBy: String!,
+  $submittedAt: Timestamp
+) @auth(level: PUBLIC) {
+  frameHealthReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalScore: $totalScore
+    percentage: $percentage
+    createdBy: $createdBy
+    submittedAt: $submittedAt
+  })
+}
+
+mutation CreateFrameHealthRatingItem(
+  $reportId: FrameHealthReport_Key!,
+  $item: String!,
+  $rating: Int!
+) @auth(level: PUBLIC) {
+  frameHealthRatingItem_insert(data: {
+    report: $reportId
+    item: $item
+    rating: $rating
+  })
+}
+
+query ListFrameHealthReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameHealthReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalScore
+    percentage
+    createdBy
+    submittedAt
+    timestamp
+    frameHealthRatingItems_on_report {
+      item
+      rating
+    }
+  }
+}
+
+mutation CreateFrameProductionDetailsReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalQuantity: Int!,
+  $totalWeight: Float!,
+  $createdBy: String!,
+  $submittedAt: Timestamp
+) @auth(level: PUBLIC) {
+  frameProductionDetailsReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalQuantity: $totalQuantity
+    totalWeight: $totalWeight
+    createdBy: $createdBy
+    submittedAt: $submittedAt
+  })
+}
+
+mutation CreateFrameProductionLineItem(
+  $reportId: FrameProductionDetailsReport_Key!,
+  $section: String!,
+  $density: String!,
+  $color: String!,
+  $length: Float!,
+  $quantity: Int!,
+  $perPieceWeight: Float!,
+  $totalWeight: Float!,
+  $manualWeightPerFoot: Float
+) @auth(level: PUBLIC) {
+  frameProductionLineItem_insert(data: {
+    report: $reportId
+    section: $section
+    density: $density
+    color: $color
+    length: $length
+    quantity: $quantity
+    perPieceWeight: $perPieceWeight
+    totalWeight: $totalWeight
+    manualWeightPerFoot: $manualWeightPerFoot
+  })
+}
+
+query ListFrameProductionDetailsReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameProductionDetailsReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalQuantity
+    totalWeight
+    createdBy
+    submittedAt
+    timestamp
+    frameProductionLineItems_on_report {
+      section
+      density
+      color
+      length
+      quantity
+      perPieceWeight
+      totalWeight
+      manualWeightPerFoot
+    }
+  }
+}
+
+query GetFrameProductionDetailsReport(
+  $machineNumber: String!,
+  $date: Date!,
+  $shift: String!
+) @auth(level: PUBLIC) {
+  frameProductionDetailsReports(
+    where: {
+      machineNumber: { eq: $machineNumber }
+      date: { eq: $date }
+      shift: { eq: $shift }
+    }
+    limit: 1
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalQuantity
+    totalWeight
+    createdBy
+    submittedAt
+    frameProductionLineItems_on_report {
+      section
+      density
+      color
+      length
+      quantity
+      perPieceWeight
+      totalWeight
+    }
+  }
+}
+
+mutation CreateFrameProductionWeightReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $productionWeight: Float!,
+  $maintenanceWeight: Float!,
+  $totalProductionWeight: Float!,
+  $targetWeight: Float!,
+  $efficiencyPercentage: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  frameProductionWeightReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    productionWeight: $productionWeight
+    maintenanceWeight: $maintenanceWeight
+    totalProductionWeight: $totalProductionWeight
+    targetWeight: $targetWeight
+    efficiencyPercentage: $efficiencyPercentage
+    createdBy: $createdBy
+  })
+}
+
+query ListFrameProductionWeightReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameProductionWeightReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    productionWeight
+    maintenanceWeight
+    totalProductionWeight
+    targetWeight
+    efficiencyPercentage
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateFrameShiftPackingReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalRejectedWeight: Float!,
+  $qualityAcceptancePercentage: Float!,
+  $packingEfficiency: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  frameShiftPackingReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalRejectedWeight: $totalRejectedWeight
+    qualityAcceptancePercentage: $qualityAcceptancePercentage
+    packingEfficiency: $packingEfficiency
+    createdBy: $createdBy
+  })
+}
+
+mutation CreateFramePackingLineItem(
+  $reportId: FrameShiftPackingReport_Key!,
+  $section: String!,
+  $density: String!,
+  $color: String!,
+  $length: Float!,
+  $productionQuantity: Int!,
+  $perPieceWeight: Float!,
+  $packed: Int!,
+  $rejectedQuality: Int!
+) @auth(level: PUBLIC) {
+  framePackingLineItem_insert(data: {
+    report: $reportId
+    section: $section
+    density: $density
+    color: $color
+    length: $length
+    productionQuantity: $productionQuantity
+    perPieceWeight: $perPieceWeight
+    packed: $packed
+    rejectedQuality: $rejectedQuality
+  })
+}
+
+query ListFrameShiftPackingReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameShiftPackingReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalRejectedWeight
+    qualityAcceptancePercentage
+    packingEfficiency
+    createdBy
+    timestamp
+    framePackingLineItems_on_report {
+      section
+      density
+      color
+      length
+      productionQuantity
+      perPieceWeight
+      packed
+      rejectedQuality
+    }
+  }
+}
+
+mutation CreateFrameWritingEfficiency(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $submittedAt: Timestamp,
+  $shiftEndTime: Timestamp!,
+  $score: Int!,
+  $operatorId: String!
+) @auth(level: PUBLIC) {
+  frameWritingEfficiency_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    submittedAt: $submittedAt
+    shiftEndTime: $shiftEndTime
+    score: $score
+    operatorId: $operatorId
+  })
+}
+
+query ListFrameWritingEfficiency(
+  $operatorId: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameWritingEfficiencies(
+    where: {
+      _and: [
+        { operatorId: { eq: $operatorId } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    submittedAt
+    shiftEndTime
+    score
+    operatorId
+    timestamp
+  }
+}
+
+mutation CreateFrameCustomerRejectionReport(
+  $originalProductionDate: Date!,
+  $rejectionDate: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalRejectedWeight: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  frameCustomerRejectionReport_insert(data: {
+    originalProductionDate: $originalProductionDate
+    rejectionDate: $rejectionDate
+    machineNumber: $machineNumber
+    shift: $shift
+    totalRejectedWeight: $totalRejectedWeight
+    createdBy: $createdBy
+  })
+}
+
+mutation CreateFrameCustomerRejectionItem(
+  $reportId: FrameCustomerRejectionReport_Key!,
+  $section: String!,
+  $density: String!,
+  $color: String!,
+  $length: Float!,
+  $quantity: Int!,
+  $perPieceWeight: Float!,
+  $totalWeight: Float!
+) @auth(level: PUBLIC) {
+  frameCustomerRejectionItem_insert(data: {
+    report: $reportId
+    section: $section
+    density: $density
+    color: $color
+    length: $length
+    quantity: $quantity
+    perPieceWeight: $perPieceWeight
+    totalWeight: $totalWeight
+  })
+}
+
+query ListFrameCustomerRejectionReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  frameCustomerRejectionReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { originalProductionDate: { ge: $startDate } }
+        { originalProductionDate: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ originalProductionDate: DESC }]
+  ) {
+    id
+    originalProductionDate
+    rejectionDate
+    machineNumber
+    shift
+    totalRejectedWeight
+    createdBy
+    timestamp
+    frameCustomerRejectionItems_on_report {
+      section
+      density
+      color
+      length
+      quantity
+      perPieceWeight
+      totalWeight
+    }
+  }
+}

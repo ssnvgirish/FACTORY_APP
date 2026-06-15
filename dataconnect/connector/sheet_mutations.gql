@@ -1,0 +1,567 @@
+# ═══════════════════════════════════════
+# Sheet Report Mutations & Queries
+# ═══════════════════════════════════════
+
+mutation CreateSheetCleaningReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $machineCondition: Int!,
+  $groundCondition: Int!,
+  $mouldCondition: Int!,
+  $totalScore: Int!,
+  $percentage: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  sheetCleaningReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    machineCondition: $machineCondition
+    groundCondition: $groundCondition
+    mouldCondition: $mouldCondition
+    totalScore: $totalScore
+    percentage: $percentage
+    createdBy: $createdBy
+  })
+}
+
+query ListSheetCleaningReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetCleaningReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    machineCondition
+    groundCondition
+    mouldCondition
+    totalScore
+    percentage
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateSheetToolsCountReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $totalToolsGiven: Int!,
+  $totalToolsAvailable: Int!,
+  $percentageAvailable: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  sheetToolsCountReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    totalToolsGiven: $totalToolsGiven
+    totalToolsAvailable: $totalToolsAvailable
+    percentageAvailable: $percentageAvailable
+    createdBy: $createdBy
+  })
+}
+
+query ListSheetToolsCountReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetToolsCountReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    totalToolsGiven
+    totalToolsAvailable
+    percentageAvailable
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateSheetHealthReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalScore: Int!,
+  $percentage: Float!,
+  $createdBy: String!,
+  $submittedAt: Timestamp
+) @auth(level: PUBLIC) {
+  sheetHealthReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalScore: $totalScore
+    percentage: $percentage
+    createdBy: $createdBy
+    submittedAt: $submittedAt
+  })
+}
+
+mutation CreateSheetHealthRatingItem(
+  $reportId: SheetHealthReport_Key!,
+  $item: String!,
+  $rating: Int!
+) @auth(level: PUBLIC) {
+  sheetHealthRatingItem_insert(data: {
+    report: $reportId
+    item: $item
+    rating: $rating
+  })
+}
+
+query ListSheetHealthReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetHealthReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalScore
+    percentage
+    createdBy
+    submittedAt
+    timestamp
+    sheetHealthRatingItems_on_report {
+      item
+      rating
+    }
+  }
+}
+
+mutation CreateSheetProductionDetailsReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalQuantity: Int!,
+  $totalWeight: Float!,
+  $totalRunningFeet: Float!,
+  $createdBy: String!,
+  $submittedAt: Timestamp
+) @auth(level: PUBLIC) {
+  sheetProductionDetailsReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalQuantity: $totalQuantity
+    totalWeight: $totalWeight
+    totalRunningFeet: $totalRunningFeet
+    createdBy: $createdBy
+    submittedAt: $submittedAt
+  })
+}
+
+mutation CreateSheetProductionLineItem(
+  $reportId: SheetProductionDetailsReport_Key!,
+  $thickness: String!,
+  $density: String!,
+  $color: String!,
+  $length: Float!,
+  $width: Float!,
+  $quantity: Int!,
+  $sqft: Float!,
+  $perPieceWeight: Float!,
+  $totalWeight: Float!,
+  $totalRunningFeet: Float!,
+  $timeOfChange: Timestamp,
+  $manualWeightPerSqft: Float
+) @auth(level: PUBLIC) {
+  sheetProductionLineItem_insert(data: {
+    report: $reportId
+    thickness: $thickness
+    density: $density
+    color: $color
+    length: $length
+    width: $width
+    quantity: $quantity
+    sqft: $sqft
+    perPieceWeight: $perPieceWeight
+    totalWeight: $totalWeight
+    totalRunningFeet: $totalRunningFeet
+    timeOfChange: $timeOfChange
+    manualWeightPerSqft: $manualWeightPerSqft
+  })
+}
+
+query ListSheetProductionDetailsReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetProductionDetailsReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalQuantity
+    totalWeight
+    totalRunningFeet
+    createdBy
+    submittedAt
+    timestamp
+    sheetProductionLineItems_on_report {
+      thickness
+      density
+      color
+      length
+      width
+      quantity
+      sqft
+      perPieceWeight
+      totalWeight
+      totalRunningFeet
+      timeOfChange
+      manualWeightPerSqft
+    }
+  }
+}
+
+query GetSheetProductionDetailsReport(
+  $machineNumber: String!,
+  $date: Date!,
+  $shift: String!
+) @auth(level: PUBLIC) {
+  sheetProductionDetailsReports(
+    where: {
+      machineNumber: { eq: $machineNumber }
+      date: { eq: $date }
+      shift: { eq: $shift }
+    }
+    limit: 1
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalQuantity
+    totalWeight
+    totalRunningFeet
+    createdBy
+    submittedAt
+    sheetProductionLineItems_on_report {
+      thickness
+      density
+      color
+      length
+      width
+      quantity
+      sqft
+      perPieceWeight
+      totalWeight
+      totalRunningFeet
+    }
+  }
+}
+
+mutation CreateSheetRunningFeetReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $productionRunningFeet: Float!,
+  $maintenanceRunningFeet: Float!,
+  $totalProductionRunningFeet: Float!,
+  $targetRunningFeet: Float!,
+  $efficiencyPercentage: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  sheetRunningFeetReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    productionRunningFeet: $productionRunningFeet
+    maintenanceRunningFeet: $maintenanceRunningFeet
+    totalProductionRunningFeet: $totalProductionRunningFeet
+    targetRunningFeet: $targetRunningFeet
+    efficiencyPercentage: $efficiencyPercentage
+    createdBy: $createdBy
+  })
+}
+
+query ListSheetRunningFeetReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetRunningFeetReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    productionRunningFeet
+    maintenanceRunningFeet
+    totalProductionRunningFeet
+    targetRunningFeet
+    efficiencyPercentage
+    createdBy
+    timestamp
+  }
+}
+
+mutation CreateSheetShiftPackingReport(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalRejectedRunningFeet: Float!,
+  $qualityAcceptancePercentage: Float!,
+  $packingEfficiency: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  sheetShiftPackingReport_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    totalRejectedRunningFeet: $totalRejectedRunningFeet
+    qualityAcceptancePercentage: $qualityAcceptancePercentage
+    packingEfficiency: $packingEfficiency
+    createdBy: $createdBy
+  })
+}
+
+mutation CreateSheetPackingLineItem(
+  $reportId: SheetShiftPackingReport_Key!,
+  $thickness: String!,
+  $density: String!,
+  $color: String!,
+  $length: Float!,
+  $width: Float!,
+  $productionQuantity: Int!,
+  $perPieceWeight: Float!,
+  $runningFeetPerItem: Float!,
+  $packed: Int!,
+  $onlySanding: Int!,
+  $sandingAndPacked: Int!,
+  $rejectedQuality: Int!
+) @auth(level: PUBLIC) {
+  sheetPackingLineItem_insert(data: {
+    report: $reportId
+    thickness: $thickness
+    density: $density
+    color: $color
+    length: $length
+    width: $width
+    productionQuantity: $productionQuantity
+    perPieceWeight: $perPieceWeight
+    runningFeetPerItem: $runningFeetPerItem
+    packed: $packed
+    onlySanding: $onlySanding
+    sandingAndPacked: $sandingAndPacked
+    rejectedQuality: $rejectedQuality
+  })
+}
+
+query ListSheetShiftPackingReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetShiftPackingReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    totalRejectedRunningFeet
+    qualityAcceptancePercentage
+    packingEfficiency
+    createdBy
+    timestamp
+    sheetPackingLineItems_on_report {
+      thickness
+      density
+      color
+      length
+      width
+      productionQuantity
+      perPieceWeight
+      runningFeetPerItem
+      packed
+      onlySanding
+      sandingAndPacked
+      rejectedQuality
+    }
+  }
+}
+
+mutation CreateSheetWritingEfficiency(
+  $date: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $submittedAt: Timestamp,
+  $shiftEndTime: Timestamp!,
+  $score: Int!,
+  $operatorId: String!
+) @auth(level: PUBLIC) {
+  sheetWritingEfficiency_insert(data: {
+    date: $date
+    machineNumber: $machineNumber
+    shift: $shift
+    submittedAt: $submittedAt
+    shiftEndTime: $shiftEndTime
+    score: $score
+    operatorId: $operatorId
+  })
+}
+
+query ListSheetWritingEfficiency(
+  $operatorId: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetWritingEfficiencies(
+    where: {
+      _and: [
+        { operatorId: { eq: $operatorId } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    date
+    machineNumber
+    shift
+    submittedAt
+    shiftEndTime
+    score
+    operatorId
+    timestamp
+  }
+}
+
+mutation CreateSheetCustomerRejectionReport(
+  $originalProductionDate: Date!,
+  $machineNumber: String!,
+  $shift: String!,
+  $totalRejectedRunningFeet: Float!,
+  $createdBy: String!
+) @auth(level: PUBLIC) {
+  sheetCustomerRejectionReport_insert(data: {
+    originalProductionDate: $originalProductionDate
+    machineNumber: $machineNumber
+    shift: $shift
+    totalRejectedRunningFeet: $totalRejectedRunningFeet
+    createdBy: $createdBy
+  })
+}
+
+mutation CreateSheetCustomerRejectionItem(
+  $reportId: SheetCustomerRejectionReport_Key!,
+  $thickness: String!,
+  $density: String!,
+  $color: String!,
+  $length: Float!,
+  $width: Float!,
+  $quantity: Int!,
+  $sqft: Float!,
+  $perPieceWeight: Float!,
+  $totalWeight: Float!,
+  $totalRunningFeet: Float!
+) @auth(level: PUBLIC) {
+  sheetCustomerRejectionItem_insert(data: {
+    report: $reportId
+    thickness: $thickness
+    density: $density
+    color: $color
+    length: $length
+    width: $width
+    quantity: $quantity
+    sqft: $sqft
+    perPieceWeight: $perPieceWeight
+    totalWeight: $totalWeight
+    totalRunningFeet: $totalRunningFeet
+  })
+}
+
+query ListSheetCustomerRejectionReports(
+  $machineNumber: String,
+  $startDate: Date,
+  $endDate: Date
+) @auth(level: PUBLIC) {
+  sheetCustomerRejectionReports(
+    where: {
+      _and: [
+        { machineNumber: { eq: $machineNumber } }
+        { originalProductionDate: { ge: $startDate } }
+        { originalProductionDate: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ originalProductionDate: DESC }]
+  ) {
+    id
+    originalProductionDate
+    machineNumber
+    shift
+    totalRejectedRunningFeet
+    createdBy
+    timestamp
+    sheetCustomerRejectionItems_on_report {
+      thickness
+      density
+      color
+      length
+      width
+      quantity
+      sqft
+      perPieceWeight
+      totalWeight
+      totalRunningFeet
+    }
+  }
+}

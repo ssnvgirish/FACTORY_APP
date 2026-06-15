@@ -1,0 +1,102 @@
+# ═══════════════════════════════════════
+# User Mutations
+# ═══════════════════════════════════════
+
+mutation CreateUser(
+  $uid: String!,
+  $name: String!,
+  $phone: String!,
+  $password: String!,
+  $email: String!,
+  $roles: [String!]!,
+  $assignedMachines: [String!]!,
+  $fixedSalary: Float!,
+  $isActive: Boolean!
+) @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: $uid
+    name: $name
+    phone: $phone
+    password: $password
+    email: $email
+    roles: $roles
+    assignedMachines: $assignedMachines
+    fixedSalary: $fixedSalary
+    isActive: $isActive
+  })
+}
+
+mutation UpdateUser(
+  $id: User_Key!,
+  $name: String!,
+  $phone: String!,
+  $roles: [String!]!,
+  $assignedMachines: [String!]!,
+  $fixedSalary: Float!,
+  $isActive: Boolean!
+) @auth(level: PUBLIC) {
+  user_update(key: $id, data: {
+    name: $name
+    phone: $phone
+    roles: $roles
+    assignedMachines: $assignedMachines
+    fixedSalary: $fixedSalary
+    isActive: $isActive
+  })
+}
+
+mutation ToggleUserActive($id: User_Key!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  user_update(key: $id, data: { isActive: $isActive })
+}
+
+# ═══════════════════════════════════════
+# User Queries
+# ═══════════════════════════════════════
+
+query GetUserByPhone($phone: String!) @auth(level: PUBLIC) {
+  users(where: { phone: { eq: $phone } }, limit: 1) {
+    id
+    uid
+    name
+    phone
+    password
+    email
+    roles
+    assignedMachines
+    fixedSalary
+    isActive
+  }
+}
+
+query GetUserById($id: User_Key!) @auth(level: PUBLIC) {
+  user(key: $id) {
+    id
+    uid
+    name
+    phone
+    password
+    email
+    roles
+    assignedMachines
+    fixedSalary
+    isActive
+  }
+}
+
+query ListAllUsers @auth(level: PUBLIC) {
+  users {
+    id
+    uid
+    name
+    phone
+    email
+    roles
+    assignedMachines
+    fixedSalary
+    isActive
+  }
+}
+
+# ═══════════════════════════════════════
+# Master Tables – queries/mutations moved to master_tables.gql
+# ═══════════════════════════════════════

@@ -1,0 +1,72 @@
+# Konnect Architecture Rules
+
+## Stack And Core Patterns
+- Flutter app uses BLoC + GetIt (`locator`) + repository/data source layering.
+- Keep feature code under `lib/src/features/<feature_name>/` and avoid cross-feature tight coupling.
+- Prefer interface-first repositories (`I*Repository`) with concrete `*RepositoryImpl` classes.
+- Shared services live under `lib/src/services/` or `lib/src/resources/`.
+
+## Dependency Injection
+- Register new dependencies in `lib/locator.dart` using existing patterns.
+- Use constructor injection for classes; avoid ad-hoc `locator.get` calls deep inside pure domain logic.
+- Avoid duplicate registrations and check lifecycle choice: singleton vs lazySingleton vs factory.
+
+## BLoC And UI
+- Keep side effects out of widgets where possible; drive effects through BLoC or service layers.
+- Keep widget rebuild scope narrow (`BlocBuilder` near leaf widgets when practical).
+- In this repo, `BlocProvider.maybeOf<T>(context)` is unavailable. Use guarded lookup patterns.
+
+## Code Generation
+- Models use `freezed` + `json_serializable`. Run `build_runner` after schema changes.
+- Never hand-edit `*.g.dart` or `*.freezed.dart` files.
+
+## Routing (Dual-Navigation System)
+
+This app uses **two co-existing navigation systems** — understand both before touching routing.
+
+### GoRouter (Tab-Level Navigation)
+- Tab shell lives in `lib/src/features/app_router/app_bottom_nav_bar_router.dart`.
+- All GoRoute builders for in-app screens live in `lib/src/features/navigation/repository/goroute_service.dart`.
+- Route path string constants live in `lib/src/utilities/app_route_names.dart`.
+- Path lists (`featurePaths`, `deepLinkPaths`, `hideBottomNavRoutes`) live in `lib/src/third_party_dependencies/app_router/app_router_path.dart`.
+- **Never use `context.go`/`context.push` directly in widgets** — use `AppNavigationService` (`lib/src/third_party_dependencies/app_router/services/app_navigation_service.dart`).
+- When a GoRoute needs to pass complex objects, use `NavigationExtrasManager` (not `context.push(path, extra: obj)`) — see `lib/src/third_party_dependencies/app_router/utils/navigation_extras_manager.dart`.
+- **CRITICAL gotcha**: GoRouter's `redirect` function **drops the `extra` parameter**. Avoid `willRedirect=true` paths for routes that rely on `extra`.
+
+### Navigator 1.0 (In-Tab Pushes — Legacy)
+- Used for deep in-tab navigation where GoRouter shell is already established.
+- Routes defined in `lib/routers.dart` using `Navigator.pushNamed(context, routeName)`.
+- Prefer GoRouter routes for any new navigable screen.
+
+### Adding A New Navigable Screen (4-Step Checklist)
+1. Add route path constant to `lib/src/utilities/app_route_names.dart`.
+2. Add the path to the correct list in `app_router_path.dart` (`featurePaths` or `deepLinkPaths`).
+3. Add a `GoRoute` builder method to `GoRouteService` (or `RouteDefinitions.sharedRoutes`), wrapping the page in `BlocProvider`.
+4. Add it to `sharedRoutes` or the appropriate branch in `app_bottom_nav_bar_router.dart`.
+
+### Route Constant Naming Convention
+```dart
+// lib/src/utilities/app_route_names.dart
+const String myFeatureViewRoute = '/MyFeatureScreen';
+```
+
+## Data And Networking
+- Keep API contract mapping in data layer; do not leak DTOs into UI layer.
+- Use existing GraphQL/HTTP resource helpers before introducing new client abstractions.
+- Wrap GraphQL queries/mutations through `lib/src/resources/remote_data_resource/gql/`.
+
+## Testing
+- Unit test BLoCs/repositories with `bloc_test`, `mocktail`/`mockito`, and deterministic fixtures.
+- Add regression tests for bug fixes when feasible.
+
+## Lint And Analysis Rules
+- Analyzer excludes `*.g.dart`, `*.freezed.dart`, `*.mocks.dart` — never hand-edit these.
+- Key enforced rules: `prefer_const_constructors`, `exhaustive_cases`, `empty_statements`.
+- Disabled: `prefer_double_quotes` (use single quotes), `always_specify_types`, `prefer_relative_imports`.
+- Use package imports: `import 'package:kmart/...'`.
+- `use_build_context_synchronously` is currently ignored in analyzer — but still guard with `mounted`.
+
+## Safety Constraints
+- Never log secrets/tokens/PII.
+- Avoid changing build flavors, secrets, or CI scripts unless task explicitly requires it.
+- Keep changes minimal and localized to requested scope.

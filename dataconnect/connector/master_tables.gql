@@ -1,0 +1,347 @@
+# ═══════════════════════════════════════
+# Master Tables – CRUD Operations
+# ═══════════════════════════════════════
+
+# ── MasterMachine ──
+
+query ListMasterMachines @auth(level: PUBLIC) {
+  masterMachines(orderBy: [{ sortOrder: ASC }]) {
+    id name type sortOrder isActive
+  }
+}
+
+mutation InsertMasterMachine($name: String!, $type: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: $name, type: $type, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterMachine($id: MasterMachine_Key!, $name: String!, $type: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterMachine_update(key: $id, data: { name: $name, type: $type, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterMachine($id: MasterMachine_Key!) @auth(level: PUBLIC) {
+  masterMachine_delete(key: $id)
+}
+
+# ── MasterShift ──
+
+query ListMasterShifts @auth(level: PUBLIC) {
+  masterShifts(orderBy: [{ sortOrder: ASC }]) {
+    id name sortOrder isActive
+  }
+}
+
+mutation InsertMasterShift($name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterShift_insert(data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterShift($id: MasterShift_Key!, $name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterShift_update(key: $id, data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterShift($id: MasterShift_Key!) @auth(level: PUBLIC) {
+  masterShift_delete(key: $id)
+}
+
+# ── MasterRole ──
+
+query ListMasterRoles @auth(level: PUBLIC) {
+  masterRoles(orderBy: [{ sortOrder: ASC }]) {
+    id code displayName sortOrder isActive
+  }
+}
+
+mutation InsertMasterRole($code: String!, $displayName: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: $code, displayName: $displayName, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterRole($id: MasterRole_Key!, $code: String!, $displayName: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterRole_update(key: $id, data: { code: $code, displayName: $displayName, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterRole($id: MasterRole_Key!) @auth(level: PUBLIC) {
+  masterRole_delete(key: $id)
+}
+
+# ── MasterFrameSection ──
+
+query ListMasterFrameSections @auth(level: PUBLIC) {
+  masterFrameSections(orderBy: [{ sortOrder: ASC }]) {
+    id name sortOrder isActive
+  }
+}
+
+mutation InsertMasterFrameSection($name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterFrameSection_insert(data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterFrameSection($id: MasterFrameSection_Key!, $name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterFrameSection_update(key: $id, data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterFrameSection($id: MasterFrameSection_Key!) @auth(level: PUBLIC) {
+  masterFrameSection_delete(key: $id)
+}
+
+# ── MasterFrameDensity ──
+
+query ListMasterFrameDensities @auth(level: PUBLIC) {
+  masterFrameDensities(orderBy: [{ sortOrder: ASC }]) {
+    id value sortOrder isActive
+  }
+}
+
+mutation InsertMasterFrameDensity($value: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterFrameDensity_insert(data: { value: $value, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterFrameDensity($id: MasterFrameDensity_Key!, $value: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterFrameDensity_update(key: $id, data: { value: $value, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterFrameDensity($id: MasterFrameDensity_Key!) @auth(level: PUBLIC) {
+  masterFrameDensity_delete(key: $id)
+}
+
+# ── MasterFrameColor ──
+
+query ListMasterFrameColors @auth(level: PUBLIC) {
+  masterFrameColors(orderBy: [{ sortOrder: ASC }]) {
+    id name sortOrder isActive
+  }
+}
+
+mutation InsertMasterFrameColor($name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterFrameColor_insert(data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterFrameColor($id: MasterFrameColor_Key!, $name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterFrameColor_update(key: $id, data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterFrameColor($id: MasterFrameColor_Key!) @auth(level: PUBLIC) {
+  masterFrameColor_delete(key: $id)
+}
+
+# ── MasterSheetThickness ──
+
+query ListMasterSheetThicknesses @auth(level: PUBLIC) {
+  masterSheetThicknesses(orderBy: [{ sortOrder: ASC }]) {
+    id value sortOrder isActive
+  }
+}
+
+mutation InsertMasterSheetThickness($value: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterSheetThickness_insert(data: { value: $value, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterSheetThickness($id: MasterSheetThickness_Key!, $value: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterSheetThickness_update(key: $id, data: { value: $value, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterSheetThickness($id: MasterSheetThickness_Key!) @auth(level: PUBLIC) {
+  masterSheetThickness_delete(key: $id)
+}
+
+# ── MasterSheetDensity ──
+
+query ListMasterSheetDensities @auth(level: PUBLIC) {
+  masterSheetDensities(orderBy: [{ sortOrder: ASC }]) {
+    id value sortOrder isActive
+  }
+}
+
+mutation InsertMasterSheetDensity($value: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterSheetDensity_insert(data: { value: $value, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterSheetDensity($id: MasterSheetDensity_Key!, $value: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterSheetDensity_update(key: $id, data: { value: $value, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterSheetDensity($id: MasterSheetDensity_Key!) @auth(level: PUBLIC) {
+  masterSheetDensity_delete(key: $id)
+}
+
+# ── MasterSheetColor ──
+
+query ListMasterSheetColors @auth(level: PUBLIC) {
+  masterSheetColors(orderBy: [{ sortOrder: ASC }]) {
+    id name sortOrder isActive
+  }
+}
+
+mutation InsertMasterSheetColor($name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterSheetColor_insert(data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterSheetColor($id: MasterSheetColor_Key!, $name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterSheetColor_update(key: $id, data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterSheetColor($id: MasterSheetColor_Key!) @auth(level: PUBLIC) {
+  masterSheetColor_delete(key: $id)
+}
+
+# ── MasterMaintenanceItem ──
+
+query ListMasterMaintenanceItems @auth(level: PUBLIC) {
+  masterMaintenanceItems(orderBy: [{ sortOrder: ASC }]) {
+    id name category sortOrder isActive
+  }
+}
+
+mutation InsertMasterMaintenanceItem($name: String!, $category: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterMaintenanceItem_insert(data: { name: $name, category: $category, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterMaintenanceItem($id: MasterMaintenanceItem_Key!, $name: String!, $category: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterMaintenanceItem_update(key: $id, data: { name: $name, category: $category, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterMaintenanceItem($id: MasterMaintenanceItem_Key!) @auth(level: PUBLIC) {
+  masterMaintenanceItem_delete(key: $id)
+}
+
+# ── MasterScrapProduct ──
+
+query ListMasterScrapProducts @auth(level: PUBLIC) {
+  masterScrapProducts(orderBy: [{ sortOrder: ASC }]) {
+    id name sortOrder isActive
+  }
+}
+
+mutation InsertMasterScrapProduct($name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterScrapProduct_insert(data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation UpdateMasterScrapProduct($id: MasterScrapProduct_Key!, $name: String!, $sortOrder: Int!, $isActive: Boolean!) @auth(level: PUBLIC) {
+  masterScrapProduct_update(key: $id, data: { name: $name, sortOrder: $sortOrder, isActive: $isActive })
+}
+
+mutation DeleteMasterScrapProduct($id: MasterScrapProduct_Key!) @auth(level: PUBLIC) {
+  masterScrapProduct_delete(key: $id)
+}
+
+# ═══════════════════════════════════════
+# Master Lookup Tables – CRUD
+# ═══════════════════════════════════════
+
+# ── MasterFrameWeight ──
+
+query ListMasterFrameWeights @auth(level: PUBLIC) {
+  masterFrameWeights {
+    id section density weightPerFoot
+  }
+}
+
+mutation InsertMasterFrameWeight($section: String!, $density: String!, $weightPerFoot: Float!) @auth(level: PUBLIC) {
+  masterFrameWeight_insert(data: { section: $section, density: $density, weightPerFoot: $weightPerFoot })
+}
+
+mutation UpdateMasterFrameWeight($id: MasterFrameWeight_Key!, $section: String!, $density: String!, $weightPerFoot: Float!) @auth(level: PUBLIC) {
+  masterFrameWeight_update(key: $id, data: { section: $section, density: $density, weightPerFoot: $weightPerFoot })
+}
+
+mutation DeleteMasterFrameWeight($id: MasterFrameWeight_Key!) @auth(level: PUBLIC) {
+  masterFrameWeight_delete(key: $id)
+}
+
+# ── MasterSheetWeight ──
+
+query ListMasterSheetWeights @auth(level: PUBLIC) {
+  masterSheetWeights {
+    id thickness density weightPerSqft
+  }
+}
+
+mutation InsertMasterSheetWeight($thickness: String!, $density: String!, $weightPerSqft: Float!) @auth(level: PUBLIC) {
+  masterSheetWeight_insert(data: { thickness: $thickness, density: $density, weightPerSqft: $weightPerSqft })
+}
+
+mutation UpdateMasterSheetWeight($id: MasterSheetWeight_Key!, $thickness: String!, $density: String!, $weightPerSqft: Float!) @auth(level: PUBLIC) {
+  masterSheetWeight_update(key: $id, data: { thickness: $thickness, density: $density, weightPerSqft: $weightPerSqft })
+}
+
+mutation DeleteMasterSheetWeight($id: MasterSheetWeight_Key!) @auth(level: PUBLIC) {
+  masterSheetWeight_delete(key: $id)
+}
+
+# ── MasterFrameTarget ──
+
+query ListMasterFrameTargets @auth(level: PUBLIC) {
+  masterFrameTargets {
+    id section targetKgPerHour
+  }
+}
+
+mutation InsertMasterFrameTarget($section: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
+  masterFrameTarget_insert(data: { section: $section, targetKgPerHour: $targetKgPerHour })
+}
+
+mutation UpdateMasterFrameTarget($id: MasterFrameTarget_Key!, $section: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
+  masterFrameTarget_update(key: $id, data: { section: $section, targetKgPerHour: $targetKgPerHour })
+}
+
+mutation DeleteMasterFrameTarget($id: MasterFrameTarget_Key!) @auth(level: PUBLIC) {
+  masterFrameTarget_delete(key: $id)
+}
+
+# ── MasterSheetTarget ──
+
+query ListMasterSheetTargets @auth(level: PUBLIC) {
+  masterSheetTargets {
+    id thickness targetFeetPerHour
+  }
+}
+
+mutation InsertMasterSheetTarget($thickness: String!, $targetFeetPerHour: Float!) @auth(level: PUBLIC) {
+  masterSheetTarget_insert(data: { thickness: $thickness, targetFeetPerHour: $targetFeetPerHour })
+}
+
+mutation UpdateMasterSheetTarget($id: MasterSheetTarget_Key!, $thickness: String!, $targetFeetPerHour: Float!) @auth(level: PUBLIC) {
+  masterSheetTarget_update(key: $id, data: { thickness: $thickness, targetFeetPerHour: $targetFeetPerHour })
+}
+
+mutation DeleteMasterSheetTarget($id: MasterSheetTarget_Key!) @auth(level: PUBLIC) {
+  masterSheetTarget_delete(key: $id)
+}
+
+# ── MasterSalaryWeightage ──
+
+query ListMasterSalaryWeightages @auth(level: PUBLIC) {
+  masterSalaryWeightages {
+    id variable label category percentage
+  }
+}
+
+mutation InsertMasterSalaryWeightage($variable: String!, $label: String!, $category: String!, $percentage: Float!) @auth(level: PUBLIC) {
+  masterSalaryWeightage_insert(data: { variable: $variable, label: $label, category: $category, percentage: $percentage })
+}
+
+mutation UpdateMasterSalaryWeightage($id: MasterSalaryWeightage_Key!, $variable: String!, $label: String!, $category: String!, $percentage: Float!) @auth(level: PUBLIC) {
+  masterSalaryWeightage_update(key: $id, data: { variable: $variable, label: $label, category: $category, percentage: $percentage })
+}
+
+mutation DeleteMasterSalaryWeightage($id: MasterSalaryWeightage_Key!) @auth(level: PUBLIC) {
+  masterSalaryWeightage_delete(key: $id)
+}
+
+# ── MasterScrapTarget ──
+
+query ListMasterScrapTargets @auth(level: PUBLIC) {
+  masterScrapTargets {
+    id product targetKgPerHour
+  }
+}
+
+mutation InsertMasterScrapTarget($product: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
+  masterScrapTarget_insert(data: { product: $product, targetKgPerHour: $targetKgPerHour })
+}
+
+mutation UpdateMasterScrapTarget($id: MasterScrapTarget_Key!, $product: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
+  masterScrapTarget_update(key: $id, data: { product: $product, targetKgPerHour: $targetKgPerHour })
+}
+
+mutation DeleteMasterScrapTarget($id: MasterScrapTarget_Key!) @auth(level: PUBLIC) {
+  masterScrapTarget_delete(key: $id)
+}

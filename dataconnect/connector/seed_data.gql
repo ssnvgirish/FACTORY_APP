@@ -1,0 +1,1071 @@
+# ═══════════════════════════════════════
+# Seed Data Mutations
+# ═══════════════════════════════════════
+# Run these via the Data Connect emulator or Firebase console
+# to populate the database with sample data.
+
+# ── Seed Users ──
+
+mutation SeedAdminUser @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "admin-1"
+    name: "Admin"
+    phone: "+910000000000"
+    password: "admin123"
+    email: ""
+    roles: ["admin", "plant_manager"]
+    assignedMachines: []
+    fixedSalary: 0
+    isActive: true
+  })
+}
+
+mutation SeedOperator1 @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "op-1"
+    name: "Ravi Kumar"
+    phone: "+911111111111"
+    password: "1234"
+    email: ""
+    roles: ["machine_operator"]
+    assignedMachines: ["Frame Machine 1"]
+    fixedSalary: 18000
+    isActive: true
+  })
+}
+
+mutation SeedOperator2 @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "op-2"
+    name: "Suresh Yadav"
+    phone: "+912222222222"
+    password: "1234"
+    email: ""
+    roles: ["machine_operator"]
+    assignedMachines: ["Frame Machine 2"]
+    fixedSalary: 16000
+    isActive: true
+  })
+}
+
+mutation SeedOperator3 @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "op-3"
+    name: "Amit Sharma"
+    phone: "+913333333333"
+    password: "1234"
+    email: ""
+    roles: ["machine_operator"]
+    assignedMachines: ["Sheet Machine 3"]
+    fixedSalary: 17500
+    isActive: true
+  })
+}
+
+mutation SeedOperator4 @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "op-4"
+    name: "Deepak Verma"
+    phone: "+914444444444"
+    password: "1234"
+    email: ""
+    roles: ["machine_operator"]
+    assignedMachines: ["Sheet Machine 4"]
+    fixedSalary: 15500
+    isActive: true
+  })
+}
+
+mutation SeedQualityPacking @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "qp-1"
+    name: "Vijay Patel"
+    phone: "+915555555555"
+    password: "1234"
+    email: ""
+    roles: ["quality_packing_supervisor"]
+    assignedMachines: ["Frame Machine 1", "Frame Machine 2", "Sheet Machine 3", "Sheet Machine 4", "Sheet Machine 5"]
+    fixedSalary: 20000
+    isActive: true
+  })
+}
+
+# ── Seed Master Machines ──
+
+mutation SeedMachineFrame1 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Frame Machine 1", type: "frame", sortOrder: 1, isActive: true })
+}
+mutation SeedMachineFrame2 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Frame Machine 2", type: "frame", sortOrder: 2, isActive: true })
+}
+mutation SeedMachineSheet3 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Sheet Machine 3", type: "sheet", sortOrder: 3, isActive: true })
+}
+mutation SeedMachineSheet4 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Sheet Machine 4", type: "sheet", sortOrder: 4, isActive: true })
+}
+mutation SeedMachineSheet5 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Sheet Machine 5", type: "sheet", sortOrder: 5, isActive: true })
+}
+mutation SeedMachineCrusher1 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Crusher Machine 1", type: "scrap", sortOrder: 6, isActive: true })
+}
+mutation SeedMachineCrusher2 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Crusher Machine 2", type: "scrap", sortOrder: 7, isActive: true })
+}
+mutation SeedMachineCrusher3 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Crusher Machine 3", type: "scrap", sortOrder: 8, isActive: true })
+}
+mutation SeedMachinePulverizer1 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Pulverizer Machine 1", type: "scrap", sortOrder: 9, isActive: true })
+}
+mutation SeedMachinePulverizer2 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Pulverizer Machine 2", type: "scrap", sortOrder: 10, isActive: true })
+}
+mutation SeedMachinePulverizer3 @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Pulverizer Machine 3", type: "scrap", sortOrder: 11, isActive: true })
+}
+mutation SeedMachineShredder @auth(level: PUBLIC) {
+  masterMachine_insert(data: { name: "Shredder", type: "scrap", sortOrder: 12, isActive: true })
+}
+
+# ── Seed Master Shifts ──
+
+mutation SeedShiftDay @auth(level: PUBLIC) {
+  masterShift_insert(data: { name: "Day Shift", sortOrder: 1, isActive: true })
+}
+mutation SeedShiftNight @auth(level: PUBLIC) {
+  masterShift_insert(data: { name: "Night Shift", sortOrder: 2, isActive: true })
+}
+
+# ── Seed Master Roles ──
+
+mutation SeedRoleOperator @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: "machine_operator", displayName: "Machine Operator", sortOrder: 1, isActive: true })
+}
+mutation SeedRoleQuality @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: "quality_packing_supervisor", displayName: "Quality & Packing Supervisor", sortOrder: 2, isActive: true })
+}
+mutation SeedRoleFrameSenior @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: "frames_senior_operator", displayName: "Frames Senior Operator", sortOrder: 3, isActive: true })
+}
+mutation SeedRoleSheetSenior @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: "sheet_senior_operator", displayName: "Sheet Senior Operator", sortOrder: 4, isActive: true })
+}
+mutation SeedRolePlantManager @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: "plant_manager", displayName: "Plant Manager", sortOrder: 5, isActive: true })
+}
+mutation SeedRoleAdmin @auth(level: PUBLIC) {
+  masterRole_insert(data: { code: "admin", displayName: "Admin", sortOrder: 6, isActive: true })
+}
+
+# ── Seed Master Frame Sections ──
+
+mutation SeedFrameSection1 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "3x2", sortOrder: 1, isActive: true }) }
+mutation SeedFrameSection2 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "4x2", sortOrder: 2, isActive: true }) }
+mutation SeedFrameSection3 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "4x2.5", sortOrder: 3, isActive: true }) }
+mutation SeedFrameSection4 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "5x2.5", sortOrder: 4, isActive: true }) }
+mutation SeedFrameSection5 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "3x2 (HR)", sortOrder: 5, isActive: true }) }
+mutation SeedFrameSection6 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "4x2.5(HR)", sortOrder: 6, isActive: true }) }
+mutation SeedFrameSection7 @auth(level: PUBLIC) { masterFrameSection_insert(data: { name: "Window Shutter", sortOrder: 7, isActive: true }) }
+
+# ── Seed Master Frame Densities ──
+
+mutation SeedFrameDensity1 @auth(level: PUBLIC) { masterFrameDensity_insert(data: { value: "0.75", sortOrder: 1, isActive: true }) }
+mutation SeedFrameDensity2 @auth(level: PUBLIC) { masterFrameDensity_insert(data: { value: "0.80", sortOrder: 2, isActive: true }) }
+mutation SeedFrameDensity3 @auth(level: PUBLIC) { masterFrameDensity_insert(data: { value: "0.90", sortOrder: 3, isActive: true }) }
+mutation SeedFrameDensity4 @auth(level: PUBLIC) { masterFrameDensity_insert(data: { value: "Others", sortOrder: 4, isActive: true }) }
+
+# ── Seed Master Frame Colors ──
+
+mutation SeedFrameColor1 @auth(level: PUBLIC) { masterFrameColor_insert(data: { name: "Brown", sortOrder: 1, isActive: true }) }
+mutation SeedFrameColor2 @auth(level: PUBLIC) { masterFrameColor_insert(data: { name: "Ivory", sortOrder: 2, isActive: true }) }
+mutation SeedFrameColor3 @auth(level: PUBLIC) { masterFrameColor_insert(data: { name: "NFC Color", sortOrder: 3, isActive: true }) }
+
+# ── Seed Master Sheet Thicknesses ──
+
+mutation SeedSheetThick1 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "6mm", sortOrder: 1, isActive: true }) }
+mutation SeedSheetThick2 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "7mm", sortOrder: 2, isActive: true }) }
+mutation SeedSheetThick3 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "8mm", sortOrder: 3, isActive: true }) }
+mutation SeedSheetThick4 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "9mm", sortOrder: 4, isActive: true }) }
+mutation SeedSheetThick5 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "12mm", sortOrder: 5, isActive: true }) }
+mutation SeedSheetThick6 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "13mm", sortOrder: 6, isActive: true }) }
+mutation SeedSheetThick7 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "16mm", sortOrder: 7, isActive: true }) }
+mutation SeedSheetThick8 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "17mm", sortOrder: 8, isActive: true }) }
+mutation SeedSheetThick9 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "18mm", sortOrder: 9, isActive: true }) }
+mutation SeedSheetThick10 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "19mm", sortOrder: 10, isActive: true }) }
+mutation SeedSheetThick11 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "22mm", sortOrder: 11, isActive: true }) }
+mutation SeedSheetThick12 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "25mm sheet", sortOrder: 12, isActive: true }) }
+mutation SeedSheetThick13 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "25mm Door", sortOrder: 13, isActive: true }) }
+mutation SeedSheetThick14 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "26mm", sortOrder: 14, isActive: true }) }
+mutation SeedSheetThick15 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "27mm", sortOrder: 15, isActive: true }) }
+mutation SeedSheetThick16 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "28mm", sortOrder: 16, isActive: true }) }
+mutation SeedSheetThick17 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "30mm", sortOrder: 17, isActive: true }) }
+mutation SeedSheetThick18 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "31mm", sortOrder: 18, isActive: true }) }
+mutation SeedSheetThick19 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "33mm", sortOrder: 19, isActive: true }) }
+mutation SeedSheetThick20 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "35mm", sortOrder: 20, isActive: true }) }
+mutation SeedSheetThick21 @auth(level: PUBLIC) { masterSheetThickness_insert(data: { value: "36mm", sortOrder: 21, isActive: true }) }
+
+# ── Seed Master Sheet Densities ──
+
+mutation SeedSheetDensity1 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.45", sortOrder: 1, isActive: true }) }
+mutation SeedSheetDensity2 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.50", sortOrder: 2, isActive: true }) }
+mutation SeedSheetDensity3 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.55", sortOrder: 3, isActive: true }) }
+mutation SeedSheetDensity4 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.60", sortOrder: 4, isActive: true }) }
+mutation SeedSheetDensity5 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.65", sortOrder: 5, isActive: true }) }
+mutation SeedSheetDensity6 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.70", sortOrder: 6, isActive: true }) }
+mutation SeedSheetDensity7 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "0.80", sortOrder: 7, isActive: true }) }
+mutation SeedSheetDensity8 @auth(level: PUBLIC) { masterSheetDensity_insert(data: { value: "Others", sortOrder: 8, isActive: true }) }
+
+# ── Seed Master Sheet Colors ──
+
+mutation SeedSheetColor1 @auth(level: PUBLIC) { masterSheetColor_insert(data: { name: "Brown", sortOrder: 1, isActive: true }) }
+mutation SeedSheetColor2 @auth(level: PUBLIC) { masterSheetColor_insert(data: { name: "Ivory", sortOrder: 2, isActive: true }) }
+mutation SeedSheetColor3 @auth(level: PUBLIC) { masterSheetColor_insert(data: { name: "NFC Sanding", sortOrder: 3, isActive: true }) }
+mutation SeedSheetColor4 @auth(level: PUBLIC) { masterSheetColor_insert(data: { name: "NFC No Sanding", sortOrder: 4, isActive: true }) }
+mutation SeedSheetColor5 @auth(level: PUBLIC) { masterSheetColor_insert(data: { name: "White", sortOrder: 5, isActive: true }) }
+
+# ── Seed Master Maintenance Items ──
+
+mutation SeedMaint1 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Die Cleaning", category: "frame", sortOrder: 1, isActive: true }) }
+mutation SeedMaint2 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Die Change", category: "frame", sortOrder: 2, isActive: true }) }
+mutation SeedMaint3 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Generator Maintenance", category: "frame", sortOrder: 3, isActive: true }) }
+mutation SeedMaint4 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Air Compressor Maintenance", category: "frame", sortOrder: 4, isActive: true }) }
+mutation SeedMaint5 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Chiller Maintenance", category: "frame", sortOrder: 5, isActive: true }) }
+mutation SeedMaint6 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Mixer Maintenance", category: "frame", sortOrder: 6, isActive: true }) }
+mutation SeedMaint7 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Main Machine Maintenance", category: "frame", sortOrder: 7, isActive: true }) }
+mutation SeedMaint8 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "UPS Maintenance", category: "frame", sortOrder: 8, isActive: true }) }
+mutation SeedMaint9 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Others", category: "frame", sortOrder: 9, isActive: true }) }
+mutation SeedMaintScrap1 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Blade gap adjustment", category: "scrap", sortOrder: 10, isActive: true }) }
+mutation SeedMaintScrap2 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Blade replacement", category: "scrap", sortOrder: 11, isActive: true }) }
+mutation SeedMaintScrap3 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Generator maintenance", category: "scrap", sortOrder: 12, isActive: true }) }
+mutation SeedMaintScrap4 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Motors maintenance", category: "scrap", sortOrder: 13, isActive: true }) }
+mutation SeedMaintScrap5 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Panel Board maintenance", category: "scrap", sortOrder: 14, isActive: true }) }
+mutation SeedMaintScrap6 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Machine electrical parts maintenance", category: "scrap", sortOrder: 15, isActive: true }) }
+mutation SeedMaintScrap7 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Machine mechanical parts maintenance", category: "scrap", sortOrder: 16, isActive: true }) }
+mutation SeedMaintScrap8 @auth(level: PUBLIC) { masterMaintenanceItem_insert(data: { name: "Others", category: "scrap", sortOrder: 17, isActive: true }) }
+
+# ── Seed Master Scrap Products ──
+
+mutation SeedScrapProd1 @auth(level: PUBLIC) { masterScrapProduct_insert(data: { name: "Frames Brown Color Scrap", sortOrder: 1, isActive: true }) }
+mutation SeedScrapProd2 @auth(level: PUBLIC) { masterScrapProduct_insert(data: { name: "Sheets Brown Color Scrap", sortOrder: 2, isActive: true }) }
+mutation SeedScrapProd3 @auth(level: PUBLIC) { masterScrapProduct_insert(data: { name: "Sheets Ivory Color Scrap", sortOrder: 3, isActive: true }) }
+mutation SeedScrapProd4 @auth(level: PUBLIC) { masterScrapProduct_insert(data: { name: "Sheets NFC Color Scrap", sortOrder: 4, isActive: true }) }
+mutation SeedScrapProd5 @auth(level: PUBLIC) { masterScrapProduct_insert(data: { name: "Sheets Orange Color Scrap", sortOrder: 5, isActive: true }) }
+mutation SeedScrapProd6 @auth(level: PUBLIC) { masterScrapProduct_insert(data: { name: "Mix scrap", sortOrder: 6, isActive: true }) }
+
+# ── Seed Master Frame Weights (section × density → weight per foot) ──
+
+mutation SeedFW1 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "3x2", density: "0.75", weightPerFoot: 0.486 }) }
+mutation SeedFW2 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "3x2", density: "0.80", weightPerFoot: 0.519 }) }
+mutation SeedFW3 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "3x2", density: "0.90", weightPerFoot: 0.584 }) }
+mutation SeedFW4 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2", density: "0.75", weightPerFoot: 0.647 }) }
+mutation SeedFW5 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2", density: "0.80", weightPerFoot: 0.690 }) }
+mutation SeedFW6 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2", density: "0.90", weightPerFoot: 0.777 }) }
+mutation SeedFW7 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2.5", density: "0.75", weightPerFoot: 0.810 }) }
+mutation SeedFW8 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2.5", density: "0.80", weightPerFoot: 0.864 }) }
+mutation SeedFW9 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2.5", density: "0.90", weightPerFoot: 0.972 }) }
+mutation SeedFW10 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "5x2.5", density: "0.75", weightPerFoot: 1.012 }) }
+mutation SeedFW11 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "5x2.5", density: "0.80", weightPerFoot: 1.080 }) }
+mutation SeedFW12 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "5x2.5", density: "0.90", weightPerFoot: 1.215 }) }
+mutation SeedFW13 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "3x2 (HR)", density: "0.75", weightPerFoot: 0.486 }) }
+mutation SeedFW14 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "3x2 (HR)", density: "0.80", weightPerFoot: 0.519 }) }
+mutation SeedFW15 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "3x2 (HR)", density: "0.90", weightPerFoot: 0.584 }) }
+mutation SeedFW16 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2.5(HR)", density: "0.75", weightPerFoot: 0.810 }) }
+mutation SeedFW17 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2.5(HR)", density: "0.80", weightPerFoot: 0.864 }) }
+mutation SeedFW18 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "4x2.5(HR)", density: "0.90", weightPerFoot: 0.972 }) }
+mutation SeedFW19 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "Window Shutter", density: "0.75", weightPerFoot: 0.648 }) }
+mutation SeedFW20 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "Window Shutter", density: "0.80", weightPerFoot: 0.691 }) }
+mutation SeedFW21 @auth(level: PUBLIC) { masterFrameWeight_insert(data: { section: "Window Shutter", density: "0.90", weightPerFoot: 0.778 }) }
+
+# ── Seed Master Salary Weightages ──
+
+mutation SeedSalaryWA @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wA", label: "Machine Cleaning", category: "frame_sheet", percentage: 15.0 }) }
+mutation SeedSalaryWB @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wB", label: "Tools Count", category: "frame_sheet", percentage: 10.0 }) }
+mutation SeedSalaryWC @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wC", label: "Machine Health", category: "frame_sheet", percentage: 25.0 }) }
+mutation SeedSalaryWD @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wD", label: "Production Efficiency", category: "frame_sheet", percentage: 20.0 }) }
+mutation SeedSalaryWE @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wE", label: "Report Writing", category: "frame_sheet", percentage: 20.0 }) }
+mutation SeedSalaryWF @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wF", label: "Quality / Packing", category: "frame_sheet", percentage: 10.0 }) }
+
+mutation SeedScrapSalaryWA @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wA", label: "Machine Cleaning %", category: "scrap", percentage: 15.0 }) }
+mutation SeedScrapSalaryWB @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wB", label: "Tools Count %", category: "scrap", percentage: 10.0 }) }
+mutation SeedScrapSalaryWE @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wE", label: "Production Efficiency %", category: "scrap", percentage: 30.0 }) }
+mutation SeedScrapSalaryWF @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wF", label: "Report Writing Efficiency %", category: "scrap", percentage: 20.0 }) }
+mutation SeedScrapSalaryWG @auth(level: PUBLIC) { masterSalaryWeightage_insert(data: { variable: "wG", label: "Scrap Quality Rating %", category: "scrap", percentage: 25.0 }) }
+
+# ── Seed Frame Cleaning Reports ──
+
+mutation SeedFrameCleaning1 @auth(level: PUBLIC) {
+  frameCleaningReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Frame Machine 1"
+    machineCondition: 7
+    groundCondition: 6
+    mouldCondition: 8
+    totalScore: 21
+    percentage: 70.0
+    createdBy: "op-1"
+  })
+}
+
+mutation SeedFrameCleaning2 @auth(level: PUBLIC) {
+  frameCleaningReport_insert(data: {
+    date: "2025-07-11"
+    machineNumber: "Frame Machine 2"
+    machineCondition: 8
+    groundCondition: 7
+    mouldCondition: 9
+    totalScore: 24
+    percentage: 80.0
+    createdBy: "op-2"
+  })
+}
+
+mutation SeedFrameCleaning3 @auth(level: PUBLIC) {
+  frameCleaningReport_insert(data: {
+    date: "2025-07-08"
+    machineNumber: "Frame Machine 1"
+    machineCondition: 9
+    groundCondition: 8
+    mouldCondition: 10
+    totalScore: 27
+    percentage: 90.0
+    createdBy: "op-1"
+  })
+}
+
+mutation SeedFrameCleaning4 @auth(level: PUBLIC) {
+  frameCleaningReport_insert(data: {
+    date: "2025-07-05"
+    machineNumber: "Frame Machine 2"
+    machineCondition: 10
+    groundCondition: 9
+    mouldCondition: 8
+    totalScore: 27
+    percentage: 90.0
+    createdBy: "op-2"
+  })
+}
+
+mutation SeedFrameCleaning5 @auth(level: PUBLIC) {
+  frameCleaningReport_insert(data: {
+    date: "2025-07-02"
+    machineNumber: "Frame Machine 1"
+    machineCondition: 8
+    groundCondition: 10
+    mouldCondition: 9
+    totalScore: 27
+    percentage: 90.0
+    createdBy: "op-1"
+  })
+}
+
+# ── Seed Frame Tools Count Reports ──
+
+mutation SeedFrameTools1 @auth(level: PUBLIC) {
+  frameToolsCountReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Frame Machine 1"
+    totalToolsGiven: 100
+    totalToolsAvailable: 70
+    percentageAvailable: 70.0
+    createdBy: "op-1"
+  })
+}
+
+mutation SeedFrameTools2 @auth(level: PUBLIC) {
+  frameToolsCountReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Frame Machine 2"
+    totalToolsGiven: 100
+    totalToolsAvailable: 80
+    percentageAvailable: 80.0
+    createdBy: "op-2"
+  })
+}
+
+mutation SeedFrameTools3 @auth(level: PUBLIC) {
+  frameToolsCountReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Frame Machine 1"
+    totalToolsGiven: 100
+    totalToolsAvailable: 90
+    percentageAvailable: 90.0
+    createdBy: "op-1"
+  })
+}
+
+mutation SeedFrameTools4 @auth(level: PUBLIC) {
+  frameToolsCountReport_insert(data: {
+    date: "2025-07-08"
+    machineNumber: "Frame Machine 2"
+    totalToolsGiven: 100
+    totalToolsAvailable: 90
+    percentageAvailable: 90.0
+    createdBy: "op-2"
+  })
+}
+
+# ── Seed Frame Health Reports ──
+
+mutation SeedFrameHealth1 @auth(level: PUBLIC) {
+  frameHealthReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    totalScore: 42
+    percentage: 60.0
+    createdBy: "op-1"
+    submittedAt: "2025-07-14T10:00:00Z"
+  })
+}
+
+mutation SeedFrameHealth2 @auth(level: PUBLIC) {
+  frameHealthReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Frame Machine 2"
+    shift: "Night Shift"
+    totalScore: 49
+    percentage: 70.0
+    createdBy: "op-2"
+    submittedAt: "2025-07-12T22:00:00Z"
+  })
+}
+
+mutation SeedFrameHealth3 @auth(level: PUBLIC) {
+  frameHealthReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    totalScore: 56
+    percentage: 80.0
+    createdBy: "op-1"
+    submittedAt: "2025-07-10T10:00:00Z"
+  })
+}
+
+# ── Seed Frame Production Weight Reports ──
+
+mutation SeedFrameWeight1 @auth(level: PUBLIC) {
+  frameProductionWeightReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    productionWeight: 480.0
+    maintenanceWeight: 200.0
+    totalProductionWeight: 680.0
+    targetWeight: 1200.0
+    efficiencyPercentage: 56.67
+    createdBy: "op-1"
+  })
+}
+
+mutation SeedFrameWeight2 @auth(level: PUBLIC) {
+  frameProductionWeightReport_insert(data: {
+    date: "2025-07-11"
+    machineNumber: "Frame Machine 2"
+    shift: "Night Shift"
+    productionWeight: 530.0
+    maintenanceWeight: 230.0
+    totalProductionWeight: 760.0
+    targetWeight: 1200.0
+    efficiencyPercentage: 63.33
+    createdBy: "op-2"
+  })
+}
+
+mutation SeedFrameWeight3 @auth(level: PUBLIC) {
+  frameProductionWeightReport_insert(data: {
+    date: "2025-07-08"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    productionWeight: 580.0
+    maintenanceWeight: 260.0
+    totalProductionWeight: 840.0
+    targetWeight: 1200.0
+    efficiencyPercentage: 70.0
+    createdBy: "op-1"
+  })
+}
+
+mutation SeedFrameWeight4 @auth(level: PUBLIC) {
+  frameProductionWeightReport_insert(data: {
+    date: "2025-07-05"
+    machineNumber: "Frame Machine 2"
+    shift: "Night Shift"
+    productionWeight: 630.0
+    maintenanceWeight: 290.0
+    totalProductionWeight: 920.0
+    targetWeight: 1200.0
+    efficiencyPercentage: 76.67
+    createdBy: "op-2"
+  })
+}
+
+# ── Seed Sheet Cleaning Reports ──
+
+mutation SeedSheetCleaning1 @auth(level: PUBLIC) {
+  sheetCleaningReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Sheet Machine 3"
+    machineCondition: 8
+    groundCondition: 7
+    mouldCondition: 9
+    totalScore: 24
+    percentage: 80.0
+    createdBy: "op-3"
+  })
+}
+
+mutation SeedSheetCleaning2 @auth(level: PUBLIC) {
+  sheetCleaningReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Sheet Machine 4"
+    machineCondition: 9
+    groundCondition: 8
+    mouldCondition: 10
+    totalScore: 27
+    percentage: 90.0
+    createdBy: "op-4"
+  })
+}
+
+mutation SeedSheetCleaning3 @auth(level: PUBLIC) {
+  sheetCleaningReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Sheet Machine 5"
+    machineCondition: 10
+    groundCondition: 9
+    mouldCondition: 9
+    totalScore: 28
+    percentage: 93.33
+    createdBy: "op-3"
+  })
+}
+
+mutation SeedSheetCleaning4 @auth(level: PUBLIC) {
+  sheetCleaningReport_insert(data: {
+    date: "2025-07-08"
+    machineNumber: "Sheet Machine 3"
+    machineCondition: 9
+    groundCondition: 10
+    mouldCondition: 10
+    totalScore: 29
+    percentage: 96.67
+    createdBy: "op-4"
+  })
+}
+
+mutation SeedSheetCleaning5 @auth(level: PUBLIC) {
+  sheetCleaningReport_insert(data: {
+    date: "2025-07-06"
+    machineNumber: "Sheet Machine 4"
+    machineCondition: 10
+    groundCondition: 10
+    mouldCondition: 9
+    totalScore: 29
+    percentage: 96.67
+    createdBy: "op-3"
+  })
+}
+
+# ── Seed Sheet Running Feet Reports ──
+
+mutation SeedSheetRunningFeet1 @auth(level: PUBLIC) {
+  sheetRunningFeetReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Sheet Machine 3"
+    shift: "Day Shift"
+    productionRunningFeet: 520.0
+    maintenanceRunningFeet: 160.0
+    totalProductionRunningFeet: 680.0
+    targetRunningFeet: 1000.0
+    efficiencyPercentage: 68.0
+    createdBy: "op-3"
+  })
+}
+
+mutation SeedSheetRunningFeet2 @auth(level: PUBLIC) {
+  sheetRunningFeetReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Sheet Machine 4"
+    shift: "Night Shift"
+    productionRunningFeet: 580.0
+    maintenanceRunningFeet: 140.0
+    totalProductionRunningFeet: 720.0
+    targetRunningFeet: 1000.0
+    efficiencyPercentage: 72.0
+    createdBy: "op-4"
+  })
+}
+
+mutation SeedSheetRunningFeet3 @auth(level: PUBLIC) {
+  sheetRunningFeetReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Sheet Machine 3"
+    shift: "Day Shift"
+    productionRunningFeet: 640.0
+    maintenanceRunningFeet: 180.0
+    totalProductionRunningFeet: 820.0
+    targetRunningFeet: 1000.0
+    efficiencyPercentage: 82.0
+    createdBy: "op-3"
+  })
+}
+
+# ── Seed Salary Calculations (Jul 2025) ──
+
+mutation SeedSalaryOp1 @auth(level: PUBLIC) {
+  salaryCalculation_insert(data: {
+    operatorId: "op-1"
+    operatorName: "Ravi Kumar"
+    year: 2025
+    month: 7
+    a: 82.0
+    b: 75.0
+    c: 70.0
+    d: 88.0
+    e: 78.0
+    f: 65.0
+    wA: 15
+    wB: 10
+    wC: 25
+    wD: 20
+    wE: 20
+    wF: 10
+    multiplier: 76.4
+    fixedSalary: 18000
+    calculatedSalary: 13752.0
+  })
+}
+
+mutation SeedSalaryOp2 @auth(level: PUBLIC) {
+  salaryCalculation_insert(data: {
+    operatorId: "op-2"
+    operatorName: "Suresh Yadav"
+    year: 2025
+    month: 7
+    a: 85.5
+    b: 79.0
+    c: 75.0
+    d: 86.0
+    e: 81.0
+    f: 71.0
+    wA: 15
+    wB: 10
+    wC: 25
+    wD: 20
+    wE: 20
+    wF: 10
+    multiplier: 80.025
+    fixedSalary: 16000
+    calculatedSalary: 12804.0
+  })
+}
+
+mutation SeedSalaryOp3 @auth(level: PUBLIC) {
+  salaryCalculation_insert(data: {
+    operatorId: "op-3"
+    operatorName: "Amit Sharma"
+    year: 2025
+    month: 7
+    a: 89.0
+    b: 83.0
+    c: 80.0
+    d: 84.0
+    e: 84.0
+    f: 77.0
+    wA: 15
+    wB: 10
+    wC: 25
+    wD: 20
+    wE: 20
+    wF: 10
+    multiplier: 83.35
+    fixedSalary: 17500
+    calculatedSalary: 14586.25
+  })
+}
+
+mutation SeedSalaryOp4 @auth(level: PUBLIC) {
+  salaryCalculation_insert(data: {
+    operatorId: "op-4"
+    operatorName: "Deepak Verma"
+    year: 2025
+    month: 7
+    a: 92.5
+    b: 87.0
+    c: 85.0
+    d: 82.0
+    e: 87.0
+    f: 83.0
+    wA: 15
+    wB: 10
+    wC: 25
+    wD: 20
+    wE: 20
+    wF: 10
+    multiplier: 86.475
+    fixedSalary: 15500
+    calculatedSalary: 13403.625
+  })
+}
+
+# ── Seed Writing Efficiency Records (Frame) ──
+
+mutation SeedFrameWriting1 @auth(level: PUBLIC) {
+  frameWritingEfficiency_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    submittedAt: "2025-07-14T17:30:00Z"
+    shiftEndTime: "2025-07-14T18:00:00Z"
+    score: 5
+    operatorId: "op-1"
+  })
+}
+
+mutation SeedFrameWriting2 @auth(level: PUBLIC) {
+  frameWritingEfficiency_insert(data: {
+    date: "2025-07-13"
+    machineNumber: "Frame Machine 2"
+    shift: "Night Shift"
+    submittedAt: "2025-07-14T05:30:00Z"
+    shiftEndTime: "2025-07-14T06:00:00Z"
+    score: 4
+    operatorId: "op-2"
+  })
+}
+
+mutation SeedFrameWriting3 @auth(level: PUBLIC) {
+  frameWritingEfficiency_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    submittedAt: "2025-07-12T18:10:00Z"
+    shiftEndTime: "2025-07-12T18:00:00Z"
+    score: 3
+    operatorId: "op-1"
+  })
+}
+
+# ── Seed Writing Efficiency Records (Sheet) ──
+
+mutation SeedSheetWriting1 @auth(level: PUBLIC) {
+  sheetWritingEfficiency_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Sheet Machine 3"
+    shift: "Day Shift"
+    submittedAt: "2025-07-14T17:45:00Z"
+    shiftEndTime: "2025-07-14T18:00:00Z"
+    score: 5
+    operatorId: "op-3"
+  })
+}
+
+mutation SeedSheetWriting2 @auth(level: PUBLIC) {
+  sheetWritingEfficiency_insert(data: {
+    date: "2025-07-13"
+    machineNumber: "Sheet Machine 4"
+    shift: "Night Shift"
+    submittedAt: "2025-07-14T05:50:00Z"
+    shiftEndTime: "2025-07-14T06:00:00Z"
+    score: 4
+    operatorId: "op-4"
+  })
+}
+
+# ═══════════════════════════════════════
+# Scrap/Regrind Seed Data
+# ═══════════════════════════════════════
+
+# ── Seed Scrap Operators ──
+
+mutation SeedScrapOperator1 @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "op-5"
+    name: "Rajesh Singh"
+    phone: "+916666666666"
+    password: "1234"
+    email: ""
+    roles: ["machine_operator"]
+    assignedMachines: ["Pulverizer 1"]
+    fixedSalary: 15000
+    isActive: true
+  })
+}
+
+mutation SeedScrapOperator2 @auth(level: PUBLIC) {
+  user_insert(data: {
+    uid: "op-6"
+    name: "Manoj Tiwari"
+    phone: "+917777777777"
+    password: "1234"
+    email: ""
+    roles: ["machine_operator"]
+    assignedMachines: ["Pulverizer 2"]
+    fixedSalary: 14500
+    isActive: true
+  })
+}
+
+# ── Scrap master data already seeded above in Master Tables section ──
+
+# ── Seed Scrap Cleaning Reports ──
+
+mutation SeedScrapCleaning1 @auth(level: PUBLIC) {
+  scrapCleaningReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Pulverizer 1"
+    machineCondition: 8
+    groundCondition: 7
+    totalScore: 15
+    percentage: 75.0
+    createdBy: "op-5"
+  })
+}
+
+mutation SeedScrapCleaning2 @auth(level: PUBLIC) {
+  scrapCleaningReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Pulverizer 2"
+    machineCondition: 9
+    groundCondition: 8
+    totalScore: 17
+    percentage: 85.0
+    createdBy: "op-6"
+  })
+}
+
+mutation SeedScrapCleaning3 @auth(level: PUBLIC) {
+  scrapCleaningReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Pulverizer 1"
+    machineCondition: 7
+    groundCondition: 9
+    totalScore: 16
+    percentage: 80.0
+    createdBy: "op-5"
+  })
+}
+
+mutation SeedScrapCleaning4 @auth(level: PUBLIC) {
+  scrapCleaningReport_insert(data: {
+    date: "2025-07-08"
+    machineNumber: "Pulverizer 3"
+    machineCondition: 10
+    groundCondition: 9
+    totalScore: 19
+    percentage: 95.0
+    createdBy: "op-6"
+  })
+}
+
+# ── Seed Scrap Tools Count Reports ──
+
+mutation SeedScrapTools1 @auth(level: PUBLIC) {
+  scrapToolsCountReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Pulverizer 1"
+    totalToolsGiven: 20
+    totalToolsAvailable: 18
+    percentageAvailable: 90.0
+    createdBy: "op-5"
+  })
+}
+
+mutation SeedScrapTools2 @auth(level: PUBLIC) {
+  scrapToolsCountReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Pulverizer 2"
+    totalToolsGiven: 25
+    totalToolsAvailable: 22
+    percentageAvailable: 88.0
+    createdBy: "op-6"
+  })
+}
+
+mutation SeedScrapTools3 @auth(level: PUBLIC) {
+  scrapToolsCountReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Pulverizer 1"
+    totalToolsGiven: 20
+    totalToolsAvailable: 19
+    percentageAvailable: 95.0
+    createdBy: "op-5"
+  })
+}
+
+# ── Seed Scrap Production Weight Reports ──
+
+mutation SeedScrapProdWeight1 @auth(level: PUBLIC) {
+  scrapProductionWeightReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Pulverizer 1"
+    shift: "Day Shift"
+    totalProductionWeight: 450.0
+    maintenanceWeight: 125.0
+    totalWeight: 575.0
+    targetWeight: 800.0
+    efficiencyPercentage: 71.88
+    createdBy: "op-5"
+  })
+}
+
+mutation SeedScrapProdWeight2 @auth(level: PUBLIC) {
+  scrapProductionWeightReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Pulverizer 2"
+    shift: "Night Shift"
+    totalProductionWeight: 525.0
+    maintenanceWeight: 87.5
+    totalWeight: 612.5
+    targetWeight: 800.0
+    efficiencyPercentage: 76.56
+    createdBy: "op-6"
+  })
+}
+
+mutation SeedScrapProdWeight3 @auth(level: PUBLIC) {
+  scrapProductionWeightReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Pulverizer 1"
+    shift: "Day Shift"
+    totalProductionWeight: 380.0
+    maintenanceWeight: 150.0
+    totalWeight: 530.0
+    targetWeight: 800.0
+    efficiencyPercentage: 66.25
+    createdBy: "op-5"
+  })
+}
+
+# ── Seed Scrap Writing Efficiency ──
+
+mutation SeedScrapWriting1 @auth(level: PUBLIC) {
+  scrapWritingEfficiency_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Pulverizer 1"
+    shift: "Day Shift"
+    submittedAt: "2025-07-14T17:30:00Z"
+    shiftEndTime: "2025-07-14T18:00:00Z"
+    score: 5
+    operatorId: "op-5"
+  })
+}
+
+mutation SeedScrapWriting2 @auth(level: PUBLIC) {
+  scrapWritingEfficiency_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Pulverizer 2"
+    shift: "Night Shift"
+    submittedAt: "2025-07-13T05:45:00Z"
+    shiftEndTime: "2025-07-13T06:00:00Z"
+    score: 4
+    operatorId: "op-6"
+  })
+}
+
+mutation SeedScrapWriting3 @auth(level: PUBLIC) {
+  scrapWritingEfficiency_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Pulverizer 1"
+    shift: "Day Shift"
+    submittedAt: "2025-07-10T18:15:00Z"
+    shiftEndTime: "2025-07-10T18:00:00Z"
+    score: 3
+    operatorId: "op-5"
+  })
+}
+
+# ── Seed Scrap Quality Reports ──
+
+mutation SeedScrapQuality1 @auth(level: PUBLIC) {
+  scrapQualityReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Frame Machine 1"
+    shift: "Day Shift"
+    product: "Frame Regrind"
+    qualityRating: 8
+    createdBy: "op-5"
+  })
+}
+
+mutation SeedScrapQuality2 @auth(level: PUBLIC) {
+  scrapQualityReport_insert(data: {
+    date: "2025-07-14"
+    machineNumber: "Sheet Machine 3"
+    shift: "Day Shift"
+    product: "Sheet Regrind"
+    qualityRating: 7
+    createdBy: "op-5"
+  })
+}
+
+mutation SeedScrapQuality3 @auth(level: PUBLIC) {
+  scrapQualityReport_insert(data: {
+    date: "2025-07-12"
+    machineNumber: "Frame Machine 2"
+    shift: "Night Shift"
+    product: "Mixed Regrind"
+    qualityRating: 6
+    createdBy: "op-6"
+  })
+}
+
+mutation SeedScrapQuality4 @auth(level: PUBLIC) {
+  scrapQualityReport_insert(data: {
+    date: "2025-07-10"
+    machineNumber: "Sheet Machine 4"
+    shift: "Day Shift"
+    product: "PVC Powder"
+    qualityRating: 9
+    createdBy: "op-6"
+  })
+}
+
+# ── Seed Scrap Salary Calculations ──
+
+mutation SeedScrapSalary1 @auth(level: PUBLIC) {
+  scrapSalaryCalculation_insert(data: {
+    operatorId: "op-5"
+    operatorName: "Rajesh Singh"
+    year: 2025
+    month: 7
+    a: 78.33
+    b: 91.67
+    e: 71.88
+    f: 80.0
+    g: 75.0
+    wA: 20
+    wB: 15
+    wE: 25
+    wF: 15
+    wG: 25
+    multiplier: 78.53
+    fixedSalary: 15000
+    calculatedSalary: 11779.5
+  })
+}
+
+mutation SeedScrapSalary2 @auth(level: PUBLIC) {
+  scrapSalaryCalculation_insert(data: {
+    operatorId: "op-6"
+    operatorName: "Manoj Tiwari"
+    year: 2025
+    month: 7
+    a: 87.5
+    b: 89.45
+    e: 82.03
+    f: 80.0
+    g: 73.33
+    wA: 20
+    wB: 15
+    wE: 25
+    wF: 15
+    wG: 25
+    multiplier: 81.85
+    fixedSalary: 14500
+    calculatedSalary: 11868.25
+  })
+}

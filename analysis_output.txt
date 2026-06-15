@@ -1,0 +1,558 @@
+Analyzing factory_app...                                        
+
+   info • Statements in an if should be enclosed in a block • lib/features/salary/data/datasources/salary_remote_datasource.dart:65:7 • curly_braces_in_flow_control_structures
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_cleaning_report.dart:56:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_cleaning_report.dart:63:60 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_cleaning_report.dart:90:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_cleaning_report.dart:91:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_cleaning_report.dart:153:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_item.dart:56:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCustomerRejectionItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_customer_rejection_item.dart:63:74 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_item.dart:90:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCustomerRejectionItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_customer_rejection_item.dart:91:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_item.dart:124:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_item.dart:187:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_report.dart:53:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCustomerRejectionReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_customer_rejection_report.dart:60:78 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_report.dart:87:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCustomerRejectionReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_customer_rejection_report.dart:88:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_customer_rejection_report.dart:138:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_rating_item.dart:51:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthRatingItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_health_rating_item.dart:58:64 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_rating_item.dart:85:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthRatingItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_health_rating_item.dart:86:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_rating_item.dart:119:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_rating_item.dart:162:3 • prefer_const_constructors_in_immutables
+   info • The private field _submittedAt could be 'final' • lib/generated/dataconnect/create_frame_health_report.dart:10:23 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_report.dart:59:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_health_report.dart:66:56 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_report.dart:93:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_health_report.dart:94:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_health_report.dart:165:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_packing_line_item.dart:57:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'framePackingLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_packing_line_item.dart:64:62 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_packing_line_item.dart:91:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'framePackingLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_packing_line_item.dart:92:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_packing_line_item.dart:125:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_packing_line_item.dart:192:3 • prefer_const_constructors_in_immutables
+   info • The private field _submittedAt could be 'final' • lib/generated/dataconnect/create_frame_production_details_report.dart:10:23 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_details_report.dart:59:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionDetailsReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_production_details_report.dart:66:78 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_details_report.dart:93:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionDetailsReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_production_details_report.dart:94:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_details_report.dart:165:3 • prefer_const_constructors_in_immutables
+   info • The private field _manualWeightPerFoot could be 'final' • lib/generated/dataconnect/create_frame_production_line_item.dart:12:20 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_line_item.dart:61:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_production_line_item.dart:68:68 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_line_item.dart:95:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_production_line_item.dart:96:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_line_item.dart:129:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_line_item.dart:211:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_weight_report.dart:57:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_production_weight_report.dart:64:76 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_weight_report.dart:91:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_production_weight_report.dart:92:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_production_weight_report.dart:158:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_shift_packing_report.dart:55:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameShiftPackingReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_shift_packing_report.dart:62:68 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_shift_packing_report.dart:89:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameShiftPackingReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_shift_packing_report.dart:90:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_shift_packing_report.dart:148:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_tools_count_report.dart:56:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_tools_count_report.dart:63:64 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_tools_count_report.dart:90:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_tools_count_report.dart:91:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_tools_count_report.dart:153:3 • prefer_const_constructors_in_immutables
+   info • The private field _submittedAt could be 'final' • lib/generated/dataconnect/create_frame_writing_efficiency.dart:7:23 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_writing_efficiency.dart:59:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_writing_efficiency.dart:66:66 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_writing_efficiency.dart:93:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_frame_writing_efficiency.dart:94:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_frame_writing_efficiency.dart:165:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_salary_calculation.dart:67:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_salary_calculation.dart:74:56 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_salary_calculation.dart:101:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_salary_calculation.dart:102:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_salary_calculation.dart:208:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_cleaning_report.dart:56:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_cleaning_report.dart:63:60 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_cleaning_report.dart:90:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_cleaning_report.dart:91:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_cleaning_report.dart:153:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_item.dart:59:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCustomerRejectionItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_customer_rejection_item.dart:66:74 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_item.dart:93:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCustomerRejectionItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_customer_rejection_item.dart:94:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_item.dart:127:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_item.dart:202:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_report.dart:53:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCustomerRejectionReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_customer_rejection_report.dart:60:78 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_report.dart:87:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCustomerRejectionReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_customer_rejection_report.dart:88:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_customer_rejection_report.dart:138:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_rating_item.dart:51:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetHealthRatingItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_health_rating_item.dart:58:64 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_rating_item.dart:85:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetHealthRatingItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_health_rating_item.dart:86:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_rating_item.dart:119:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_rating_item.dart:162:3 • prefer_const_constructors_in_immutables
+   info • The private field _submittedAt could be 'final' • lib/generated/dataconnect/create_sheet_health_report.dart:10:23 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_report.dart:59:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_health_report.dart:66:56 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_report.dart:93:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_health_report.dart:94:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_health_report.dart:165:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_packing_line_item.dart:61:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetPackingLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_packing_line_item.dart:68:62 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_packing_line_item.dart:95:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetPackingLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_packing_line_item.dart:96:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_packing_line_item.dart:129:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_packing_line_item.dart:212:3 • prefer_const_constructors_in_immutables
+   info • The private field _submittedAt could be 'final' • lib/generated/dataconnect/create_sheet_production_details_report.dart:11:23 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_details_report.dart:60:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionDetailsReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_production_details_report.dart:67:78 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_details_report.dart:94:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionDetailsReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_production_details_report.dart:95:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_details_report.dart:171:3 • prefer_const_constructors_in_immutables
+   info • The private field _timeOfChange could be 'final' • lib/generated/dataconnect/create_sheet_production_line_item.dart:15:23 • prefer_final_fields
+   info • The private field _manualWeightPerSqft could be 'final' • lib/generated/dataconnect/create_sheet_production_line_item.dart:16:20 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_line_item.dart:69:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_production_line_item.dart:76:68 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_line_item.dart:103:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionLineItem_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_production_line_item.dart:104:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_line_item.dart:137:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_production_line_item.dart:243:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_running_feet_report.dart:97:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_running_feet_report.dart:103:3 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_running_feet_report.dart:134:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_running_feet_report.dart:135:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_running_feet_report.dart:224:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_shift_packing_report.dart:55:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetShiftPackingReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_shift_packing_report.dart:62:68 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_shift_packing_report.dart:89:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetShiftPackingReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_shift_packing_report.dart:90:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_shift_packing_report.dart:148:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_tools_count_report.dart:56:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_tools_count_report.dart:63:64 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_tools_count_report.dart:90:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_tools_count_report.dart:91:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_tools_count_report.dart:153:3 • prefer_const_constructors_in_immutables
+   info • The private field _submittedAt could be 'final' • lib/generated/dataconnect/create_sheet_writing_efficiency.dart:7:23 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_writing_efficiency.dart:59:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_writing_efficiency.dart:66:66 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_writing_efficiency.dart:93:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_sheet_writing_efficiency.dart:94:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_sheet_writing_efficiency.dart:165:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_user.dart:57:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_user.dart:64:30 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_user.dart:91:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/create_user.dart:92:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/create_user.dart:162:3 • prefer_const_constructors_in_immutables
+   info • Library names are not necessary • lib/generated/dataconnect/default.dart:1:9 • unnecessary_library_name
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_dropdown_config_by_category.dart:59:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_dropdown_config_by_category.dart:97:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_dropdown_config_by_category.dart:132:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/get_frame_production_details_report.dart:32:108 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_frame_production_details_report.dart:87:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/get_frame_production_details_report.dart:96:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_frame_production_details_report.dart:153:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_frame_production_details_report.dart:195:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_frame_production_details_report.dart:238:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_reference_table.dart:57:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_reference_table.dart:95:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_reference_table.dart:130:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_salary_calculation.dart:133:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_salary_calculation.dart:189:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_salary_calculation.dart:232:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/get_sheet_production_details_report.dart:33:108 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_sheet_production_details_report.dart:91:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/get_sheet_production_details_report.dart:101:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_sheet_production_details_report.dart:170:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_sheet_production_details_report.dart:215:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_sheet_production_details_report.dart:258:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_id.dart:89:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_id.dart:134:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_id.dart:168:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_id.dart:203:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_phone.dart:89:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_phone.dart:134:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/get_user_by_phone.dart:169:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/insert_dropdown_config.dart:50:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/insert_dropdown_config.dart:57:50 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/insert_dropdown_config.dart:84:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/insert_dropdown_config.dart:85:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/insert_dropdown_config.dart:125:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/insert_reference_table.dart:50:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'referenceTable_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/insert_reference_table.dart:57:50 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/insert_reference_table.dart:84:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'referenceTable_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/insert_reference_table.dart:85:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/insert_reference_table.dart:123:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_all_salary_calculations_for_month.dart:132:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_all_salary_calculations_for_month.dart:188:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_all_salary_calculations_for_month.dart:227:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_all_users.dart:84:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_all_users.dart:128:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_dropdown_configs.dart:58:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_dropdown_configs.dart:96:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_cleaning_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_cleaning_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_cleaning_reports.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_cleaning_reports.dart:102:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_cleaning_reports.dart:147:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_cleaning_reports.dart:206:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'frameCustomerRejectionItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:44:113 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:96:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCustomerRejectionItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:104:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:161:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:203:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_customer_rejection_reports.dart:262:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_health_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_health_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_health_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'frameHealthRatingItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_health_reports.dart:46:86 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_health_reports.dart:106:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthRatingItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_health_reports.dart:116:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_health_reports.dart:153:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_health_reports.dart:190:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_health_reports.dart:249:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_production_details_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_production_details_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_production_details_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'frameProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_production_details_reports.dart:46:110 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_details_reports.dart:106:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_production_details_reports.dart:116:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_details_reports.dart:179:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_details_reports.dart:222:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_details_reports.dart:281:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_production_weight_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_production_weight_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_production_weight_reports.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_weight_reports.dart:106:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_weight_reports.dart:152:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_production_weight_reports.dart:211:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'framePackingLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:46:97 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:104:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'framePackingLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:114:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:175:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:218:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_shift_packing_reports.dart:277:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_frame_tools_count_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_tools_count_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_tools_count_reports.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_tools_count_reports.dart:102:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_tools_count_reports.dart:147:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_tools_count_reports.dart:206:3 • prefer_const_constructors_in_immutables
+   info • The private field _operatorId could be 'final' • lib/generated/dataconnect/list_frame_writing_efficiency.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_frame_writing_efficiency.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_frame_writing_efficiency.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_writing_efficiency.dart:100:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_writing_efficiency.dart:144:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_frame_writing_efficiency.dart:203:3 • prefer_const_constructors_in_immutables
+   info • The private field _operatorId could be 'final' • lib/generated/dataconnect/list_salary_calculations.dart:4:20 • prefer_final_fields
+   info • The private field _year could be 'final' • lib/generated/dataconnect/list_salary_calculations.dart:5:17 • prefer_final_fields
+   info • The private field _month could be 'final' • lib/generated/dataconnect/list_salary_calculations.dart:6:17 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_salary_calculations.dart:146:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_salary_calculations.dart:202:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_salary_calculations.dart:261:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_cleaning_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_cleaning_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_cleaning_reports.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_cleaning_reports.dart:102:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_cleaning_reports.dart:147:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_cleaning_reports.dart:206:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'sheetCustomerRejectionItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:44:113 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:96:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCustomerRejectionItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:104:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:173:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:218:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_customer_rejection_reports.dart:277:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_health_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_health_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_health_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'sheetHealthRatingItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_health_reports.dart:46:86 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_health_reports.dart:106:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetHealthRatingItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_health_reports.dart:116:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_health_reports.dart:153:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_health_reports.dart:190:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_health_reports.dart:249:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'sheetProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_production_details_reports.dart:47:110 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:110:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetProductionLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_production_details_reports.dart:121:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:202:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:249:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_production_details_reports.dart:308:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_running_feet_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_running_feet_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_running_feet_reports.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_running_feet_reports.dart:106:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_running_feet_reports.dart:152:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_running_feet_reports.dart:211:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:6:22 • prefer_final_fields
+   info • The variable name 'sheetPackingLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:46:97 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:104:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetPackingLineItems_on_report' isn't a lowerCamelCase identifier • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:114:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:191:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:238:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_shift_packing_reports.dart:297:3 • prefer_const_constructors_in_immutables
+   info • The private field _machineNumber could be 'final' • lib/generated/dataconnect/list_sheet_tools_count_reports.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_tools_count_reports.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_tools_count_reports.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_tools_count_reports.dart:102:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_tools_count_reports.dart:147:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_tools_count_reports.dart:206:3 • prefer_const_constructors_in_immutables
+   info • The private field _operatorId could be 'final' • lib/generated/dataconnect/list_sheet_writing_efficiency.dart:4:20 • prefer_final_fields
+   info • The private field _startDate could be 'final' • lib/generated/dataconnect/list_sheet_writing_efficiency.dart:5:22 • prefer_final_fields
+   info • The private field _endDate could be 'final' • lib/generated/dataconnect/list_sheet_writing_efficiency.dart:6:22 • prefer_final_fields
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_writing_efficiency.dart:100:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_writing_efficiency.dart:144:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/list_sheet_writing_efficiency.dart:203:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_admin_user.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_admin_user.dart:55:33 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_admin_user.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_admin_user.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_colors.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_colors.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_colors.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_colors.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_densities.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_densities.dart:55:56 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_densities.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_densities.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_machines.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_machines.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_machines.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_machines.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_sections.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_sections.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_frame_sections.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_frame_sections.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_maintenance_items.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_maintenance_items.dart:55:58 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_maintenance_items.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_maintenance_items.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_roles.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_roles.dart:55:47 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_roles.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_roles.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_colors.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_colors.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_colors.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_colors.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_densities.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_densities.dart:55:56 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_densities.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_densities.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_machines.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_machines.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_machines.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_machines.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_thicknesses.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_thicknesses.dart:55:58 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_sheet_thicknesses.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_sheet_thicknesses.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_shifts.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_shifts.dart:55:48 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_dropdown_shifts.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_dropdown_shifts.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning1.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning2.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning3.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning4.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning4.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning4.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning4.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning5.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning5.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_cleaning5.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_cleaning5.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_health1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_health1.dart:55:49 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_health1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_health1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_health2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_health2.dart:55:49 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_health2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_health2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_health3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_health3.dart:55:49 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_health3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameHealthReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_health3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools1.dart:55:52 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools2.dart:55:52 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools3.dart:55:52 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools4.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools4.dart:55:52 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_tools4.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameToolsCountReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_tools4.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight1.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight2.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight3.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight4.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight4.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight4.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameProductionWeightReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight4.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight_table.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'referenceTable_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight_table.dart:55:50 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_weight_table.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'referenceTable_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_weight_table.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_writing1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_writing1.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_writing1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_writing1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_writing2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_writing2.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_writing2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_writing2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_writing3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_writing3.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_frame_writing3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'frameWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_frame_writing3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator1.dart:55:33 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator2.dart:55:33 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator3.dart:55:33 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator4.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator4.dart:55:33 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_operator4.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_operator4.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_quality_packing.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_quality_packing.dart:55:38 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_quality_packing.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_quality_packing.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op1.dart:55:46 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op2.dart:55:46 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op3.dart:55:46 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op4.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op4.dart:55:46 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_salary_op4.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_salary_op4.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning1.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning2.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning3.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning4.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning4.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning4.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning4.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning5.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning5.dart:55:53 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_cleaning5.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetCleaningReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_cleaning5.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_running_feet1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_running_feet1.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_running_feet1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_running_feet1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_running_feet2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_running_feet2.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_running_feet2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_running_feet2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_running_feet3.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_running_feet3.dart:55:59 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_running_feet3.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetRunningFeetReport_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_running_feet3.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_writing1.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_writing1.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_writing1.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_writing1.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_writing2.dart:48:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_writing2.dart:55:55 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/seed_sheet_writing2.dart:82:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'sheetWritingEfficiency_insert' isn't a lowerCamelCase identifier • lib/generated/dataconnect/seed_sheet_writing2.dart:83:19 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/toggle_user_active.dart:50:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/toggle_user_active.dart:57:37 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/toggle_user_active.dart:86:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/toggle_user_active.dart:87:10 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/toggle_user_active.dart:120:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/toggle_user_active.dart:159:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_dropdown_config.dart:51:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_dropdown_config.dart:58:51 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_dropdown_config.dart:87:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'dropdownConfig_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_dropdown_config.dart:88:10 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_dropdown_config.dart:121:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_dropdown_config.dart:166:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_reference_table.dart:51:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'referenceTable_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_reference_table.dart:58:51 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_reference_table.dart:87:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'referenceTable_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_reference_table.dart:88:10 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_reference_table.dart:121:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_reference_table.dart:164:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_salary_calculation.dart:68:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_salary_calculation.dart:75:57 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_salary_calculation.dart:104:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'salaryCalculation_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_salary_calculation.dart:105:10 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_salary_calculation.dart:138:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_salary_calculation.dart:249:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_user.dart:55:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_user.dart:62:31 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_user.dart:91:3 • prefer_const_constructors_in_immutables
+   info • The variable name 'user_update' isn't a lowerCamelCase identifier • lib/generated/dataconnect/update_user.dart:92:10 • non_constant_identifier_names
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_user.dart:125:3 • prefer_const_constructors_in_immutables
+   info • Constructors in '@immutable' classes should be declared as 'const' • lib/generated/dataconnect/update_user.dart:188:3 • prefer_const_constructors_in_immutables
+
+554 issues found. (ran in 2.7s)

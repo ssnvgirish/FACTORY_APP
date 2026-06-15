@@ -1,0 +1,5 @@
+connectorId: "default"
+generate:
+  dartSdk:
+    outputDir: "../../lib/generated/dataconnect"
+    package: "factory_app"
