@@ -545,9 +545,7 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
           (r) => FrameCustomerRejectionReport(
             id: r.id,
             originalProductionDate: r.originalProductionDate,
-            // TODO: uncomment after running `flutterfire dataconnect:sdk:generate`
-            // rejectionDate: r.rejectionDate,
-            rejectionDate: r.originalProductionDate,
+            rejectionDate: r.rejectionDate,
             machineNumber: r.machineNumber,
             shift: r.shift,
             rejectedItems: r.frameCustomerRejectionItems_on_report
