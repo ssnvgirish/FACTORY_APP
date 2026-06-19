@@ -250,7 +250,7 @@ type FrameCustomerRejectionItem @table {
 
 type FrameCustomerRejectionReport @table {
   originalProductionDate: Date!
-  rejectionDate: Date
+  rejectionDate: Date!
   machineNumber: String!
   shift: String!
   totalRejectedWeight: Float!

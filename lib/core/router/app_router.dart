@@ -6,6 +6,8 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/dashboard/presentation/pages/reports_tab_page.dart';
+import '../../features/dashboard/presentation/pages/report_results_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/frames/presentation/pages/frame_reports_page.dart';
 import '../../features/frames/presentation/pages/frame_cleaning_report_list_page.dart';
@@ -78,7 +80,41 @@ class AppRouter {
           builder: (context, state, child) => _ScaffoldWithNav(child: child),
           routes: [
             GoRoute(path: '/home', builder: (_, s) => const HomePage()),
-            GoRoute(path: '/report', builder: (_, s) => const DashboardPage()),
+            GoRoute(
+              path: '/report',
+              builder: (_, s) => const ReportsTabPage(),
+              routes: [
+                GoRoute(
+                  path: 'results/:type/:targetId/:targetName/:startTime/:endTime',
+                  builder: (_, s) {
+                    final type = s.pathParameters['type'] == 'machine'
+                        ? ReportGenerationType.machineAndTimeRange
+                        : ReportGenerationType.operatorWise;
+                    final targetId = s.pathParameters['targetId'] ?? '';
+                    final targetName = s.pathParameters['targetName'] ?? '';
+                    final startTime =
+                        int.tryParse(s.pathParameters['startTime'] ?? '0');
+                    final endTime =
+                        int.tryParse(s.pathParameters['endTime'] ?? '0');
+                    final request = ReportRequest(
+                      type: type,
+                      target: ReportTarget(id: targetId, name: targetName),
+                      start: startTime != null && startTime > 0
+                          ? DateTime.fromMillisecondsSinceEpoch(startTime)
+                          : null,
+                      end: endTime != null && endTime > 0
+                          ? DateTime.fromMillisecondsSinceEpoch(endTime)
+                          : null,
+                    );
+                    return ReportResultsPage(request: request);
+                  },
+                ),
+              ],
+            ),
+            GoRoute(
+              path: '/dashboard',
+              builder: (_, s) => const DashboardPage(),
+            ),
             GoRoute(
               path: '/frames',
               builder: (_, s) => const FrameReportsPage(),
@@ -247,7 +283,7 @@ class _ScaffoldWithNav extends StatelessWidget {
         final destinations = _buildDestinations(user);
 
         return Scaffold(
-          body: child,
+          body: SizedBox.expand(child: child),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _currentIndex(context, destinations),
             onDestinationSelected: (i) =>

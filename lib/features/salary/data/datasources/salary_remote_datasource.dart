@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../generated/dataconnect/default.dart';
 import '../../domain/entities/salary_entities.dart';
