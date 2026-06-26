@@ -418,47 +418,95 @@ class _WeightMatrixPage extends StatelessWidget {
 
 // ─── Target Matrix Page (section/thickness × density → target) ────────────
 
-class _TargetMatrixPage extends StatelessWidget {
+class _TargetMatrixPage extends StatefulWidget {
   final String title;
   final MasterLookupType lookupType;
   const _TargetMatrixPage({required this.title, required this.lookupType});
 
-  bool get _isFrame => lookupType == MasterLookupType.frameTargets;
+  @override
+  State<_TargetMatrixPage> createState() => _TargetMatrixPageState();
+}
+
+class _TargetMatrixPageState extends State<_TargetMatrixPage> {
+  List<MasterTableItem> _sections = [];
+  List<MasterTableItem> _densities = [];
+
+  bool get _isFrame => widget.lookupType == MasterLookupType.frameTargets;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMasterData();
+  }
+
+  void _loadMasterData() {
+    final sectionTableType = _isFrame
+        ? MasterTableType.frameSections
+        : MasterTableType.sheetThicknesses;
+    final densityTableType = _isFrame
+        ? MasterTableType.frameDensities
+        : MasterTableType.sheetDensities;
+
+    context.read<AdminBloc>().add(LoadMasterTable(sectionTableType));
+    context.read<AdminBloc>().add(LoadMasterTable(densityTableType));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(widget.title)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
         child: const Icon(Icons.add),
       ),
-      body: BlocConsumer<AdminBloc, AdminState>(
+      body: BlocListener<AdminBloc, AdminState>(
         listener: (context, state) {
-          if (state is MasterLookupSaved) {
-            context.read<AdminBloc>().add(LoadMasterLookup(lookupType));
-          }
-          if (state is AdminError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+          if (state is MasterTableLoaded) {
+            setState(() {
+              if (_isFrame) {
+                if (state.tableType == MasterTableType.frameSections) {
+                  _sections = state.items;
+                } else if (state.tableType == MasterTableType.frameDensities) {
+                  _densities = state.items;
+                }
+              } else {
+                if (state.tableType == MasterTableType.sheetThicknesses) {
+                  _sections = state.items;
+                } else if (state.tableType == MasterTableType.sheetDensities) {
+                  _densities = state.items;
+                }
+              }
+            });
           }
         },
-        builder: (context, state) {
-          if (state is AdminLoading) return const LoadingWidget();
-          if (state is MasterTargetsLoaded && state.lookupType == lookupType) {
-            if (state.entries.isEmpty) {
-              return const EmptyStateWidget(
-                message: 'No entries yet. Tap + to add.',
+        child: BlocConsumer<AdminBloc, AdminState>(
+          listener: (context, state) {
+            if (state is MasterLookupSaved) {
+              context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
+            }
+            if (state is AdminError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
               );
             }
-            return _buildMatrix(context, state.entries);
-          }
-          return const LoadingWidget();
-        },
+          },
+          builder: (context, state) {
+            if (state is AdminLoading) return const LoadingWidget();
+            if (state is MasterTargetsLoaded &&
+                state.lookupType == widget.lookupType) {
+              if (state.entries.isEmpty) {
+                return const EmptyStateWidget(
+                  message: 'No entries yet. Tap + to add.',
+                );
+              }
+              return _buildMatrix(context, state.entries);
+            }
+            return const LoadingWidget();
+          },
+        ),
       ),
     );
   }
@@ -565,7 +613,7 @@ class _TargetMatrixPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.delete, size: 18, color: Colors.red),
               onPressed: () => context.read<AdminBloc>().add(
-                DeleteMasterTargetEntry(lookupType, entry.id),
+                DeleteMasterTargetEntry(widget.lookupType, entry.id),
               ),
             ),
           ],
@@ -652,113 +700,130 @@ class _TargetMatrixPage extends StatelessWidget {
   }
 
   void _showAddDialog(BuildContext context) {
-    final kCtrl = TextEditingController();
-    final dCtrl = TextEditingController();
+    String? selectedSection;
+    String? selectedDensity;
     final vCtrl = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add Target'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: kCtrl,
-              decoration: InputDecoration(
-                labelText: _isFrame ? 'Section' : 'Thickness',
-                hintText: _isFrame ? 'e.g., 3x2' : 'e.g., 0.5',
-              ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Add Target'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: selectedSection,
+                  decoration: InputDecoration(
+                    labelText: _isFrame ? 'Section *' : 'Thickness *',
+                  ),
+                  items: _sections
+                      .where((item) => item.isActive)
+                      .map((item) => DropdownMenuItem(
+                            value: item.value,
+                            child: Text(item.value),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() => selectedSection = value),
+                  validator: (value) =>
+                      value == null ? 'Please select' : null,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: selectedDensity,
+                  decoration: const InputDecoration(
+                    labelText: 'Density *',
+                  ),
+                  items: _densities
+                      .where((item) => item.isActive)
+                      .map((item) => DropdownMenuItem(
+                            value: item.value,
+                            child: Text(item.value),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() => selectedDensity = value),
+                  validator: (value) =>
+                      value == null ? 'Please select' : null,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: vCtrl,
+                  decoration: InputDecoration(
+                    labelText: _isFrame ? 'Target (kg/hr) *' : 'Target (ft/hr) *',
+                    hintText: _isFrame ? 'e.g., 50.5' : 'e.g., 100.0',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: dCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Density *',
-                hintText: 'e.g., 0.75',
-              ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: vCtrl,
-              decoration: InputDecoration(
-                labelText: _isFrame ? 'Target (kg/hr)' : 'Target (ft/hr)',
-                hintText: _isFrame ? 'e.g., 50.5' : 'e.g., 100.0',
-              ),
-              keyboardType: TextInputType.number,
+            ElevatedButton(
+              onPressed: () {
+                if (selectedSection == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text(_isFrame
+                          ? 'Please select a section'
+                          : 'Please select a thickness'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (selectedDensity == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select a density'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                final targetStr = vCtrl.text.trim();
+                if (targetStr.isEmpty) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Target value is required'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                final target = double.tryParse(targetStr);
+                if (target == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Target must be a valid number'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                context.read<AdminBloc>().add(
+                  SaveMasterTargetEntry(
+                    widget.lookupType,
+                    MasterTargetEntry(
+                      id: '',
+                      key: selectedSection!,
+                      density: selectedDensity,
+                      target: target,
+                    ),
+                    isNew: true,
+                  ),
+                );
+                Navigator.pop(ctx);
+              },
+              child: const Text('Add'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final section = kCtrl.text.trim();
-              final density = dCtrl.text.trim();
-              final targetStr = vCtrl.text.trim();
-
-              // Validation
-              if (section.isEmpty) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      _isFrame
-                          ? 'Section is required'
-                          : 'Thickness is required',
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              if (density.isEmpty) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(
-                    content: Text('Density is required'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              if (targetStr.isEmpty) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(
-                    content: Text('Target value is required'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              final target = double.tryParse(targetStr);
-              if (target == null) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(
-                    content: Text('Target must be a valid number'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-
-              context.read<AdminBloc>().add(
-                SaveMasterTargetEntry(
-                  lookupType,
-                  MasterTargetEntry(
-                    id: '',
-                    key: section,
-                    density: density,
-                    target: target,
-                  ),
-                  isNew: true,
-                ),
-              );
-              Navigator.pop(ctx);
-            },
-            child: const Text('Add'),
-          ),
-        ],
       ),
     );
   }
@@ -790,7 +855,7 @@ class _TargetMatrixPage extends StatelessWidget {
             onPressed: () {
               context.read<AdminBloc>().add(
                 SaveMasterTargetEntry(
-                  lookupType,
+                  widget.lookupType,
                   MasterTargetEntry(
                     id: existing.id,
                     key: existing.key,
@@ -825,7 +890,7 @@ class _TargetMatrixPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<AdminBloc>().add(
-                DeleteMasterTargetEntry(lookupType, entry.id),
+                DeleteMasterTargetEntry(widget.lookupType, entry.id),
               );
               Navigator.pop(ctx);
             },
