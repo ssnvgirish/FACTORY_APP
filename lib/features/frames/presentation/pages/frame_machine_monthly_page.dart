@@ -322,14 +322,13 @@ class _MachineCalendarViewState extends State<_MachineCalendarView> {
                 (r) => _ReportEntry(
                   date: r.date,
                   shift: r.shift,
-                  summaryLabel: '${r.percentage.toStringAsFixed(0)}%',
+                  summaryLabel: '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
                   details: {
                     'Shift': r.shift,
-                    'Total Score': '${r.totalScore}/${r.ratings.length * 10}',
-                    'Percentage': '${r.percentage.toStringAsFixed(1)}%',
+                    'Total Duration': '${r.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
                     ...{
-                      for (final item in r.ratings)
-                        item.item: '${item.rating}/10',
+                      for (final entry in r.entries)
+                        entry.maintenanceItem: '${entry.durationHours.toStringAsFixed(2)}h',
                     },
                   },
                 ),

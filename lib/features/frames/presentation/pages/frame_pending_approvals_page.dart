@@ -27,12 +27,10 @@ class FramePendingApprovalsPage extends StatelessWidget {
                 return ReportCard(
                   title: '${report.machineNumber} — ${report.shift}',
                   subtitle:
-                      '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.percentage.toStringAsFixed(1)}%',
+                      '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.entries.length} item(s)',
                   trailing:
-                      '${report.totalScore}/${report.ratings.length * 10}',
-                  statusColor: report.percentage >= 80
-                      ? AppTheme.successGreen
-                      : AppTheme.warningYellow,
+                      '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
+                  statusColor: AppTheme.pendingBlue,
                 );
               },
             );

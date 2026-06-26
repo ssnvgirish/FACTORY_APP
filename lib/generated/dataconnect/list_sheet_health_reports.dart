@@ -111,42 +111,7 @@ class ListSheetHealthReportsSheetHealthReports {
     required this.sheetMaintenanceEntries_on_report,
   });
 }
-    
-  }
-  @override
-  int get hashCode => Object.hashAll([id.hashCode, date.hashCode, machineNumber.hashCode, shift.hashCode, totalMaintenanceDurationHours.hashCode, createdBy.hashCode, submittedAt.hashCode, timestamp.hashCode, sheetMaintenanceEntries_on_report.hashCode]);
-  
 
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json['id'] = nativeToJson<String>(id);
-    json['date'] = nativeToJson<DateTime>(date);
-    json['machineNumber'] = nativeToJson<String>(machineNumber);
-    json['shift'] = nativeToJson<String>(shift);
-    json['totalMaintenanceDurationHours'] = nativeToJson<double>(totalMaintenanceDurationHours);
-    json['createdBy'] = nativeToJson<String>(createdBy);
-    if (submittedAt != null) {
-      json['submittedAt'] = submittedAt!.toJson();
-    }
-    if (timestamp != null) {
-      json['timestamp'] = timestamp!.toJson();
-    }
-    json['sheetMaintenanceEntries_on_report'] = sheetMaintenanceEntries_on_report.map((e) => e.toJson()).toList();
-    return json;
-  }
-
-  ListSheetHealthReportsSheetHealthReports({
-    required this.id,
-    required this.date,
-    required this.machineNumber,
-    required this.shift,
-    required this.totalMaintenanceDurationHours,
-    required this.createdBy,
-    this.submittedAt,
-    this.timestamp,
-    required this.sheetMaintenanceEntries_on_report,
-  });
-}
 
 @immutable
 class ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport {

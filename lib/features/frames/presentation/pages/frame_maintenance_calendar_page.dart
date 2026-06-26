@@ -79,7 +79,7 @@ class _MaintenanceCalendarState extends State<_MaintenanceCalendar> {
         for (final r in reports) {
           final key = DateTime(r.date.year, r.date.month, r.date.day);
           final existing = dataMap[key];
-          final label = '${r.percentage.toStringAsFixed(0)}%';
+          final label = '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h';
           if (r.shift.toLowerCase().contains('day')) {
             dataMap[key] = CalendarDayData(
               dayShiftLabel: label,
@@ -177,54 +177,50 @@ class _MaintenanceCalendarState extends State<_MaintenanceCalendar> {
                 ),
                 const Spacer(),
                 Text(
-                  '${report.percentage.toStringAsFixed(1)}%',
+                  '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: report.percentage >= 80
-                        ? AppTheme.successGreen
-                        : report.percentage >= 50
-                        ? AppTheme.warningYellow
-                        : AppTheme.errorRed,
+                    color: AppTheme.pendingBlue,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 4),
             Text(
-              'Score: ${report.totalScore} / ${report.ratings.length * 10}',
+              'Total Duration: ${report.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const Divider(height: 16),
-            ...report.ratings.map(
-              (item) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
+            ...report.entries.map(
+              (entry) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        item.item,
-                        style: const TextStyle(fontSize: 12),
+                    Text(
+                      entry.maintenanceItem,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Container(
-                      width: 28,
-                      height: 22,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: _ratingColor(
-                          item.rating,
-                        ).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(4),
+                    Text(
+                      '${DateFormat('HH:mm').format(entry.startTime)} – ${DateFormat('HH:mm').format(entry.endTime)} (${entry.durationHours.toStringAsFixed(2)}h)',
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                    if (entry.personDoingMaintenance.isNotEmpty)
+                      Text(
+                        'Person: ${entry.personDoingMaintenance}',
+                        style: const TextStyle(fontSize: 11),
                       ),
-                      child: Text(
-                        '${item.rating}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: _ratingColor(item.rating),
+                    if (entry.description.isNotEmpty)
+                      Text(
+                        entry.description,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.textSecondary,
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -235,9 +231,4 @@ class _MaintenanceCalendarState extends State<_MaintenanceCalendar> {
     );
   }
 
-  Color _ratingColor(int rating) {
-    if (rating >= 8) return AppTheme.successGreen;
-    if (rating >= 5) return AppTheme.warningYellow;
-    return AppTheme.errorRed;
-  }
 }
