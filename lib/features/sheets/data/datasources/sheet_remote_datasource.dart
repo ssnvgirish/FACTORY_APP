@@ -164,8 +164,7 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
           date: report.date,
           machineNumber: report.machineNumber,
           shift: report.shift,
-          totalScore: report.totalScore,
-          percentage: report.percentage,
+          totalMaintenanceDurationHours: report.totalMaintenanceDurationHours,
           createdBy: report.createdBy,
         )
         .submittedAt(
@@ -176,14 +175,21 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
         .execute();
 
     final reportId = result.data.sheetHealthReport_insert.id;
-    for (final rating in report.ratings) {
+    for (final entry in report.entries) {
       await connector
-          .createSheetHealthRatingItem(
-            reportId: CreateSheetHealthRatingItemVariablesReportId(
+          .createSheetMaintenanceEntry(
+            reportId: CreateSheetMaintenanceEntryVariablesReportId(
               id: reportId,
             ),
-            item: rating.item,
-            rating: rating.rating,
+            maintenanceItem: entry.maintenanceItem,
+            startTime: Timestamp(
+              0,
+              entry.startTime.millisecondsSinceEpoch ~/ 1000,
+            ),
+            endTime: Timestamp(0, entry.endTime.millisecondsSinceEpoch ~/ 1000),
+            personDoingMaintenance: entry.personDoingMaintenance,
+            description: entry.description,
+            durationHours: entry.durationHours,
           )
           .execute();
     }
@@ -207,11 +213,19 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
             date: r.date,
             machineNumber: r.machineNumber,
             shift: r.shift,
-            ratings: r.sheetHealthRatingItems_on_report
-                .map((ri) => HealthRatingItem(item: ri.item, rating: ri.rating))
+            entries: r.sheetMaintenanceEntries_on_report
+                .map(
+                  (e) => FrameMaintenanceEntry(
+                    maintenanceItem: e.maintenanceItem,
+                    startTime: e.startTime.toDateTime(),
+                    endTime: e.endTime.toDateTime(),
+                    personDoingMaintenance: e.personDoingMaintenance,
+                    description: e.description,
+                    durationHours: e.durationHours,
+                  ),
+                )
                 .toList(),
-            totalScore: r.totalScore,
-            percentage: r.percentage,
+            totalMaintenanceDurationHours: r.totalMaintenanceDurationHours,
             createdBy: r.createdBy,
             submittedAt: r.submittedAt?.toDateTime(),
             timestamp: r.timestamp?.toDateTime(),

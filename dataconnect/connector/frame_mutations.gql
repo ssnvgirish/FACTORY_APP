@@ -100,8 +100,7 @@ mutation CreateFrameHealthReport(
   $date: Date!,
   $machineNumber: String!,
   $shift: String!,
-  $totalScore: Int!,
-  $percentage: Float!,
+  $totalMaintenanceDurationHours: Float!,
   $createdBy: String!,
   $submittedAt: Timestamp
 ) @auth(level: PUBLIC) {
@@ -109,22 +108,29 @@ mutation CreateFrameHealthReport(
     date: $date
     machineNumber: $machineNumber
     shift: $shift
-    totalScore: $totalScore
-    percentage: $percentage
+    totalMaintenanceDurationHours: $totalMaintenanceDurationHours
     createdBy: $createdBy
     submittedAt: $submittedAt
   })
 }
 
-mutation CreateFrameHealthRatingItem(
+mutation CreateFrameMaintenanceEntry(
   $reportId: FrameHealthReport_Key!,
-  $item: String!,
-  $rating: Int!
+  $maintenanceItem: String!,
+  $startTime: Timestamp!,
+  $endTime: Timestamp!,
+  $personDoingMaintenance: String!,
+  $description: String!,
+  $durationHours: Float!
 ) @auth(level: PUBLIC) {
-  frameHealthRatingItem_insert(data: {
+  frameMaintenanceEntry_insert(data: {
     report: $reportId
-    item: $item
-    rating: $rating
+    maintenanceItem: $maintenanceItem
+    startTime: $startTime
+    endTime: $endTime
+    personDoingMaintenance: $personDoingMaintenance
+    description: $description
+    durationHours: $durationHours
   })
 }
 
@@ -147,14 +153,17 @@ query ListFrameHealthReports(
     date
     machineNumber
     shift
-    totalScore
-    percentage
+    totalMaintenanceDurationHours
     createdBy
     submittedAt
     timestamp
-    frameHealthRatingItems_on_report {
-      item
-      rating
+    frameMaintenanceEntries_on_report {
+      maintenanceItem
+      startTime
+      endTime
+      personDoingMaintenance
+      description
+      durationHours
     }
   }
 }

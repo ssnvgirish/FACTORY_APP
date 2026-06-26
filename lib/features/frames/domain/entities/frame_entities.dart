@@ -67,14 +67,30 @@ class ToolsCountReport extends Equatable {
   ];
 }
 
-class HealthRatingItem extends Equatable {
-  final String item; // e.g., 'Die Cleaning', 'Generator Maintenance'
-  final int rating; // 1-10
+class FrameMaintenanceEntry extends Equatable {
+  final String maintenanceItem;
+  final DateTime startTime;
+  final DateTime endTime;
+  final String personDoingMaintenance;
+  final String description;
+  final double durationHours;
 
-  const HealthRatingItem({required this.item, required this.rating});
+  const FrameMaintenanceEntry({
+    required this.maintenanceItem,
+    required this.startTime,
+    required this.endTime,
+    required this.personDoingMaintenance,
+    required this.description,
+    required this.durationHours,
+  });
 
   @override
-  List<Object?> get props => [item, rating];
+  List<Object?> get props => [
+    maintenanceItem,
+    startTime,
+    endTime,
+    personDoingMaintenance,
+  ];
 }
 
 class MachineHealthReport extends Equatable {
@@ -82,9 +98,8 @@ class MachineHealthReport extends Equatable {
   final DateTime date;
   final String machineNumber;
   final String shift;
-  final List<HealthRatingItem> ratings;
-  final int totalScore; // sum of all ratings
-  final double percentage; // totalScore / (ratings.length * 10) * 100
+  final List<FrameMaintenanceEntry> entries;
+  final double totalMaintenanceDurationHours;
   final String createdBy;
   final DateTime? timestamp;
   final DateTime? submittedAt;
@@ -94,16 +109,15 @@ class MachineHealthReport extends Equatable {
     required this.date,
     required this.machineNumber,
     required this.shift,
-    required this.ratings,
-    required this.totalScore,
-    required this.percentage,
+    required this.entries,
+    required this.totalMaintenanceDurationHours,
     required this.createdBy,
     this.timestamp,
     this.submittedAt,
   });
 
   @override
-  List<Object?> get props => [id, date, machineNumber, shift, ratings];
+  List<Object?> get props => [id, date, machineNumber, shift, entries];
 }
 
 class FrameProductionLineItem extends Equatable {

@@ -62,16 +62,27 @@ class ToolsCountReportModel {
   }
 }
 
-class HealthRatingItemModel {
-  static HealthRatingItem fromMap(Map<String, dynamic> data) {
-    return HealthRatingItem(
-      item: data['item'] ?? '',
-      rating: data['rating'] ?? 0,
+class FrameMaintenanceEntryModel {
+  static FrameMaintenanceEntry fromMap(Map<String, dynamic> data) {
+    return FrameMaintenanceEntry(
+      maintenanceItem: data['maintenanceItem'] ?? '',
+      startTime: dateTimeOrNull(data['startTime']) ?? DateTime.now(),
+      endTime: dateTimeOrNull(data['endTime']) ?? DateTime.now(),
+      personDoingMaintenance: data['personDoingMaintenance'] ?? '',
+      description: data['description'] ?? '',
+      durationHours: (data['durationHours'] ?? 0).toDouble(),
     );
   }
 
-  static Map<String, dynamic> toMap(HealthRatingItem item) {
-    return {'item': item.item, 'rating': item.rating};
+  static Map<String, dynamic> toMap(FrameMaintenanceEntry entry) {
+    return {
+      'maintenanceItem': entry.maintenanceItem,
+      'startTime': entry.startTime,
+      'endTime': entry.endTime,
+      'personDoingMaintenance': entry.personDoingMaintenance,
+      'description': entry.description,
+      'durationHours': entry.durationHours,
+    };
   }
 }
 
@@ -80,17 +91,17 @@ class MachineHealthReportModel {
     Map<String, dynamic> data, {
     String id = '',
   }) {
-    final ratings = (data['ratings'] as List<dynamic>? ?? [])
-        .map((e) => HealthRatingItemModel.fromMap(e as Map<String, dynamic>))
+    final entries = (data['entries'] as List<dynamic>? ?? [])
+        .map((e) => FrameMaintenanceEntryModel.fromMap(e as Map<String, dynamic>))
         .toList();
     return MachineHealthReport(
       id: id,
       date: requireDateTime(data['date'], 'date'),
       machineNumber: data['machineNumber'] ?? '',
       shift: data['shift'] ?? '',
-      ratings: ratings,
-      totalScore: data['totalScore'] ?? 0,
-      percentage: (data['percentage'] ?? 0).toDouble(),
+      entries: entries,
+      totalMaintenanceDurationHours:
+          (data['totalMaintenanceDurationHours'] ?? 0).toDouble(),
       createdBy: data['createdBy'] ?? '',
       timestamp: dateTimeOrNull(data['timestamp']),
       submittedAt: dateTimeOrNull(data['submittedAt']),
@@ -102,11 +113,10 @@ class MachineHealthReportModel {
       'date': report.date,
       'machineNumber': report.machineNumber,
       'shift': report.shift,
-      'ratings': report.ratings
-          .map((e) => HealthRatingItemModel.toMap(e))
+      'entries': report.entries
+          .map((e) => FrameMaintenanceEntryModel.toMap(e))
           .toList(),
-      'totalScore': report.totalScore,
-      'percentage': report.percentage,
+      'totalMaintenanceDurationHours': report.totalMaintenanceDurationHours,
       'createdBy': report.createdBy,
       'timestamp': writeTimestamp(report.timestamp),
       'submittedAt': writeTimestamp(report.submittedAt),

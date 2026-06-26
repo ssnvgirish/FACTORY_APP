@@ -38,25 +38,23 @@ class ListSheetHealthReportsSheetHealthReports {
   final DateTime date;
   final String machineNumber;
   final String shift;
-  final int totalScore;
-  final double percentage;
+  final double totalMaintenanceDurationHours;
   final String createdBy;
   final Timestamp? submittedAt;
   final Timestamp? timestamp;
-  final List<ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport> sheetHealthRatingItems_on_report;
+  final List<ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport> sheetMaintenanceEntries_on_report;
   ListSheetHealthReportsSheetHealthReports.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   date = nativeFromJson<DateTime>(json['date']),
   machineNumber = nativeFromJson<String>(json['machineNumber']),
   shift = nativeFromJson<String>(json['shift']),
-  totalScore = nativeFromJson<int>(json['totalScore']),
-  percentage = nativeFromJson<double>(json['percentage']),
+  totalMaintenanceDurationHours = nativeFromJson<double>(json['totalMaintenanceDurationHours']),
   createdBy = nativeFromJson<String>(json['createdBy']),
   submittedAt = json['submittedAt'] == null ? null : Timestamp.fromJson(json['submittedAt']),
   timestamp = json['timestamp'] == null ? null : Timestamp.fromJson(json['timestamp']),
-  sheetHealthRatingItems_on_report = (json['sheetHealthRatingItems_on_report'] as List<dynamic>)
-        .map((e) => ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport.fromJson(e))
+  sheetMaintenanceEntries_on_report = (json['sheetMaintenanceEntries_on_report'] as List<dynamic>)
+        .map((e) => ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport.fromJson(e))
         .toList();
   @override
   bool operator ==(Object other) {
@@ -72,16 +70,15 @@ class ListSheetHealthReportsSheetHealthReports {
     date == otherTyped.date && 
     machineNumber == otherTyped.machineNumber && 
     shift == otherTyped.shift && 
-    totalScore == otherTyped.totalScore && 
-    percentage == otherTyped.percentage && 
+    totalMaintenanceDurationHours == otherTyped.totalMaintenanceDurationHours && 
     createdBy == otherTyped.createdBy && 
     submittedAt == otherTyped.submittedAt && 
     timestamp == otherTyped.timestamp && 
-    sheetHealthRatingItems_on_report == otherTyped.sheetHealthRatingItems_on_report;
+    sheetMaintenanceEntries_on_report == otherTyped.sheetMaintenanceEntries_on_report;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, date.hashCode, machineNumber.hashCode, shift.hashCode, totalScore.hashCode, percentage.hashCode, createdBy.hashCode, submittedAt.hashCode, timestamp.hashCode, sheetHealthRatingItems_on_report.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, date.hashCode, machineNumber.hashCode, shift.hashCode, totalMaintenanceDurationHours.hashCode, createdBy.hashCode, submittedAt.hashCode, timestamp.hashCode, sheetMaintenanceEntries_on_report.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -90,8 +87,7 @@ class ListSheetHealthReportsSheetHealthReports {
     json['date'] = nativeToJson<DateTime>(date);
     json['machineNumber'] = nativeToJson<String>(machineNumber);
     json['shift'] = nativeToJson<String>(shift);
-    json['totalScore'] = nativeToJson<int>(totalScore);
-    json['percentage'] = nativeToJson<double>(percentage);
+    json['totalMaintenanceDurationHours'] = nativeToJson<double>(totalMaintenanceDurationHours);
     json['createdBy'] = nativeToJson<String>(createdBy);
     if (submittedAt != null) {
       json['submittedAt'] = submittedAt!.toJson();
@@ -99,7 +95,7 @@ class ListSheetHealthReportsSheetHealthReports {
     if (timestamp != null) {
       json['timestamp'] = timestamp!.toJson();
     }
-    json['sheetHealthRatingItems_on_report'] = sheetHealthRatingItems_on_report.map((e) => e.toJson()).toList();
+    json['sheetMaintenanceEntries_on_report'] = sheetMaintenanceEntries_on_report.map((e) => e.toJson()).toList();
     return json;
   }
 
@@ -108,23 +104,66 @@ class ListSheetHealthReportsSheetHealthReports {
     required this.date,
     required this.machineNumber,
     required this.shift,
-    required this.totalScore,
-    required this.percentage,
+    required this.totalMaintenanceDurationHours,
     required this.createdBy,
     this.submittedAt,
     this.timestamp,
-    required this.sheetHealthRatingItems_on_report,
+    required this.sheetMaintenanceEntries_on_report,
+  });
+}
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, date.hashCode, machineNumber.hashCode, shift.hashCode, totalMaintenanceDurationHours.hashCode, createdBy.hashCode, submittedAt.hashCode, timestamp.hashCode, sheetMaintenanceEntries_on_report.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['date'] = nativeToJson<DateTime>(date);
+    json['machineNumber'] = nativeToJson<String>(machineNumber);
+    json['shift'] = nativeToJson<String>(shift);
+    json['totalMaintenanceDurationHours'] = nativeToJson<double>(totalMaintenanceDurationHours);
+    json['createdBy'] = nativeToJson<String>(createdBy);
+    if (submittedAt != null) {
+      json['submittedAt'] = submittedAt!.toJson();
+    }
+    if (timestamp != null) {
+      json['timestamp'] = timestamp!.toJson();
+    }
+    json['sheetMaintenanceEntries_on_report'] = sheetMaintenanceEntries_on_report.map((e) => e.toJson()).toList();
+    return json;
+  }
+
+  ListSheetHealthReportsSheetHealthReports({
+    required this.id,
+    required this.date,
+    required this.machineNumber,
+    required this.shift,
+    required this.totalMaintenanceDurationHours,
+    required this.createdBy,
+    this.submittedAt,
+    this.timestamp,
+    required this.sheetMaintenanceEntries_on_report,
   });
 }
 
 @immutable
-class ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport {
-  final String item;
-  final int rating;
-  ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport.fromJson(dynamic json):
+class ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport {
+  final String maintenanceItem;
+  final Timestamp startTime;
+  final Timestamp endTime;
+  final String personDoingMaintenance;
+  final String description;
+  final double durationHours;
+  ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport.fromJson(dynamic json):
   
-  item = nativeFromJson<String>(json['item']),
-  rating = nativeFromJson<int>(json['rating']);
+  maintenanceItem = nativeFromJson<String>(json['maintenanceItem']),
+  startTime = Timestamp.fromJson(json['startTime']),
+  endTime = Timestamp.fromJson(json['endTime']),
+  personDoingMaintenance = nativeFromJson<String>(json['personDoingMaintenance']),
+  description = nativeFromJson<String>(json['description']),
+  durationHours = nativeFromJson<double>(json['durationHours']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -134,25 +173,37 @@ class ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport {
       return false;
     }
 
-    final ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport otherTyped = other as ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport;
-    return item == otherTyped.item && 
-    rating == otherTyped.rating;
+    final ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport otherTyped = other as ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport;
+    return maintenanceItem == otherTyped.maintenanceItem && 
+    startTime == otherTyped.startTime && 
+    endTime == otherTyped.endTime && 
+    personDoingMaintenance == otherTyped.personDoingMaintenance && 
+    description == otherTyped.description && 
+    durationHours == otherTyped.durationHours;
     
   }
   @override
-  int get hashCode => Object.hashAll([item.hashCode, rating.hashCode]);
+  int get hashCode => Object.hashAll([maintenanceItem.hashCode, startTime.hashCode, endTime.hashCode, personDoingMaintenance.hashCode, description.hashCode, durationHours.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['item'] = nativeToJson<String>(item);
-    json['rating'] = nativeToJson<int>(rating);
+    json['maintenanceItem'] = nativeToJson<String>(maintenanceItem);
+    json['startTime'] = startTime.toJson();
+    json['endTime'] = endTime.toJson();
+    json['personDoingMaintenance'] = nativeToJson<String>(personDoingMaintenance);
+    json['description'] = nativeToJson<String>(description);
+    json['durationHours'] = nativeToJson<double>(durationHours);
     return json;
   }
 
-  ListSheetHealthReportsSheetHealthReportsSheetHealthRatingItemsOnReport({
-    required this.item,
-    required this.rating,
+  ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport({
+    required this.maintenanceItem,
+    required this.startTime,
+    required this.endTime,
+    required this.personDoingMaintenance,
+    required this.description,
+    required this.durationHours,
   });
 }
 

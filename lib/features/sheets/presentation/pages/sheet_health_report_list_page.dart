@@ -45,13 +45,10 @@ class SheetHealthReportListPage extends StatelessWidget {
           return ReportCard(
             title: '${report.machineNumber} - ${report.shift}',
             subtitle:
-                '${DateFormat('dd MMM yyyy').format(report.date)} - Score: ${report.totalScore}/${report.ratings.length * 10}',
-            trailing: '${report.percentage.toStringAsFixed(1)}%',
-            statusColor: report.percentage >= 80
-                ? AppTheme.successGreen
-                : report.percentage >= 50
-                ? AppTheme.warningYellow
-                : AppTheme.errorRed,
+                '${DateFormat('dd MMM yyyy').format(report.date)} - ${report.entries.length} item(s)',
+            trailing:
+                '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
+            statusColor: AppTheme.pendingBlue,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -65,23 +62,34 @@ class SheetHealthReportListPage extends StatelessWidget {
                     ReportField('Machine', report.machineNumber),
                     ReportField('Shift', report.shift),
                     ReportField(
-                      'Total Score',
-                      '${report.totalScore}/${report.ratings.length * 10}',
-                    ),
-                    ReportField(
-                      'Percentage',
-                      '${report.percentage.toStringAsFixed(1)}%',
+                      'Total Maintenance Duration',
+                      '${report.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
                     ),
                   ],
                   sections: [
                     ReportSection(
-                      title: 'Health Ratings',
-                      itemLabel: 'Rating',
-                      items: report.ratings
+                      title: 'Maintenance Entries',
+                      itemLabel: 'Entry',
+                      items: report.entries
                           .map(
-                            (r) => ReportSectionItem(
-                              heading: r.item,
-                              fields: [ReportField('Rating', '${r.rating}/10')],
+                            (e) => ReportSectionItem(
+                              heading: e.maintenanceItem,
+                              fields: [
+                                ReportField(
+                                  'Start',
+                                  DateFormat('hh:mm a').format(e.startTime),
+                                ),
+                                ReportField(
+                                  'End',
+                                  DateFormat('hh:mm a').format(e.endTime),
+                                ),
+                                ReportField(
+                                  'Duration',
+                                  '${e.durationHours.toStringAsFixed(2)}h',
+                                ),
+                                ReportField('Person', e.personDoingMaintenance),
+                                ReportField('Description', e.description),
+                              ],
                             ),
                           )
                           .toList(),

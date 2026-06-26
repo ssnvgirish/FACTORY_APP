@@ -154,11 +154,22 @@ class TestFactories {
   // HEALTH RATING ITEM FACTORIES
   // ═══════════════════════════════════════
 
-  static HealthRatingItem fakeHealthRatingItem({
-    String item = 'Die Change',
-    int rating = 8,
+  static FrameMaintenanceEntry fakeMaintenanceEntry({
+    String maintenanceItem = 'Die Change',
+    DateTime? startTime,
+    DateTime? endTime,
+    String personDoingMaintenance = 'John',
+    String description = 'Routine check',
+    double durationHours = 1.0,
   }) {
-    return HealthRatingItem(item: item, rating: rating);
+    return FrameMaintenanceEntry(
+      maintenanceItem: maintenanceItem,
+      startTime: startTime ?? DateTime(2026, 3, 15, 8, 0),
+      endTime: endTime ?? DateTime(2026, 3, 15, 9, 0),
+      personDoingMaintenance: personDoingMaintenance,
+      description: description,
+      durationHours: durationHours,
+    );
   }
 
   // ═══════════════════════════════════════
@@ -170,9 +181,8 @@ class TestFactories {
     DateTime? date,
     String machineNumber = 'Frame Machine 1',
     String shift = 'Day Shift',
-    List<HealthRatingItem>? ratings,
-    int totalScore = 56,
-    double percentage = 80.0,
+    List<FrameMaintenanceEntry>? entries,
+    double totalMaintenanceDurationHours = 1.0,
     String createdBy = 'op-1',
   }) {
     return MachineHealthReport(
@@ -180,19 +190,8 @@ class TestFactories {
       date: date ?? DateTime(2026, 3, 15),
       machineNumber: machineNumber,
       shift: shift,
-      ratings:
-          ratings ??
-          [
-            fakeHealthRatingItem(item: 'Die Change', rating: 8),
-            fakeHealthRatingItem(item: 'Die Cleaning', rating: 8),
-            fakeHealthRatingItem(item: 'Generator Maintenance', rating: 8),
-            fakeHealthRatingItem(item: 'Air Compressor Maintenance', rating: 8),
-            fakeHealthRatingItem(item: 'Hydraulic Press', rating: 8),
-            fakeHealthRatingItem(item: 'Cooler Maintenance', rating: 8),
-            fakeHealthRatingItem(item: 'Others', rating: 8),
-          ],
-      totalScore: totalScore,
-      percentage: percentage,
+      entries: entries ?? [fakeMaintenanceEntry(maintenanceItem: 'Die Change')],
+      totalMaintenanceDurationHours: totalMaintenanceDurationHours,
       createdBy: createdBy,
     );
   }

@@ -42,17 +42,16 @@ void main() {
       expect(seniorOperator.isFramesSenior, isTrue);
     });
 
-    test('health report ratings exist in mock data', () {
+    test('health report entries exist in mock data', () {
       final report = TestFactories.fakeMachineHealthReport();
-      expect(report.ratings.isNotEmpty, isTrue);
-      expect(report.totalScore, greaterThan(0));
-      expect(report.percentage, greaterThan(0));
+      expect(report.entries.isNotEmpty, isTrue);
+      expect(report.totalMaintenanceDurationHours, greaterThanOrEqualTo(0));
     });
 
-    test('health report percentage is calculated correctly', () {
+    test('health report entries have required fields', () {
       final report = TestFactories.fakeMachineHealthReport();
-      expect(report.ratings.length, 7);
-      expect(report.totalScore, 56);
+      expect(report.entries.length, 1);
+      expect(report.entries.first.maintenanceItem, 'Die Change');
     });
   });
 }

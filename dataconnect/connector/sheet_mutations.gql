@@ -100,8 +100,7 @@ mutation CreateSheetHealthReport(
   $date: Date!,
   $machineNumber: String!,
   $shift: String!,
-  $totalScore: Int!,
-  $percentage: Float!,
+  $totalMaintenanceDurationHours: Float!,
   $createdBy: String!,
   $submittedAt: Timestamp
 ) @auth(level: PUBLIC) {
@@ -109,22 +108,29 @@ mutation CreateSheetHealthReport(
     date: $date
     machineNumber: $machineNumber
     shift: $shift
-    totalScore: $totalScore
-    percentage: $percentage
+    totalMaintenanceDurationHours: $totalMaintenanceDurationHours
     createdBy: $createdBy
     submittedAt: $submittedAt
   })
 }
 
-mutation CreateSheetHealthRatingItem(
+mutation CreateSheetMaintenanceEntry(
   $reportId: SheetHealthReport_Key!,
-  $item: String!,
-  $rating: Int!
+  $maintenanceItem: String!,
+  $startTime: Timestamp!,
+  $endTime: Timestamp!,
+  $personDoingMaintenance: String!,
+  $description: String!,
+  $durationHours: Float!
 ) @auth(level: PUBLIC) {
-  sheetHealthRatingItem_insert(data: {
+  sheetMaintenanceEntry_insert(data: {
     report: $reportId
-    item: $item
-    rating: $rating
+    maintenanceItem: $maintenanceItem
+    startTime: $startTime
+    endTime: $endTime
+    personDoingMaintenance: $personDoingMaintenance
+    description: $description
+    durationHours: $durationHours
   })
 }
 
@@ -147,14 +153,17 @@ query ListSheetHealthReports(
     date
     machineNumber
     shift
-    totalScore
-    percentage
+    totalMaintenanceDurationHours
     createdBy
     submittedAt
     timestamp
-    sheetHealthRatingItems_on_report {
-      item
-      rating
+    sheetMaintenanceEntries_on_report {
+      maintenanceItem
+      startTime
+      endTime
+      personDoingMaintenance
+      description
+      durationHours
     }
   }
 }

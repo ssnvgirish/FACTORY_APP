@@ -150,18 +150,21 @@ type FrameToolsCountReport @table {
   timestamp: Timestamp @default(expr: "request.time")
 }
 
-type FrameHealthRatingItem @table {
+type FrameMaintenanceEntry @table {
   report: FrameHealthReport!
-  item: String!
-  rating: Int!
+  maintenanceItem: String!
+  startTime: Timestamp!
+  endTime: Timestamp!
+  personDoingMaintenance: String!
+  description: String!
+  durationHours: Float!
 }
 
 type FrameHealthReport @table {
   date: Date!
   machineNumber: String!
   shift: String!
-  totalScore: Int!
-  percentage: Float!
+  totalMaintenanceDurationHours: Float!
   createdBy: String!
   submittedAt: Timestamp
   timestamp: Timestamp @default(expr: "request.time")
@@ -284,18 +287,21 @@ type SheetToolsCountReport @table {
   timestamp: Timestamp @default(expr: "request.time")
 }
 
-type SheetHealthRatingItem @table {
+type SheetMaintenanceEntry @table {
   report: SheetHealthReport!
-  item: String!
-  rating: Int!
+  maintenanceItem: String!
+  startTime: Timestamp!
+  endTime: Timestamp!
+  personDoingMaintenance: String!
+  description: String!
+  durationHours: Float!
 }
 
 type SheetHealthReport @table {
   date: Date!
   machineNumber: String!
   shift: String!
-  totalScore: Int!
-  percentage: Float!
+  totalMaintenanceDurationHours: Float!
   createdBy: String!
   submittedAt: Timestamp
   timestamp: Timestamp @default(expr: "request.time")

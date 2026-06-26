@@ -23,25 +23,35 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
   String? _machineNumber;
   String? _shift;
   String? _selectedMaintenanceItem;
-  final TextEditingController _ratingController = TextEditingController();
+
+  DateTime? _startTime;
+  DateTime? _endTime;
+  final _personCtrl = TextEditingController();
+  final _descriptionCtrl = TextEditingController();
+
+  double get _durationHours {
+    if (_startTime == null || _endTime == null) return 0;
+    return Calculations.maintenanceDurationHours(_startTime!, _endTime!);
+  }
 
   @override
   void dispose() {
-    _ratingController.dispose();
+    _personCtrl.dispose();
+    _descriptionCtrl.dispose();
     super.dispose();
   }
 
-  int get _totalScore => int.tryParse(_ratingController.text) ?? 0;
-
-  double get _percentage => Calculations.healthPercentage(_totalScore, 1);
-
   void _submit() async {
-    if (_machineNumber == null ||
-        _shift == null ||
-        _selectedMaintenanceItem == null ||
-        _totalScore == 0) {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedMaintenanceItem == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
+        const SnackBar(content: Text('Select a maintenance item')),
+      );
+      return;
+    }
+    if (_startTime == null || _endTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select start and end times')),
       );
       return;
     }
@@ -55,9 +65,14 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthAuthenticated) return;
 
-    final ratings = [
-      HealthRatingItem(item: _selectedMaintenanceItem!, rating: _totalScore),
-    ];
+    final entry = FrameMaintenanceEntry(
+      maintenanceItem: _selectedMaintenanceItem!,
+      startTime: _startTime!,
+      endTime: _endTime!,
+      personDoingMaintenance: _personCtrl.text,
+      description: _descriptionCtrl.text,
+      durationHours: _durationHours,
+    );
 
     context.read<FrameReportsBloc>().add(
       SubmitMachineHealthReport(
@@ -65,9 +80,8 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
           date: _date,
           machineNumber: _machineNumber!,
           shift: _shift!,
-          ratings: ratings,
-          totalScore: _totalScore,
-          percentage: _percentage,
+          entries: [entry],
+          totalMaintenanceDurationHours: _durationHours,
           createdBy: authState.user.uid,
           submittedAt: DateTime.now(),
         ),
@@ -89,7 +103,6 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
           Navigator.pop(context);
         }
         if (state is FrameReportsError) {
-          debugPrint('FrameReportsError: ${state.message}');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Something went wrong'),
@@ -99,7 +112,7 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('New Health Report')),
+        appBar: AppBar(title: const Text('New Machine Health Report')),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -157,32 +170,114 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
                     .toList(),
                 onChanged: (v) => setState(() {
                   _selectedMaintenanceItem = v;
-                  _ratingController.clear();
+                  _startTime = null;
+                  _endTime = null;
+                  _personCtrl.clear();
+                  _descriptionCtrl.clear();
                 }),
                 validator: (v) =>
                     v == null ? 'Select a maintenance item' : null,
               ),
               if (_selectedMaintenanceItem != null) ...[
                 const SizedBox(height: 16),
-                const SectionHeader(
-                  title: 'Health Rating (1 = Low, 10 = Good)',
-                ),
-                const SizedBox(height: 8),
-                RatingBoxes(
-                  label: _selectedMaintenanceItem!,
-                  controller: _ratingController,
-                  onChanged: () => setState(() {}),
+                Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                dense: true,
+                                title: const Text('Start Time'),
+                                subtitle: Text(
+                                  _startTime != null
+                                      ? DateFormat('HH:mm').format(_startTime!)
+                                      : 'Select',
+                                ),
+                                onTap: () async {
+                                  final time = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  );
+                                  if (time != null) {
+                                    setState(() {
+                                      _startTime = DateTime(
+                                        _date.year,
+                                        _date.month,
+                                        _date.day,
+                                        time.hour,
+                                        time.minute,
+                                      );
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: ListTile(
+                                dense: true,
+                                title: const Text('End Time'),
+                                subtitle: Text(
+                                  _endTime != null
+                                      ? DateFormat('HH:mm').format(_endTime!)
+                                      : 'Select',
+                                ),
+                                onTap: () async {
+                                  final time = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  );
+                                  if (time != null) {
+                                    setState(() {
+                                      _endTime = DateTime(
+                                        _date.year,
+                                        _date.month,
+                                        _date.day,
+                                        time.hour,
+                                        time.minute,
+                                      );
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        TextFormField(
+                          controller: _personCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Person Doing Maintenance',
+                          ),
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? 'Enter person name'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _descriptionCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Description of Maintenance',
+                          ),
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 8),
+                        AutoCalculatedField(
+                          label: 'Duration',
+                          value: '${_durationHours.toStringAsFixed(2)} hours',
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
               const SizedBox(height: 16),
               AutoCalculatedField(
-                label: 'Total Score',
-                value: '$_totalScore / 10',
-              ),
-              const SizedBox(height: 12),
-              AutoCalculatedField(
-                label: 'Percentage',
-                value: '${_percentage.toStringAsFixed(2)}%',
+                label: 'Total Maintenance Duration',
+                value: '${_durationHours.toStringAsFixed(2)} hours',
               ),
               const SizedBox(height: 32),
               BlocBuilder<FrameReportsBloc, FrameReportsState>(

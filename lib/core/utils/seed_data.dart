@@ -356,18 +356,21 @@ Future<void> seedSampleData() async {
     final machine = i.isEven ? 'Frame Machine 1' : 'Frame Machine 2';
     final shift = i.isEven ? 'Day Shift' : 'Night Shift';
     final createdBy = machine == 'Frame Machine 1' ? 'op-1' : 'op-2';
-    final ratings = healthItems.map((item) {
-      return HealthRatingItem(item: item, rating: 6 + (i % 5));
-    }).toList();
-    final totalScore = ratings.fold<int>(0, (sum, r) => sum + r.rating);
+    final entry = FrameMaintenanceEntry(
+      maintenanceItem: healthItems[i % healthItems.length],
+      startTime: date.copyWith(hour: 8, minute: 0),
+      endTime: date.copyWith(hour: 9, minute: 0),
+      personDoingMaintenance: createdBy,
+      description: 'Routine maintenance',
+      durationHours: 1.0,
+    );
     await frameRepo.submitMachineHealthReport(
       MachineHealthReport(
         date: date,
         machineNumber: machine,
         shift: shift,
-        ratings: ratings,
-        totalScore: totalScore,
-        percentage: totalScore / (ratings.length * 10) * 100,
+        entries: [entry],
+        totalMaintenanceDurationHours: 1.0,
         createdBy: createdBy,
         submittedAt: date,
       ),
@@ -598,12 +601,13 @@ Future<void> seedSampleData() async {
     final machine = i.isEven ? 'Sheet Machine 3' : 'Sheet Machine 4';
     final shift = i.isEven ? 'Day Shift' : 'Night Shift';
     final createdBy = machine == 'Sheet Machine 3' ? 'op-3' : 'op-4';
-    final ratings = healthItems.map((item) {
-      return HealthRatingItem(item: item, rating: 7 + (i % 3));
-    }).toList();
-    final totalScore = ratings.fold<int>(
-      0,
-      (sum, rating) => sum + rating.rating,
+    final entry = FrameMaintenanceEntry(
+      maintenanceItem: healthItems[i % healthItems.length],
+      startTime: date.copyWith(hour: 8, minute: 0),
+      endTime: date.copyWith(hour: 9, minute: 0),
+      personDoingMaintenance: createdBy,
+      description: 'Routine maintenance',
+      durationHours: 1.0,
     );
 
     await sheetRepo.submitMachineHealthReport(
@@ -611,9 +615,8 @@ Future<void> seedSampleData() async {
         date: date,
         machineNumber: machine,
         shift: shift,
-        ratings: ratings,
-        totalScore: totalScore,
-        percentage: totalScore / (ratings.length * 10) * 100,
+        entries: [entry],
+        totalMaintenanceDurationHours: 1.0,
         createdBy: createdBy,
         submittedAt: date,
       ),

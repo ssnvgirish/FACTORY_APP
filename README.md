@@ -95,3 +95,6 @@ Monthly Salary = Fixed Salary × Multiplier
 | `referenceTables` | Weight tables, targets, salary weightages |
 | `dropdowns` | Configurable dropdown values |
 # FACTORY_APP
+
+
+flutter build apk --release
