@@ -8,7 +8,17 @@ import '../../../helpers/test_factories.dart';
 
 class MockFrameRepository extends Mock implements FrameRepository {}
 
-const _testTargets = AppConstants.defaultFrameTargets;
+Map<String, double> _nestedToFlat(Map<String, Map<String, double>> nested) {
+  final flat = <String, double>{};
+  for (final outer in nested.entries) {
+    for (final inner in outer.value.entries) {
+      flat['${outer.key}|${inner.key}'] = inner.value;
+    }
+  }
+  return flat;
+}
+
+final _testTargets = _nestedToFlat(AppConstants.defaultFrameTargets);
 
 void main() {
   late MockFrameRepository mockRepo;

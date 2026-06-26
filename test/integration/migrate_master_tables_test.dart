@@ -250,16 +250,15 @@ void main() {
 
     // ── Sheet Weights ──
     print('\n── Sheet Weights ──');
-    for (final entry in AppConstants.defaultSheetWeightsFlat.entries) {
-      final parts = entry.key.split('|');
-      if (parts.length == 2) {
+    for (final thickness in AppConstants.defaultSheetWeights.entries) {
+      for (final density in thickness.value.entries) {
         await _run(
-          '${parts[0]} × ${parts[1]}',
+          '${thickness.key} × ${density.key}',
           () => c
               .insertMasterSheetWeight(
-                thickness: parts[0],
-                density: parts[1],
-                weightPerSqft: entry.value,
+                thickness: thickness.key,
+                density: density.key,
+                weightPerSqft: density.value,
               )
               .execute(),
         );
@@ -268,32 +267,36 @@ void main() {
 
     // ── Frame Targets ──
     print('\n── Frame Targets ──');
-    for (final entry in AppConstants.defaultFrameTargets.entries) {
-      await _run(
-        entry.key,
-        () => c
-            .insertMasterFrameTarget(
-              section: entry.key,
-              density: '0.80',
-              targetKgPerHour: entry.value,
-            )
-            .execute(),
-      );
+    for (final section in AppConstants.defaultFrameTargets.entries) {
+      for (final density in section.value.entries) {
+        await _run(
+          '${section.key} × ${density.key}',
+          () => c
+              .insertMasterFrameTarget(
+                section: section.key,
+                density: density.key,
+                targetKgPerHour: density.value,
+              )
+              .execute(),
+        );
+      }
     }
 
     // ── Sheet Targets ──
     print('\n── Sheet Targets ──');
-    for (final entry in AppConstants.defaultSheetTargets.entries) {
-      await _run(
-        entry.key,
-        () => c
-            .insertMasterSheetTarget(
-              thickness: entry.key,
-              density: '0.60',
-              targetFeetPerHour: entry.value,
-            )
-            .execute(),
-      );
+    for (final thickness in AppConstants.defaultSheetTargets.entries) {
+      for (final density in thickness.value.entries) {
+        await _run(
+          '${thickness.key} × ${density.key}',
+          () => c
+              .insertMasterSheetTarget(
+                thickness: thickness.key,
+                density: density.key,
+                targetFeetPerHour: density.value,
+              )
+              .execute(),
+        );
+      }
     }
 
     // ── Scrap Targets ──
