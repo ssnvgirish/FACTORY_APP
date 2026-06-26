@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
 import '../bloc/scrap_regrind_bloc.dart';
@@ -70,7 +70,7 @@ class _ScrapCleaningReportFormPageState
               DropdownButtonFormField<String>(
                 initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
-                items: AppConstants.scrapAllMachines
+                items: ddp.scrapMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedMachine = v),

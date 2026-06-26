@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/utils/calculations.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
@@ -81,7 +81,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
               DropdownButtonFormField<String>(
                 initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
-                items: AppConstants.scrapAllMachines
+                items: ddp.scrapMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedMachine = v),
@@ -91,7 +91,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
               DropdownButtonFormField<String>(
                 initialValue: _selectedShift,
                 decoration: const InputDecoration(labelText: 'Shift'),
-                items: AppConstants.shifts
+                items: ddp.shifts
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedShift = v),
@@ -107,7 +107,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
                 decoration: const InputDecoration(
                   labelText: 'Select Maintenance Item',
                 ),
-                items: AppConstants.scrapMaintenanceItems
+                items: ddp.scrapMaintenanceItems
                     .map(
                       (item) =>
                           DropdownMenuItem(value: item, child: Text(item)),

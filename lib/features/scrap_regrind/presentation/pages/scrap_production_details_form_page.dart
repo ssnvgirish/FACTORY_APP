@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
 import '../bloc/scrap_regrind_bloc.dart';
@@ -68,7 +68,7 @@ class _ScrapProductionDetailsFormPageState
               DropdownButtonFormField<String>(
                 initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
-                items: AppConstants.scrapPulverizerMachines
+                items: ddp.scrapMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedMachine = v),
@@ -78,7 +78,7 @@ class _ScrapProductionDetailsFormPageState
               DropdownButtonFormField<String>(
                 initialValue: _selectedShift,
                 decoration: const InputDecoration(labelText: 'Shift'),
-                items: AppConstants.shifts
+                items: ddp.shifts
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedShift = v),
@@ -235,7 +235,7 @@ class _ProductLineCard extends StatelessWidget {
             DropdownButtonFormField<String>(
               initialValue: data.product,
               decoration: const InputDecoration(labelText: 'Product'),
-              items: AppConstants.scrapProducts
+              items: ddp.scrapProducts
                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                   .toList(),
               onChanged: (v) {
