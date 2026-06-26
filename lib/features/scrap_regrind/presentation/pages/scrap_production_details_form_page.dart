@@ -66,7 +66,7 @@ class _ScrapProductionDetailsFormPageState
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedMachine,
+                initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
                 items: AppConstants.scrapPulverizerMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
@@ -76,7 +76,7 @@ class _ScrapProductionDetailsFormPageState
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedShift,
+                initialValue: _selectedShift,
                 decoration: const InputDecoration(labelText: 'Shift'),
                 items: AppConstants.shifts
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -233,7 +233,7 @@ class _ProductLineCard extends StatelessWidget {
               ],
             ),
             DropdownButtonFormField<String>(
-              value: data.product,
+              initialValue: data.product,
               decoration: const InputDecoration(labelText: 'Product'),
               items: AppConstants.scrapProducts
                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))

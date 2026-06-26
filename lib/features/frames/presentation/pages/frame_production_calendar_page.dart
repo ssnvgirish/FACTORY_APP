@@ -227,7 +227,7 @@ class _ProductionCalendarState extends State<_ProductionCalendar> {
                       _dataCell(li.color),
                       _dataCell('${li.length}'),
                       _dataCell('${li.quantity}'),
-                      _dataCell('${li.totalWeight.toStringAsFixed(1)}'),
+                      _dataCell(li.totalWeight.toStringAsFixed(1)),
                     ],
                   ),
                 ),

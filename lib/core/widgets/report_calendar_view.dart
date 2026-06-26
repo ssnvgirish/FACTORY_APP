@@ -322,7 +322,7 @@ class _MachineCalendarScaffoldState extends State<MachineCalendarScaffold> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: DropdownButtonFormField<String>(
-              value: _selectedMachine,
+              initialValue: _selectedMachine,
               decoration: const InputDecoration(labelText: 'Select Machine'),
               items: widget.machines
                   .map((m) => DropdownMenuItem(value: m, child: Text(m)))

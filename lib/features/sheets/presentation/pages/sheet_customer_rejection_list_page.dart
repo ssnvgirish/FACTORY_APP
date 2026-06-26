@@ -105,7 +105,7 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
                                       ReportField('Quantity', '${li.quantity}'),
                                       ReportField(
                                         'SQFT',
-                                        '${li.sqft.toStringAsFixed(3)}',
+                                        li.sqft.toStringAsFixed(3),
                                       ),
                                       ReportField(
                                         'Per Piece Weight',

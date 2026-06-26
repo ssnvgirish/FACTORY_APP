@@ -525,14 +525,14 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
         wG: 25,
       );
     }
-    double _val(String variable) =>
+    double val(String variable) =>
         items.where((w) => w.variable == variable).firstOrNull?.percentage ?? 0;
     return ScrapSalaryWeightages(
-      wA: _val('wA'),
-      wB: _val('wB'),
-      wE: _val('wE'),
-      wF: _val('wF'),
-      wG: _val('wG'),
+      wA: val('wA'),
+      wB: val('wB'),
+      wE: val('wE'),
+      wF: val('wF'),
+      wG: val('wG'),
     );
   }
 

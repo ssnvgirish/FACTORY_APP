@@ -74,7 +74,11 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     const Text('Error loading report data'),
                     const SizedBox(height: 8),
@@ -167,9 +171,9 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
             const SizedBox(height: 16),
             Text(
               'Target: ${widget.request.target.displayLabel}',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -191,15 +195,9 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            _DetailRow(
-              label: 'ID',
-              value: widget.request.target.id,
-            ),
+            _DetailRow(label: 'ID', value: widget.request.target.id),
             const SizedBox(height: 8),
-            _DetailRow(
-              label: 'Name',
-              value: widget.request.target.name,
-            ),
+            _DetailRow(label: 'Name', value: widget.request.target.name),
             if (widget.request.start != null) ...[
               const SizedBox(height: 8),
               _DetailRow(
@@ -239,7 +237,9 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              isMachineType ? 'Machine Production Data' : 'Operator Performance Data',
+              isMachineType
+                  ? 'Machine Production Data'
+                  : 'Operator Performance Data',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -261,13 +261,15 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
 
     // Convert reports to display data
     final displayData = data
-        .map((report) => {
-              'date': dateFormat.format(report.date),
-              'shift': report.shift,
-              'produced': '${report.totalWeight.toStringAsFixed(2)} kg',
-              'efficiency': _calculateEfficiency(report).toStringAsFixed(1) + '%',
-              'status': _getProductionStatus(report),
-            })
+        .map(
+          (report) => {
+            'date': dateFormat.format(report.date),
+            'shift': report.shift,
+            'produced': '${report.totalWeight.toStringAsFixed(2)} kg',
+            'efficiency': '${_calculateEfficiency(report).toStringAsFixed(1)}%',
+            'status': _getProductionStatus(report),
+          },
+        )
         .toList();
 
     if (displayData.isEmpty) {
@@ -308,8 +310,9 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(item['status']!)
-                            .withValues(alpha: 0.15),
+                        color: _getStatusColor(
+                          item['status']!,
+                        ).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -330,10 +333,7 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     );
   }
 
-  Widget _buildOperatorDataTable(
-    BuildContext context,
-    List<dynamic> data,
-  ) {
+  Widget _buildOperatorDataTable(BuildContext context, List<dynamic> data) {
     // Placeholder for operator data - to be implemented
     // For now, returning empty state
     return Center(
@@ -398,17 +398,17 @@ class _DetailRow extends StatelessWidget {
           width: 120,
           child: Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: AppTheme.textSecondary),
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),

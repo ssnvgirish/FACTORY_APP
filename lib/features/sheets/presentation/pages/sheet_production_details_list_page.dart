@@ -82,10 +82,7 @@ class SheetProductionDetailsListPage extends StatelessWidget {
                                 ReportField('Length', '${li.length} in'),
                                 ReportField('Width', '${li.width} in'),
                                 ReportField('Quantity', '${li.quantity}'),
-                                ReportField(
-                                  'SQFT',
-                                  '${li.sqft.toStringAsFixed(3)}',
-                                ),
+                                ReportField('SQFT', li.sqft.toStringAsFixed(3)),
                                 ReportField(
                                   'Per Piece Weight',
                                   '${li.perPieceWeight.toStringAsFixed(3)} kg',

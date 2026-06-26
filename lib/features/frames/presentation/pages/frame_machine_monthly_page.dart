@@ -147,7 +147,7 @@ class _MachineCalendarViewState extends State<_MachineCalendarView> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: DropdownButtonFormField<String>(
-              value: _selectedMachine,
+              initialValue: _selectedMachine,
               decoration: const InputDecoration(labelText: 'Select Machine'),
               items: ddp.frameMachines
                   .map((m) => DropdownMenuItem(value: m, child: Text(m)))
@@ -322,13 +322,16 @@ class _MachineCalendarViewState extends State<_MachineCalendarView> {
                 (r) => _ReportEntry(
                   date: r.date,
                   shift: r.shift,
-                  summaryLabel: '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
+                  summaryLabel:
+                      '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
                   details: {
                     'Shift': r.shift,
-                    'Total Duration': '${r.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
+                    'Total Duration':
+                        '${r.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
                     ...{
                       for (final entry in r.entries)
-                        entry.maintenanceItem: '${entry.durationHours.toStringAsFixed(2)}h',
+                        entry.maintenanceItem:
+                            '${entry.durationHours.toStringAsFixed(2)}h',
                     },
                   },
                 ),

@@ -69,7 +69,7 @@ class _ScrapQualityReportFormPageState
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedMachine,
+                initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
                 items: AppConstants.scrapQualityMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
@@ -79,7 +79,7 @@ class _ScrapQualityReportFormPageState
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedShift,
+                initialValue: _selectedShift,
                 decoration: const InputDecoration(labelText: 'Shift'),
                 items: AppConstants.shifts
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -89,7 +89,7 @@ class _ScrapQualityReportFormPageState
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedProduct,
+                initialValue: _selectedProduct,
                 decoration: const InputDecoration(labelText: 'Product'),
                 items: AppConstants.scrapProducts
                     .map((p) => DropdownMenuItem(value: p, child: Text(p)))

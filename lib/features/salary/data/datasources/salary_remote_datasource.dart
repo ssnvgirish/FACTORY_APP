@@ -42,16 +42,16 @@ class SalaryRemoteDataSourceImpl implements SalaryRemoteDataSource {
         wF: d['wF']!,
       );
     }
-    double _val(String variable) =>
+    double val(String variable) =>
         items.where((w) => w.variable == variable).firstOrNull?.percentage ?? 0;
     final d = AppConstants.defaultSalaryWeightages;
     return SalaryWeightages(
-      wA: _val('wA') > 0 ? _val('wA') : d['wA']!,
-      wB: _val('wB') > 0 ? _val('wB') : d['wB']!,
-      wC: _val('wC') > 0 ? _val('wC') : d['wC']!,
-      wD: _val('wD') > 0 ? _val('wD') : d['wD']!,
-      wE: _val('wE') > 0 ? _val('wE') : d['wE']!,
-      wF: _val('wF') > 0 ? _val('wF') : d['wF']!,
+      wA: val('wA') > 0 ? val('wA') : d['wA']!,
+      wB: val('wB') > 0 ? val('wB') : d['wB']!,
+      wC: val('wC') > 0 ? val('wC') : d['wC']!,
+      wD: val('wD') > 0 ? val('wD') : d['wD']!,
+      wE: val('wE') > 0 ? val('wE') : d['wE']!,
+      wF: val('wF') > 0 ? val('wF') : d['wF']!,
     );
   }
 
@@ -63,8 +63,9 @@ class SalaryRemoteDataSourceImpl implements SalaryRemoteDataSource {
   ) async {
     final allUsers = await connector.listAllUsers().execute();
     final userMatch = allUsers.data.users.where((u) => u.uid == operatorId);
-    if (userMatch.isEmpty)
+    if (userMatch.isEmpty) {
       return {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0, 'f': 0};
+    }
 
     final machines = userMatch.first.assignedMachines;
     final isFrame = machines.any((m) => m.startsWith('Frame'));

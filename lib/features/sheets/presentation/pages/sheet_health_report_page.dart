@@ -131,7 +131,7 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
           const SectionHeader(title: 'Maintenance Item'),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: _selectedMaintenanceItem,
+            initialValue: _selectedMaintenanceItem,
             decoration: const InputDecoration(
               labelText: 'Select Maintenance Item',
             ),

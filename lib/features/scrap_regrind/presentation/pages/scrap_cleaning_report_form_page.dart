@@ -68,7 +68,7 @@ class _ScrapCleaningReportFormPageState
 
               // Machine dropdown
               DropdownButtonFormField<String>(
-                value: _selectedMachine,
+                initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
                 items: AppConstants.scrapAllMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))

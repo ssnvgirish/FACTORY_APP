@@ -323,8 +323,9 @@ class _TargetTableEditPage extends StatelessWidget {
         builder: (context, state) {
           if (state is AdminLoading) return const LoadingWidget();
           if (state is MasterTargetsLoaded && state.lookupType == lookupType) {
-            if (state.entries.isEmpty)
+            if (state.entries.isEmpty) {
               return const EmptyStateWidget(message: 'No entries');
+            }
             return ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: state.entries.length,

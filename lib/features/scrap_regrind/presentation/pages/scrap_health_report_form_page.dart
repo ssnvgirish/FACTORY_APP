@@ -79,7 +79,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedMachine,
+                initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
                 items: AppConstants.scrapAllMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
@@ -89,7 +89,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedShift,
+                initialValue: _selectedShift,
                 decoration: const InputDecoration(labelText: 'Shift'),
                 items: AppConstants.shifts
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -103,7 +103,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
               const SectionHeader(title: 'Maintenance Item'),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _selectedMaintenanceItem,
+                initialValue: _selectedMaintenanceItem,
                 decoration: const InputDecoration(
                   labelText: 'Select Maintenance Item',
                 ),
