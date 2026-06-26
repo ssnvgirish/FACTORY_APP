@@ -102,47 +102,95 @@ class _LookupTile extends StatelessWidget {
 
 // ─── Weight Matrix Page (section/thickness × density → weight) ────────────
 
-class _WeightMatrixPage extends StatelessWidget {
+class _WeightMatrixPage extends StatefulWidget {
   final String title;
   final MasterLookupType lookupType;
   const _WeightMatrixPage({required this.title, required this.lookupType});
 
-  bool get _isFrame => lookupType == MasterLookupType.frameWeights;
+  @override
+  State<_WeightMatrixPage> createState() => _WeightMatrixPageState();
+}
+
+class _WeightMatrixPageState extends State<_WeightMatrixPage> {
+  List<MasterTableItem> _sections = [];
+  List<MasterTableItem> _densities = [];
+
+  bool get _isFrame => widget.lookupType == MasterLookupType.frameWeights;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMasterData();
+  }
+
+  void _loadMasterData() {
+    final sectionTableType = _isFrame
+        ? MasterTableType.frameSections
+        : MasterTableType.sheetThicknesses;
+    final densityTableType = _isFrame
+        ? MasterTableType.frameDensities
+        : MasterTableType.sheetDensities;
+
+    context.read<AdminBloc>().add(LoadMasterTable(sectionTableType));
+    context.read<AdminBloc>().add(LoadMasterTable(densityTableType));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(widget.title)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
         child: const Icon(Icons.add),
       ),
-      body: BlocConsumer<AdminBloc, AdminState>(
+      body: BlocListener<AdminBloc, AdminState>(
         listener: (context, state) {
-          if (state is MasterLookupSaved) {
-            context.read<AdminBloc>().add(LoadMasterLookup(lookupType));
-          }
-          if (state is AdminError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+          if (state is MasterTableLoaded) {
+            setState(() {
+              if (_isFrame) {
+                if (state.tableType == MasterTableType.frameSections) {
+                  _sections = state.items;
+                } else if (state.tableType == MasterTableType.frameDensities) {
+                  _densities = state.items;
+                }
+              } else {
+                if (state.tableType == MasterTableType.sheetThicknesses) {
+                  _sections = state.items;
+                } else if (state.tableType == MasterTableType.sheetDensities) {
+                  _densities = state.items;
+                }
+              }
+            });
           }
         },
-        builder: (context, state) {
-          if (state is AdminLoading) return const LoadingWidget();
-          if (state is MasterWeightsLoaded && state.lookupType == lookupType) {
-            if (state.entries.isEmpty) {
-              return const EmptyStateWidget(
-                message: 'No entries yet. Tap + to add.',
+        child: BlocConsumer<AdminBloc, AdminState>(
+          listener: (context, state) {
+            if (state is MasterLookupSaved) {
+              context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
+            }
+            if (state is AdminError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
               );
             }
-            return _buildMatrix(context, state.entries);
-          }
-          return const LoadingWidget();
-        },
+          },
+          builder: (context, state) {
+            if (state is AdminLoading) return const LoadingWidget();
+            if (state is MasterWeightsLoaded &&
+                state.lookupType == widget.lookupType) {
+              if (state.entries.isEmpty) {
+                return const EmptyStateWidget(
+                  message: 'No entries yet. Tap + to add.',
+                );
+              }
+              return _buildMatrix(context, state.entries);
+            }
+            return const LoadingWidget();
+          },
+        ),
       ),
     );
   }
@@ -294,59 +342,132 @@ class _WeightMatrixPage extends StatelessWidget {
   }
 
   void _showAddDialog(BuildContext context) {
-    final k1 = TextEditingController();
-    final k2 = TextEditingController();
-    final w = TextEditingController();
+    String? selectedSection;
+    String? selectedDensity;
+    final wCtrl = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add Weight Entry'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: k1,
-              decoration: InputDecoration(
-                labelText: _isFrame ? 'Section' : 'Thickness',
-              ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Add Weight Entry'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: selectedSection,
+                  decoration: InputDecoration(
+                    labelText: _isFrame ? 'Section *' : 'Thickness *',
+                  ),
+                  items: _sections
+                      .where((item) => item.isActive)
+                      .map((item) => DropdownMenuItem(
+                            value: item.value,
+                            child: Text(item.value),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() => selectedSection = value),
+                  validator: (value) =>
+                      value == null ? 'Please select' : null,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: selectedDensity,
+                  decoration: const InputDecoration(
+                    labelText: 'Density *',
+                  ),
+                  items: _densities
+                      .where((item) => item.isActive)
+                      .map((item) => DropdownMenuItem(
+                            value: item.value,
+                            child: Text(item.value),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() => selectedDensity = value),
+                  validator: (value) =>
+                      value == null ? 'Please select' : null,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: wCtrl,
+                  decoration: InputDecoration(
+                    labelText: _isFrame
+                        ? 'Weight (kg/ft) *'
+                        : 'Weight (kg/sqft) *',
+                    hintText: 'e.g., 1.234',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: k2,
-              decoration: const InputDecoration(labelText: 'Density'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: w,
-              decoration: const InputDecoration(labelText: 'Weight'),
-              keyboardType: TextInputType.number,
+            ElevatedButton(
+              onPressed: () {
+                if (selectedSection == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text(_isFrame
+                          ? 'Please select a section'
+                          : 'Please select a thickness'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (selectedDensity == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select a density'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                final weightStr = wCtrl.text.trim();
+                if (weightStr.isEmpty) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Weight value is required'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                final weight = double.tryParse(weightStr);
+                if (weight == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Weight must be a valid number'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                context.read<AdminBloc>().add(
+                  SaveMasterWeightEntry(
+                    widget.lookupType,
+                    MasterWeightEntry(
+                      id: '',
+                      key1: selectedSection!,
+                      key2: selectedDensity!,
+                      weight: weight,
+                    ),
+                    isNew: true,
+                  ),
+                );
+                Navigator.pop(ctx);
+              },
+              child: const Text('Add'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<AdminBloc>().add(
-                SaveMasterWeightEntry(
-                  lookupType,
-                  MasterWeightEntry(
-                    id: '',
-                    key1: k1.text.trim(),
-                    key2: k2.text.trim(),
-                    weight: double.tryParse(w.text) ?? 0,
-                  ),
-                  isNew: true,
-                ),
-              );
-              Navigator.pop(ctx);
-            },
-            child: const Text('Add'),
-          ),
-        ],
       ),
     );
   }
@@ -371,7 +492,7 @@ class _WeightMatrixPage extends StatelessWidget {
             onPressed: () {
               context.read<AdminBloc>().add(
                 SaveMasterWeightEntry(
-                  lookupType,
+                  widget.lookupType,
                   MasterWeightEntry(
                     id: existing.id,
                     key1: existing.key1,
@@ -404,7 +525,7 @@ class _WeightMatrixPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<AdminBloc>().add(
-                DeleteMasterWeightEntry(lookupType, entry.id),
+                DeleteMasterWeightEntry(widget.lookupType, entry.id),
               );
               Navigator.pop(ctx);
             },
