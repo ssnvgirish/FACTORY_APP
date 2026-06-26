@@ -666,18 +666,23 @@ class _TargetMatrixPage extends StatelessWidget {
               controller: kCtrl,
               decoration: InputDecoration(
                 labelText: _isFrame ? 'Section' : 'Thickness',
+                hintText: _isFrame ? 'e.g., 3x2' : 'e.g., 0.5',
               ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: dCtrl,
-              decoration: const InputDecoration(labelText: 'Density'),
+              decoration: const InputDecoration(
+                labelText: 'Density *',
+                hintText: 'e.g., 0.75',
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: vCtrl,
               decoration: InputDecoration(
                 labelText: _isFrame ? 'Target (kg/hr)' : 'Target (ft/hr)',
+                hintText: _isFrame ? 'e.g., 50.5' : 'e.g., 100.0',
               ),
               keyboardType: TextInputType.number,
             ),
@@ -690,16 +695,61 @@ class _TargetMatrixPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              final section = kCtrl.text.trim();
+              final density = dCtrl.text.trim();
+              final targetStr = vCtrl.text.trim();
+
+              // Validation
+              if (section.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      _isFrame
+                          ? 'Section is required'
+                          : 'Thickness is required',
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              if (density.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('Density is required'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              if (targetStr.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('Target value is required'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              final target = double.tryParse(targetStr);
+              if (target == null) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('Target must be a valid number'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
               context.read<AdminBloc>().add(
                 SaveMasterTargetEntry(
                   lookupType,
                   MasterTargetEntry(
                     id: '',
-                    key: kCtrl.text.trim(),
-                    density: dCtrl.text.trim().isEmpty
-                        ? null
-                        : dCtrl.text.trim(),
-                    target: double.tryParse(vCtrl.text) ?? 0,
+                    key: section,
+                    density: density,
+                    target: target,
                   ),
                   isNew: true,
                 ),
@@ -1241,4 +1291,3 @@ class _SalaryWeightagesPageState extends State<_SalaryWeightagesPage>
     );
   }
 }
-

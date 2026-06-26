@@ -683,18 +683,24 @@ class AdminRemoteDatasource {
   ) async {
     switch (type) {
       case MasterLookupType.frameTargets:
+        if (entry.density == null || entry.density!.isEmpty) {
+          throw ArgumentError('Density is required for frame targets');
+        }
         await _connector
             .insertMasterFrameTarget(
               section: entry.key,
-              density: entry.density ?? '',
+              density: entry.density!,
               targetKgPerHour: entry.target,
             )
             .execute();
       case MasterLookupType.sheetTargets:
+        if (entry.density == null || entry.density!.isEmpty) {
+          throw ArgumentError('Density is required for sheet targets');
+        }
         await _connector
             .insertMasterSheetTarget(
               thickness: entry.key,
-              density: entry.density ?? '',
+              density: entry.density!,
               targetFeetPerHour: entry.target,
             )
             .execute();
@@ -716,20 +722,26 @@ class AdminRemoteDatasource {
   ) async {
     switch (type) {
       case MasterLookupType.frameTargets:
+        if (entry.density == null || entry.density!.isEmpty) {
+          throw ArgumentError('Density is required for frame targets');
+        }
         await _connector
             .updateMasterFrameTarget(
               id: UpdateMasterFrameTargetVariablesId(id: entry.id),
               section: entry.key,
-              density: entry.density ?? '',
+              density: entry.density!,
               targetKgPerHour: entry.target,
             )
             .execute();
       case MasterLookupType.sheetTargets:
+        if (entry.density == null || entry.density!.isEmpty) {
+          throw ArgumentError('Density is required for sheet targets');
+        }
         await _connector
             .updateMasterSheetTarget(
               id: UpdateMasterSheetTargetVariablesId(id: entry.id),
               thickness: entry.key,
-              density: entry.density ?? '',
+              density: entry.density!,
               targetFeetPerHour: entry.target,
             )
             .execute();
