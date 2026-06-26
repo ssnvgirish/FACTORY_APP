@@ -199,7 +199,8 @@ INSERT INTO public.master_frame_weight (id, section, density, weight_per_foot) V
   -- Window Shutter
   (uuid_generate_v4(), 'Window Shutter', '0.75', 0.648),
   (uuid_generate_v4(), 'Window Shutter', '0.80', 0.691),
-  (uuid_generate_v4(), 'Window Shutter', '0.90', 0.778);
+  (uuid_generate_v4(), 'Window Shutter', '0.90', 0.778)
+ON CONFLICT ON CONSTRAINT uq_frame_weight DO NOTHING;
 
 -- ══════════════════════════════════════
 -- 13. SHEET WEIGHTS (thickness × density → weight per sqft)
@@ -372,47 +373,62 @@ INSERT INTO public.master_sheet_weight (id, thickness, density, weight_per_sqft)
   (uuid_generate_v4(), '36mm', '0.60', 1.593),
   (uuid_generate_v4(), '36mm', '0.65', 1.725),
   (uuid_generate_v4(), '36mm', '0.70', 1.858),
-  (uuid_generate_v4(), '36mm', '0.80', 2.124);
+  (uuid_generate_v4(), '36mm', '0.80', 2.124)
+ON CONFLICT ON CONSTRAINT uq_sheet_weight DO NOTHING;
 
 -- ══════════════════════════════════════
--- 14. FRAME PRODUCTION TARGETS
+-- 14. FRAME PRODUCTION TARGETS (section × density → kg/hr)
 -- ══════════════════════════════════════
-INSERT INTO public.master_frame_target (id, section, target_kg_per_hour) VALUES
-  (uuid_generate_v4(), '3x2',            80.0),
-  (uuid_generate_v4(), '4x2',            100.0),
-  (uuid_generate_v4(), '4x2.5',          120.0),
-  (uuid_generate_v4(), '5x2.5',          140.0),
-  (uuid_generate_v4(), '3x2 (HR)',       80.0),
-  (uuid_generate_v4(), '4x2.5(HR)',      120.0),
-  (uuid_generate_v4(), 'Window Shutter', 90.0)
-ON CONFLICT (section) DO NOTHING;
+INSERT INTO public.master_frame_target (id, section, density, target_kg_per_hour) VALUES
+  (uuid_generate_v4(), '3x2',            '0.75',  80.0),
+  (uuid_generate_v4(), '3x2',            '0.80',  80.0),
+  (uuid_generate_v4(), '3x2',            '0.90',  80.0),
+  (uuid_generate_v4(), '4x2',            '0.75', 100.0),
+  (uuid_generate_v4(), '4x2',            '0.80', 100.0),
+  (uuid_generate_v4(), '4x2',            '0.90', 100.0),
+  (uuid_generate_v4(), '4x2.5',          '0.75', 120.0),
+  (uuid_generate_v4(), '4x2.5',          '0.80', 120.0),
+  (uuid_generate_v4(), '4x2.5',          '0.90', 120.0),
+  (uuid_generate_v4(), '5x2.5',          '0.75', 140.0),
+  (uuid_generate_v4(), '5x2.5',          '0.80', 140.0),
+  (uuid_generate_v4(), '5x2.5',          '0.90', 140.0),
+  (uuid_generate_v4(), '3x2 (HR)',       '0.75',  80.0),
+  (uuid_generate_v4(), '3x2 (HR)',       '0.80',  80.0),
+  (uuid_generate_v4(), '3x2 (HR)',       '0.90',  80.0),
+  (uuid_generate_v4(), '4x2.5(HR)',      '0.75', 120.0),
+  (uuid_generate_v4(), '4x2.5(HR)',      '0.80', 120.0),
+  (uuid_generate_v4(), '4x2.5(HR)',      '0.90', 120.0),
+  (uuid_generate_v4(), 'Window Shutter', '0.75',  90.0),
+  (uuid_generate_v4(), 'Window Shutter', '0.80',  90.0),
+  (uuid_generate_v4(), 'Window Shutter', '0.90',  90.0)
+ON CONFLICT ON CONSTRAINT uq_frame_target DO NOTHING;
 
 -- ══════════════════════════════════════
--- 15. SHEET PRODUCTION TARGETS
+-- 15. SHEET PRODUCTION TARGETS (thickness × density → ft/hr)
 -- ══════════════════════════════════════
-INSERT INTO public.master_sheet_target (id, thickness, target_feet_per_hour) VALUES
-  (uuid_generate_v4(), '6mm',        250.0),
-  (uuid_generate_v4(), '7mm',        230.0),
-  (uuid_generate_v4(), '8mm',        210.0),
-  (uuid_generate_v4(), '9mm',        200.0),
-  (uuid_generate_v4(), '12mm',       170.0),
-  (uuid_generate_v4(), '13mm',       160.0),
-  (uuid_generate_v4(), '16mm',       140.0),
-  (uuid_generate_v4(), '17mm',       130.0),
-  (uuid_generate_v4(), '18mm',       125.0),
-  (uuid_generate_v4(), '19mm',       120.0),
-  (uuid_generate_v4(), '22mm',       100.0),
-  (uuid_generate_v4(), '25mm sheet', 85.0),
-  (uuid_generate_v4(), '25mm Door',  85.0),
-  (uuid_generate_v4(), '26mm',       80.0),
-  (uuid_generate_v4(), '27mm',       78.0),
-  (uuid_generate_v4(), '28mm',       75.0),
-  (uuid_generate_v4(), '30mm',       70.0),
-  (uuid_generate_v4(), '31mm',       68.0),
-  (uuid_generate_v4(), '33mm',       60.0),
-  (uuid_generate_v4(), '35mm',       55.0),
-  (uuid_generate_v4(), '36mm',       52.0)
-ON CONFLICT (thickness) DO NOTHING;
+INSERT INTO public.master_sheet_target (id, thickness, density, target_feet_per_hour) VALUES
+  (uuid_generate_v4(), '6mm',        '0.45', 250.0), (uuid_generate_v4(), '6mm',        '0.50', 250.0), (uuid_generate_v4(), '6mm',        '0.55', 250.0), (uuid_generate_v4(), '6mm',        '0.60', 250.0), (uuid_generate_v4(), '6mm',        '0.65', 250.0), (uuid_generate_v4(), '6mm',        '0.70', 250.0), (uuid_generate_v4(), '6mm',        '0.80', 250.0),
+  (uuid_generate_v4(), '7mm',        '0.45', 230.0), (uuid_generate_v4(), '7mm',        '0.50', 230.0), (uuid_generate_v4(), '7mm',        '0.55', 230.0), (uuid_generate_v4(), '7mm',        '0.60', 230.0), (uuid_generate_v4(), '7mm',        '0.65', 230.0), (uuid_generate_v4(), '7mm',        '0.70', 230.0), (uuid_generate_v4(), '7mm',        '0.80', 230.0),
+  (uuid_generate_v4(), '8mm',        '0.45', 210.0), (uuid_generate_v4(), '8mm',        '0.50', 210.0), (uuid_generate_v4(), '8mm',        '0.55', 210.0), (uuid_generate_v4(), '8mm',        '0.60', 210.0), (uuid_generate_v4(), '8mm',        '0.65', 210.0), (uuid_generate_v4(), '8mm',        '0.70', 210.0), (uuid_generate_v4(), '8mm',        '0.80', 210.0),
+  (uuid_generate_v4(), '9mm',        '0.45', 200.0), (uuid_generate_v4(), '9mm',        '0.50', 200.0), (uuid_generate_v4(), '9mm',        '0.55', 200.0), (uuid_generate_v4(), '9mm',        '0.60', 200.0), (uuid_generate_v4(), '9mm',        '0.65', 200.0), (uuid_generate_v4(), '9mm',        '0.70', 200.0), (uuid_generate_v4(), '9mm',        '0.80', 200.0),
+  (uuid_generate_v4(), '12mm',       '0.45', 170.0), (uuid_generate_v4(), '12mm',       '0.50', 170.0), (uuid_generate_v4(), '12mm',       '0.55', 170.0), (uuid_generate_v4(), '12mm',       '0.60', 170.0), (uuid_generate_v4(), '12mm',       '0.65', 170.0), (uuid_generate_v4(), '12mm',       '0.70', 170.0), (uuid_generate_v4(), '12mm',       '0.80', 170.0),
+  (uuid_generate_v4(), '13mm',       '0.45', 160.0), (uuid_generate_v4(), '13mm',       '0.50', 160.0), (uuid_generate_v4(), '13mm',       '0.55', 160.0), (uuid_generate_v4(), '13mm',       '0.60', 160.0), (uuid_generate_v4(), '13mm',       '0.65', 160.0), (uuid_generate_v4(), '13mm',       '0.70', 160.0), (uuid_generate_v4(), '13mm',       '0.80', 160.0),
+  (uuid_generate_v4(), '16mm',       '0.45', 140.0), (uuid_generate_v4(), '16mm',       '0.50', 140.0), (uuid_generate_v4(), '16mm',       '0.55', 140.0), (uuid_generate_v4(), '16mm',       '0.60', 140.0), (uuid_generate_v4(), '16mm',       '0.65', 140.0), (uuid_generate_v4(), '16mm',       '0.70', 140.0), (uuid_generate_v4(), '16mm',       '0.80', 140.0),
+  (uuid_generate_v4(), '17mm',       '0.45', 130.0), (uuid_generate_v4(), '17mm',       '0.50', 130.0), (uuid_generate_v4(), '17mm',       '0.55', 130.0), (uuid_generate_v4(), '17mm',       '0.60', 130.0), (uuid_generate_v4(), '17mm',       '0.65', 130.0), (uuid_generate_v4(), '17mm',       '0.70', 130.0), (uuid_generate_v4(), '17mm',       '0.80', 130.0),
+  (uuid_generate_v4(), '18mm',       '0.45', 125.0), (uuid_generate_v4(), '18mm',       '0.50', 125.0), (uuid_generate_v4(), '18mm',       '0.55', 125.0), (uuid_generate_v4(), '18mm',       '0.60', 125.0), (uuid_generate_v4(), '18mm',       '0.65', 125.0), (uuid_generate_v4(), '18mm',       '0.70', 125.0), (uuid_generate_v4(), '18mm',       '0.80', 125.0),
+  (uuid_generate_v4(), '19mm',       '0.45', 120.0), (uuid_generate_v4(), '19mm',       '0.50', 120.0), (uuid_generate_v4(), '19mm',       '0.55', 120.0), (uuid_generate_v4(), '19mm',       '0.60', 120.0), (uuid_generate_v4(), '19mm',       '0.65', 120.0), (uuid_generate_v4(), '19mm',       '0.70', 120.0), (uuid_generate_v4(), '19mm',       '0.80', 120.0),
+  (uuid_generate_v4(), '22mm',       '0.45', 100.0), (uuid_generate_v4(), '22mm',       '0.50', 100.0), (uuid_generate_v4(), '22mm',       '0.55', 100.0), (uuid_generate_v4(), '22mm',       '0.60', 100.0), (uuid_generate_v4(), '22mm',       '0.65', 100.0), (uuid_generate_v4(), '22mm',       '0.70', 100.0), (uuid_generate_v4(), '22mm',       '0.80', 100.0),
+  (uuid_generate_v4(), '25mm sheet', '0.45',  85.0), (uuid_generate_v4(), '25mm sheet', '0.50',  85.0), (uuid_generate_v4(), '25mm sheet', '0.55',  85.0), (uuid_generate_v4(), '25mm sheet', '0.60',  85.0), (uuid_generate_v4(), '25mm sheet', '0.65',  85.0), (uuid_generate_v4(), '25mm sheet', '0.70',  85.0), (uuid_generate_v4(), '25mm sheet', '0.80',  85.0),
+  (uuid_generate_v4(), '25mm Door',  '0.45',  85.0), (uuid_generate_v4(), '25mm Door',  '0.50',  85.0), (uuid_generate_v4(), '25mm Door',  '0.55',  85.0), (uuid_generate_v4(), '25mm Door',  '0.60',  85.0), (uuid_generate_v4(), '25mm Door',  '0.65',  85.0), (uuid_generate_v4(), '25mm Door',  '0.70',  85.0), (uuid_generate_v4(), '25mm Door',  '0.80',  85.0),
+  (uuid_generate_v4(), '26mm',       '0.45',  80.0), (uuid_generate_v4(), '26mm',       '0.50',  80.0), (uuid_generate_v4(), '26mm',       '0.55',  80.0), (uuid_generate_v4(), '26mm',       '0.60',  80.0), (uuid_generate_v4(), '26mm',       '0.65',  80.0), (uuid_generate_v4(), '26mm',       '0.70',  80.0), (uuid_generate_v4(), '26mm',       '0.80',  80.0),
+  (uuid_generate_v4(), '27mm',       '0.45',  78.0), (uuid_generate_v4(), '27mm',       '0.50',  78.0), (uuid_generate_v4(), '27mm',       '0.55',  78.0), (uuid_generate_v4(), '27mm',       '0.60',  78.0), (uuid_generate_v4(), '27mm',       '0.65',  78.0), (uuid_generate_v4(), '27mm',       '0.70',  78.0), (uuid_generate_v4(), '27mm',       '0.80',  78.0),
+  (uuid_generate_v4(), '28mm',       '0.45',  75.0), (uuid_generate_v4(), '28mm',       '0.50',  75.0), (uuid_generate_v4(), '28mm',       '0.55',  75.0), (uuid_generate_v4(), '28mm',       '0.60',  75.0), (uuid_generate_v4(), '28mm',       '0.65',  75.0), (uuid_generate_v4(), '28mm',       '0.70',  75.0), (uuid_generate_v4(), '28mm',       '0.80',  75.0),
+  (uuid_generate_v4(), '30mm',       '0.45',  70.0), (uuid_generate_v4(), '30mm',       '0.50',  70.0), (uuid_generate_v4(), '30mm',       '0.55',  70.0), (uuid_generate_v4(), '30mm',       '0.60',  70.0), (uuid_generate_v4(), '30mm',       '0.65',  70.0), (uuid_generate_v4(), '30mm',       '0.70',  70.0), (uuid_generate_v4(), '30mm',       '0.80',  70.0),
+  (uuid_generate_v4(), '31mm',       '0.45',  68.0), (uuid_generate_v4(), '31mm',       '0.50',  68.0), (uuid_generate_v4(), '31mm',       '0.55',  68.0), (uuid_generate_v4(), '31mm',       '0.60',  68.0), (uuid_generate_v4(), '31mm',       '0.65',  68.0), (uuid_generate_v4(), '31mm',       '0.70',  68.0), (uuid_generate_v4(), '31mm',       '0.80',  68.0),
+  (uuid_generate_v4(), '33mm',       '0.45',  60.0), (uuid_generate_v4(), '33mm',       '0.50',  60.0), (uuid_generate_v4(), '33mm',       '0.55',  60.0), (uuid_generate_v4(), '33mm',       '0.60',  60.0), (uuid_generate_v4(), '33mm',       '0.65',  60.0), (uuid_generate_v4(), '33mm',       '0.70',  60.0), (uuid_generate_v4(), '33mm',       '0.80',  60.0),
+  (uuid_generate_v4(), '35mm',       '0.45',  55.0), (uuid_generate_v4(), '35mm',       '0.50',  55.0), (uuid_generate_v4(), '35mm',       '0.55',  55.0), (uuid_generate_v4(), '35mm',       '0.60',  55.0), (uuid_generate_v4(), '35mm',       '0.65',  55.0), (uuid_generate_v4(), '35mm',       '0.70',  55.0), (uuid_generate_v4(), '35mm',       '0.80',  55.0),
+  (uuid_generate_v4(), '36mm',       '0.45',  52.0), (uuid_generate_v4(), '36mm',       '0.50',  52.0), (uuid_generate_v4(), '36mm',       '0.55',  52.0), (uuid_generate_v4(), '36mm',       '0.60',  52.0), (uuid_generate_v4(), '36mm',       '0.65',  52.0), (uuid_generate_v4(), '36mm',       '0.70',  52.0), (uuid_generate_v4(), '36mm',       '0.80',  52.0)
+ON CONFLICT ON CONSTRAINT uq_sheet_target DO NOTHING;
 
 -- ══════════════════════════════════════
 -- 16. SCRAP PRODUCTION TARGETS

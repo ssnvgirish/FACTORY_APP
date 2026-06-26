@@ -222,15 +222,14 @@ class MasterTableSeeder {
     }
 
     // ── Sheet Weights ──
-    for (final entry in AppConstants.defaultSheetWeightsFlat.entries) {
-      final parts = entry.key.split('|');
-      if (parts.length == 2) {
+    for (final thickness in AppConstants.defaultSheetWeights.entries) {
+      for (final density in thickness.value.entries) {
         await run(
           () => c
               .insertMasterSheetWeight(
-                thickness: parts[0],
-                density: parts[1],
-                weightPerSqft: entry.value,
+                thickness: thickness.key,
+                density: density.key,
+                weightPerSqft: density.value,
               )
               .execute(),
         );
@@ -238,33 +237,35 @@ class MasterTableSeeder {
     }
 
     // ── Frame Targets ──
-    // Frame/sheet targets now require both section/thickness AND density.
-    // Seed each section with the most common frame density (0.80) as a starting
-    // point; the admin can add density-specific entries via the reference tables.
-    for (final entry in AppConstants.defaultFrameTargets.entries) {
-      await run(
-        () => c
-            .insertMasterFrameTarget(
-              section: entry.key,
-              density: '0.80',
-              targetKgPerHour: entry.value,
-            )
-            .execute(),
-      );
+    // One row per section × density combination.
+    for (final section in AppConstants.defaultFrameTargets.entries) {
+      for (final density in section.value.entries) {
+        await run(
+          () => c
+              .insertMasterFrameTarget(
+                section: section.key,
+                density: density.key,
+                targetKgPerHour: density.value,
+              )
+              .execute(),
+        );
+      }
     }
 
     // ── Sheet Targets ──
-    // Seed each thickness with density 0.60 as a starting point.
-    for (final entry in AppConstants.defaultSheetTargets.entries) {
-      await run(
-        () => c
-            .insertMasterSheetTarget(
-              thickness: entry.key,
-              density: '0.60',
-              targetFeetPerHour: entry.value,
-            )
-            .execute(),
-      );
+    // One row per thickness × density combination.
+    for (final thickness in AppConstants.defaultSheetTargets.entries) {
+      for (final density in thickness.value.entries) {
+        await run(
+          () => c
+              .insertMasterSheetTarget(
+                thickness: thickness.key,
+                density: density.key,
+                targetFeetPerHour: density.value,
+              )
+              .execute(),
+        );
+      }
     }
 
     // ── Scrap Targets ──

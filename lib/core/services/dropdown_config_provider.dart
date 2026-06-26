@@ -224,15 +224,15 @@ class DropdownConfigProvider {
   Map<String, Map<String, double>> get sheetWeights =>
       _sheetWeightsCache.isNotEmpty
       ? _sheetWeightsCache
-      : _flatToNested(AppConstants.defaultSheetWeightsFlat);
+      : AppConstants.defaultSheetWeights;
 
   Map<String, double> get frameTargets => _frameTargetsCache.isNotEmpty
       ? _frameTargetsCache
-      : AppConstants.defaultFrameTargets;
+      : _nestedToFlat(AppConstants.defaultFrameTargets);
 
   Map<String, double> get sheetTargets => _sheetTargetsCache.isNotEmpty
       ? _sheetTargetsCache
-      : AppConstants.defaultSheetTargets;
+      : _nestedToFlat(AppConstants.defaultSheetTargets);
 
   Map<String, double> get scrapTargets => _scrapTargetsCache.isNotEmpty
       ? _scrapTargetsCache
@@ -247,18 +247,17 @@ class DropdownConfigProvider {
   /// Force reload from the backend.
   Future<void> refresh() async => load();
 
-  /// Converts a flat weight map with `"key1|key2"` keys
-  /// into a nested `Map<key1, Map<key2, weight>>`.
-  static Map<String, Map<String, double>> _flatToNested(
-    Map<String, double> flat,
+  /// Converts a nested `Map<key1, Map<key2, value>>` into a flat
+  /// `Map<"key1|key2", value>` for use by [Calculations.calculateTargetWeight].
+  static Map<String, double> _nestedToFlat(
+    Map<String, Map<String, double>> nested,
   ) {
-    final nested = <String, Map<String, double>>{};
-    for (final entry in flat.entries) {
-      final parts = entry.key.split('|');
-      if (parts.length == 2) {
-        nested.putIfAbsent(parts[0], () => {})[parts[1]] = entry.value;
+    final flat = <String, double>{};
+    for (final outer in nested.entries) {
+      for (final inner in outer.value.entries) {
+        flat['${outer.key}|${inner.key}'] = inner.value;
       }
     }
-    return nested;
+    return flat;
   }
 }

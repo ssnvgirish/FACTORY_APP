@@ -18,32 +18,38 @@ class ReferenceTablesPage extends StatelessWidget {
         children: [
           _LookupTile(
             title: 'Frame Weight Table',
-            subtitle: 'Section × Density → Weight per foot',
+            subtitle: 'Section × Density → Weight per foot (kg)',
+            icon: Icons.table_chart,
             lookupType: MasterLookupType.frameWeights,
           ),
           _LookupTile(
             title: 'Sheet Weight Table',
-            subtitle: 'Thickness × Density → Weight per sqft',
+            subtitle: 'Thickness × Density → Weight per sqft (kg)',
+            icon: Icons.table_chart,
             lookupType: MasterLookupType.sheetWeights,
           ),
           _LookupTile(
             title: 'Frame Production Targets',
-            subtitle: 'Section × Density → Target kg/hr',
+            subtitle: 'Section × Density → Target kg / hr',
+            icon: Icons.track_changes,
             lookupType: MasterLookupType.frameTargets,
           ),
           _LookupTile(
             title: 'Sheet Production Targets',
-            subtitle: 'Thickness × Density → Target ft/hr',
+            subtitle: 'Thickness × Density → Target ft / hr',
+            icon: Icons.track_changes,
             lookupType: MasterLookupType.sheetTargets,
           ),
           _LookupTile(
             title: 'Scrap Production Targets',
-            subtitle: 'Target weight per hour by product',
+            subtitle: 'Product → Target kg / hr',
+            icon: Icons.track_changes,
             lookupType: MasterLookupType.scrapTargets,
           ),
           _LookupTile(
             title: 'Salary Weightages',
-            subtitle: 'Variable weightages summing to 100%',
+            subtitle: 'Variable weightages summing to 100 % per category',
+            icon: Icons.percent,
             lookupType: MasterLookupType.salaryWeightages,
           ),
         ],
@@ -55,11 +61,13 @@ class ReferenceTablesPage extends StatelessWidget {
 class _LookupTile extends StatelessWidget {
   final String title;
   final String subtitle;
+  final IconData icon;
   final MasterLookupType lookupType;
 
   const _LookupTile({
     required this.title,
     required this.subtitle,
+    required this.icon,
     required this.lookupType,
   });
 
@@ -69,48 +77,37 @@ class _LookupTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
+        leading: Icon(icon, color: AppTheme.accentAmber),
         title: Text(title, style: Theme.of(context).textTheme.titleMedium),
         subtitle: Text(subtitle),
-        trailing: const Icon(Icons.edit, color: AppTheme.accentAmber),
+        trailing: const Icon(Icons.chevron_right),
         onTap: () {
           context.read<AdminBloc>().add(LoadMasterLookup(lookupType));
-          if (lookupType == MasterLookupType.frameWeights ||
-              lookupType == MasterLookupType.sheetWeights) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    _WeightTableEditPage(title: title, lookupType: lookupType),
-              ),
-            );
-          } else if (lookupType == MasterLookupType.salaryWeightages) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => _SalaryWeightagesEditPage(title: title),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    _TargetTableEditPage(title: title, lookupType: lookupType),
-              ),
-            );
-          }
+          final page = switch (lookupType) {
+            MasterLookupType.frameWeights || MasterLookupType.sheetWeights =>
+              _WeightMatrixPage(title: title, lookupType: lookupType),
+            MasterLookupType.frameTargets || MasterLookupType.sheetTargets =>
+              _TargetMatrixPage(title: title, lookupType: lookupType),
+            MasterLookupType.scrapTargets => _ScrapTargetPage(title: title),
+            MasterLookupType.salaryWeightages => _SalaryWeightagesPage(
+              title: title,
+            ),
+          };
+          Navigator.push(context, MaterialPageRoute(builder: (_) => page));
         },
       ),
     );
   }
 }
 
-// ─── Weight Table Editor (section/thickness × density → weight) ───
+// ─── Weight Matrix Page (section/thickness × density → weight) ────────────
 
-class _WeightTableEditPage extends StatelessWidget {
+class _WeightMatrixPage extends StatelessWidget {
   final String title;
   final MasterLookupType lookupType;
-  const _WeightTableEditPage({required this.title, required this.lookupType});
+  const _WeightMatrixPage({required this.title, required this.lookupType});
+
+  bool get _isFrame => lookupType == MasterLookupType.frameWeights;
 
   @override
   Widget build(BuildContext context) {
@@ -138,62 +135,160 @@ class _WeightTableEditPage extends StatelessWidget {
           if (state is AdminLoading) return const LoadingWidget();
           if (state is MasterWeightsLoaded && state.lookupType == lookupType) {
             if (state.entries.isEmpty) {
-              return const EmptyStateWidget(message: 'No entries');
-            }
-            final sorted = List<MasterWeightEntry>.from(state.entries)
-              ..sort(
-                (a, b) =>
-                    '${a.key1}|${a.key2}'.compareTo('${b.key1}|${b.key2}'),
+              return const EmptyStateWidget(
+                message: 'No entries yet. Tap + to add.',
               );
-            return ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: sorted.length,
-              itemBuilder: (context, i) {
-                final e = sorted[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 6),
-                  child: ListTile(
-                    dense: true,
-                    title: Text(
-                      '${e.key1} × ${e.key2}',
-                      style: GoogleFonts.sourceCodePro(fontSize: 13),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          e.weight.toStringAsFixed(3),
-                          style: GoogleFonts.sourceCodePro(),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            size: 18,
-                            color: AppTheme.accentAmber,
-                          ),
-                          onPressed: () => _showEditDialog(context, e),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            size: 18,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            context.read<AdminBloc>().add(
-                              DeleteMasterWeightEntry(lookupType, e.id),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
+            }
+            return _buildMatrix(context, state.entries);
           }
           return const LoadingWidget();
         },
+      ),
+    );
+  }
+
+  Widget _buildMatrix(BuildContext context, List<MasterWeightEntry> entries) {
+    // Build row/column sets from the data.
+    final rowKeys = <String>{};
+    final colKeys = <String>{};
+    for (final e in entries) {
+      rowKeys.add(e.key1);
+      colKeys.add(e.key2);
+    }
+    final rows = rowKeys.toList()..sort();
+    final cols = colKeys.toList()..sort();
+
+    // Build a lookup map for fast access.
+    final lookup = <String, MasterWeightEntry>{};
+    for (final e in entries) {
+      lookup['${e.key1}|${e.key2}'] = e;
+    }
+
+    const double rowLabelWidth = 120;
+    const double cellWidth = 80;
+    const double cellHeight = 44;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header row
+            Row(
+              children: [
+                _headerCell(
+                  _isFrame ? 'Section' : 'Thickness',
+                  width: rowLabelWidth,
+                  height: cellHeight,
+                ),
+                ...cols.map(
+                  (d) =>
+                      _headerCell('ρ $d', width: cellWidth, height: cellHeight),
+                ),
+              ],
+            ),
+            const Divider(height: 2, thickness: 2),
+            // Data rows
+            ...rows.map((rowKey) {
+              return Row(
+                children: [
+                  _labelCell(rowKey, width: rowLabelWidth, height: cellHeight),
+                  ...cols.map((colKey) {
+                    final entry = lookup['$rowKey|$colKey'];
+                    return _dataCell(
+                      context,
+                      entry: entry,
+                      rowKey: rowKey,
+                      colKey: colKey,
+                      width: cellWidth,
+                      height: cellHeight,
+                    );
+                  }),
+                ],
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _headerCell(
+    String text, {
+    required double width,
+    required double height,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      alignment: Alignment.center,
+      color: AppTheme.accentAmber.withValues(alpha: 0.15),
+      child: Text(
+        text,
+        style: GoogleFonts.sourceCodePro(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _labelCell(
+    String text, {
+    required double width,
+    required double height,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.08),
+        border: const Border(bottom: BorderSide(color: Colors.black12)),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.sourceCodePro(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _dataCell(
+    BuildContext context, {
+    MasterWeightEntry? entry,
+    required String rowKey,
+    required String colKey,
+    required double width,
+    required double height,
+  }) {
+    return GestureDetector(
+      onTap: entry == null ? null : () => _showEditDialog(context, entry),
+      onLongPress: entry == null ? null : () => _confirmDelete(context, entry),
+      child: Container(
+        width: width,
+        height: height,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black12, width: 0.5),
+          color: entry == null
+              ? Colors.grey.withValues(alpha: 0.05)
+              : Colors.white,
+        ),
+        child: entry == null
+            ? const Text('—', style: TextStyle(color: Colors.black26))
+            : Text(
+                entry.weight.toStringAsFixed(3),
+                style: GoogleFonts.sourceCodePro(fontSize: 11),
+              ),
       ),
     );
   }
@@ -202,7 +297,6 @@ class _WeightTableEditPage extends StatelessWidget {
     final k1 = TextEditingController();
     final k2 = TextEditingController();
     final w = TextEditingController();
-    final isFrame = lookupType == MasterLookupType.frameWeights;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -213,7 +307,7 @@ class _WeightTableEditPage extends StatelessWidget {
             TextField(
               controller: k1,
               decoration: InputDecoration(
-                labelText: isFrame ? 'Section' : 'Thickness',
+                labelText: _isFrame ? 'Section' : 'Thickness',
               ),
             ),
             const SizedBox(height: 8),
@@ -236,14 +330,17 @@ class _WeightTableEditPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              final entry = MasterWeightEntry(
-                id: '',
-                key1: k1.text.trim(),
-                key2: k2.text.trim(),
-                weight: double.tryParse(w.text) ?? 0,
-              );
               context.read<AdminBloc>().add(
-                SaveMasterWeightEntry(lookupType, entry, isNew: true),
+                SaveMasterWeightEntry(
+                  lookupType,
+                  MasterWeightEntry(
+                    id: '',
+                    key1: k1.text.trim(),
+                    key2: k2.text.trim(),
+                    weight: double.tryParse(w.text) ?? 0,
+                  ),
+                  isNew: true,
+                ),
               );
               Navigator.pop(ctx);
             },
@@ -272,14 +369,16 @@ class _WeightTableEditPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              final entry = MasterWeightEntry(
-                id: existing.id,
-                key1: existing.key1,
-                key2: existing.key2,
-                weight: double.tryParse(w.text) ?? 0,
-              );
               context.read<AdminBloc>().add(
-                SaveMasterWeightEntry(lookupType, entry),
+                SaveMasterWeightEntry(
+                  lookupType,
+                  MasterWeightEntry(
+                    id: existing.id,
+                    key1: existing.key1,
+                    key2: existing.key2,
+                    weight: double.tryParse(w.text) ?? 0,
+                  ),
+                ),
               );
               Navigator.pop(ctx);
             },
@@ -289,24 +388,42 @@ class _WeightTableEditPage extends StatelessWidget {
       ),
     );
   }
+
+  void _confirmDelete(BuildContext context, MasterWeightEntry entry) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Entry'),
+        content: Text('Delete ${entry.key1} × ${entry.key2}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              context.read<AdminBloc>().add(
+                DeleteMasterWeightEntry(lookupType, entry.id),
+              );
+              Navigator.pop(ctx);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-// ─── Target Table Editor (key × density → target value) ───
+// ─── Target Matrix Page (section/thickness × density → target) ────────────
 
-class _TargetTableEditPage extends StatelessWidget {
+class _TargetMatrixPage extends StatelessWidget {
   final String title;
   final MasterLookupType lookupType;
-  const _TargetTableEditPage({required this.title, required this.lookupType});
+  const _TargetMatrixPage({required this.title, required this.lookupType});
 
-  bool get _hasDensity =>
-      lookupType == MasterLookupType.frameTargets ||
-      lookupType == MasterLookupType.sheetTargets;
-
-  String get _keyLabel {
-    if (lookupType == MasterLookupType.frameTargets) return 'Section';
-    if (lookupType == MasterLookupType.sheetTargets) return 'Thickness';
-    return 'Key';
-  }
+  bool get _isFrame => lookupType == MasterLookupType.frameTargets;
 
   @override
   Widget build(BuildContext context) {
@@ -334,66 +451,202 @@ class _TargetTableEditPage extends StatelessWidget {
           if (state is AdminLoading) return const LoadingWidget();
           if (state is MasterTargetsLoaded && state.lookupType == lookupType) {
             if (state.entries.isEmpty) {
-              return const EmptyStateWidget(message: 'No entries');
+              return const EmptyStateWidget(
+                message: 'No entries yet. Tap + to add.',
+              );
             }
-            final sorted = List<MasterTargetEntry>.from(state.entries)
-              ..sort((a, b) {
-                final k = a.key.compareTo(b.key);
-                if (k != 0) return k;
-                return (a.density ?? '').compareTo(b.density ?? '');
-              });
-            return ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: sorted.length,
-              itemBuilder: (context, i) {
-                final e = sorted[i];
-                final displayKey = _hasDensity && e.density != null
-                    ? '${e.key} × ${e.density}'
-                    : e.key;
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 6),
-                  child: ListTile(
-                    dense: true,
-                    title: Text(
-                      displayKey,
-                      style: GoogleFonts.sourceCodePro(fontSize: 13),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          e.target.toStringAsFixed(1),
-                          style: GoogleFonts.sourceCodePro(),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            size: 18,
-                            color: AppTheme.accentAmber,
-                          ),
-                          onPressed: () => _showEditDialog(context, e),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            size: 18,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            context.read<AdminBloc>().add(
-                              DeleteMasterTargetEntry(lookupType, e.id),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
+            return _buildMatrix(context, state.entries);
           }
           return const LoadingWidget();
         },
+      ),
+    );
+  }
+
+  Widget _buildMatrix(BuildContext context, List<MasterTargetEntry> entries) {
+    final rowKeys = <String>{};
+    final colKeys = <String>{};
+    for (final e in entries) {
+      rowKeys.add(e.key);
+      if (e.density != null) colKeys.add(e.density!);
+    }
+    final rows = rowKeys.toList()..sort();
+    final cols = colKeys.toList()..sort();
+    final hasDensity = cols.isNotEmpty;
+
+    final lookup = <String, MasterTargetEntry>{};
+    for (final e in entries) {
+      lookup[hasDensity && e.density != null
+              ? '${e.key}|${e.density}'
+              : e.key] =
+          e;
+    }
+
+    if (!hasDensity) {
+      // Simple flat list (scrap targets style).
+      return ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: entries.length,
+        itemBuilder: (context, i) => _buildFlatRow(context, entries[i]),
+      );
+    }
+
+    const double rowLabelWidth = 120;
+    const double cellWidth = 72;
+    const double cellHeight = 44;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _headerCell(
+                  _isFrame ? 'Section' : 'Thickness',
+                  width: rowLabelWidth,
+                  height: cellHeight,
+                ),
+                ...cols.map(
+                  (d) =>
+                      _headerCell('ρ $d', width: cellWidth, height: cellHeight),
+                ),
+              ],
+            ),
+            const Divider(height: 2, thickness: 2),
+            ...rows.map((rowKey) {
+              return Row(
+                children: [
+                  _labelCell(rowKey, width: rowLabelWidth, height: cellHeight),
+                  ...cols.map((colKey) {
+                    final entry = lookup['$rowKey|$colKey'];
+                    return _dataCell(
+                      context,
+                      entry: entry,
+                      rowKey: rowKey,
+                      colKey: colKey,
+                      width: cellWidth,
+                      height: cellHeight,
+                    );
+                  }),
+                ],
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlatRow(BuildContext context, MasterTargetEntry entry) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 6),
+      child: ListTile(
+        dense: true,
+        title: Text(entry.key, style: GoogleFonts.sourceCodePro(fontSize: 13)),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              entry.target.toStringAsFixed(1),
+              style: GoogleFonts.sourceCodePro(),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.edit,
+                size: 18,
+                color: AppTheme.accentAmber,
+              ),
+              onPressed: () => _showEditDialog(context, entry),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+              onPressed: () => context.read<AdminBloc>().add(
+                DeleteMasterTargetEntry(lookupType, entry.id),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _headerCell(
+    String text, {
+    required double width,
+    required double height,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      alignment: Alignment.center,
+      color: AppTheme.accentAmber.withValues(alpha: 0.15),
+      child: Text(
+        text,
+        style: GoogleFonts.sourceCodePro(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _labelCell(
+    String text, {
+    required double width,
+    required double height,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.08),
+        border: const Border(bottom: BorderSide(color: Colors.black12)),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.sourceCodePro(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _dataCell(
+    BuildContext context, {
+    MasterTargetEntry? entry,
+    required String rowKey,
+    required String colKey,
+    required double width,
+    required double height,
+  }) {
+    return GestureDetector(
+      onTap: entry == null ? null : () => _showEditDialog(context, entry),
+      onLongPress: entry == null ? null : () => _confirmDelete(context, entry),
+      child: Container(
+        width: width,
+        height: height,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black12, width: 0.5),
+          color: entry == null
+              ? Colors.grey.withValues(alpha: 0.05)
+              : Colors.white,
+        ),
+        child: entry == null
+            ? const Text('—', style: TextStyle(color: Colors.black26))
+            : Text(
+                entry.target.toStringAsFixed(0),
+                style: GoogleFonts.sourceCodePro(fontSize: 11),
+              ),
       ),
     );
   }
@@ -411,19 +664,21 @@ class _TargetTableEditPage extends StatelessWidget {
           children: [
             TextField(
               controller: kCtrl,
-              decoration: InputDecoration(labelText: _keyLabel),
-            ),
-            if (_hasDensity) ...[
-              const SizedBox(height: 8),
-              TextField(
-                controller: dCtrl,
-                decoration: const InputDecoration(labelText: 'Density'),
+              decoration: InputDecoration(
+                labelText: _isFrame ? 'Section' : 'Thickness',
               ),
-            ],
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: dCtrl,
+              decoration: const InputDecoration(labelText: 'Density'),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: vCtrl,
-              decoration: const InputDecoration(labelText: 'Target'),
+              decoration: InputDecoration(
+                labelText: _isFrame ? 'Target (kg/hr)' : 'Target (ft/hr)',
+              ),
               keyboardType: TextInputType.number,
             ),
           ],
@@ -441,7 +696,9 @@ class _TargetTableEditPage extends StatelessWidget {
                   MasterTargetEntry(
                     id: '',
                     key: kCtrl.text.trim(),
-                    density: _hasDensity ? dCtrl.text.trim() : null,
+                    density: dCtrl.text.trim().isEmpty
+                        ? null
+                        : dCtrl.text.trim(),
                     target: double.tryParse(vCtrl.text) ?? 0,
                   ),
                   isNew: true,
@@ -460,16 +717,18 @@ class _TargetTableEditPage extends StatelessWidget {
     final vCtrl = TextEditingController(
       text: existing.target.toStringAsFixed(1),
     );
-    final displayKey = _hasDensity && existing.density != null
+    final label = existing.density != null
         ? '${existing.key} × ${existing.density}'
         : existing.key;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(displayKey),
+        title: Text(label),
         content: TextField(
           controller: vCtrl,
-          decoration: const InputDecoration(labelText: 'Target'),
+          decoration: InputDecoration(
+            labelText: _isFrame ? 'Target (kg/hr)' : 'Target (ft/hr)',
+          ),
           keyboardType: TextInputType.number,
         ),
         actions: [
@@ -498,18 +757,295 @@ class _TargetTableEditPage extends StatelessWidget {
       ),
     );
   }
+
+  void _confirmDelete(BuildContext context, MasterTargetEntry entry) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Entry'),
+        content: Text(
+          'Delete target for ${entry.key}${entry.density != null ? ' × ${entry.density}' : ''}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              context.read<AdminBloc>().add(
+                DeleteMasterTargetEntry(lookupType, entry.id),
+              );
+              Navigator.pop(ctx);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-// ─── Salary Weightages Editor ───
+// ─── Scrap Target Page (simple product → target table) ────────────────────
 
-class _SalaryWeightagesEditPage extends StatelessWidget {
+class _ScrapTargetPage extends StatelessWidget {
   final String title;
-  const _SalaryWeightagesEditPage({required this.title});
+  const _ScrapTargetPage({required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddDialog(context),
+        child: const Icon(Icons.add),
+      ),
+      body: BlocConsumer<AdminBloc, AdminState>(
+        listener: (context, state) {
+          if (state is MasterLookupSaved) {
+            context.read<AdminBloc>().add(
+              const LoadMasterLookup(MasterLookupType.scrapTargets),
+            );
+          }
+          if (state is AdminError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is AdminLoading) return const LoadingWidget();
+          if (state is MasterTargetsLoaded &&
+              state.lookupType == MasterLookupType.scrapTargets) {
+            if (state.entries.isEmpty) {
+              return const EmptyStateWidget(
+                message: 'No entries yet. Tap + to add.',
+              );
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _tableHeader(),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: state.entries.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, i) =>
+                        _scrapRow(context, state.entries[i]),
+                  ),
+                ),
+              ],
+            );
+          }
+          return const LoadingWidget();
+        },
+      ),
+    );
+  }
+
+  Widget _tableHeader() {
+    return Container(
+      color: AppTheme.accentAmber.withValues(alpha: 0.15),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Product',
+              style: GoogleFonts.sourceCodePro(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          Text(
+            'Target (kg/hr)',
+            style: GoogleFonts.sourceCodePro(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(width: 72),
+        ],
+      ),
+    );
+  }
+
+  Widget _scrapRow(BuildContext context, MasterTargetEntry entry) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              entry.key,
+              style: GoogleFonts.sourceCodePro(fontSize: 12),
+            ),
+          ),
+          Text(
+            entry.target.toStringAsFixed(1),
+            style: GoogleFonts.sourceCodePro(fontSize: 12),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.edit,
+                  size: 18,
+                  color: AppTheme.accentAmber,
+                ),
+                onPressed: () => _showEditDialog(context, entry),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+                onPressed: () => context.read<AdminBloc>().add(
+                  DeleteMasterTargetEntry(
+                    MasterLookupType.scrapTargets,
+                    entry.id,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddDialog(BuildContext context) {
+    final kCtrl = TextEditingController();
+    final vCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add Scrap Target'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: kCtrl,
+              decoration: const InputDecoration(labelText: 'Product'),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: vCtrl,
+              decoration: const InputDecoration(labelText: 'Target (kg/hr)'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.read<AdminBloc>().add(
+                SaveMasterTargetEntry(
+                  MasterLookupType.scrapTargets,
+                  MasterTargetEntry(
+                    id: '',
+                    key: kCtrl.text.trim(),
+                    target: double.tryParse(vCtrl.text) ?? 0,
+                  ),
+                  isNew: true,
+                ),
+              );
+              Navigator.pop(ctx);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, MasterTargetEntry existing) {
+    final vCtrl = TextEditingController(
+      text: existing.target.toStringAsFixed(1),
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(existing.key),
+        content: TextField(
+          controller: vCtrl,
+          decoration: const InputDecoration(labelText: 'Target (kg/hr)'),
+          keyboardType: TextInputType.number,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.read<AdminBloc>().add(
+                SaveMasterTargetEntry(
+                  MasterLookupType.scrapTargets,
+                  MasterTargetEntry(
+                    id: existing.id,
+                    key: existing.key,
+                    target: double.tryParse(vCtrl.text) ?? 0,
+                  ),
+                ),
+              );
+              Navigator.pop(ctx);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Salary Weightages Page ────────────────────────────────────────────────
+
+class _SalaryWeightagesPage extends StatefulWidget {
+  final String title;
+  const _SalaryWeightagesPage({required this.title});
+
+  @override
+  State<_SalaryWeightagesPage> createState() => _SalaryWeightagesPageState();
+}
+
+class _SalaryWeightagesPageState extends State<_SalaryWeightagesPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab;
+
+  @override
+  void initState() {
+    super.initState();
+    _tab = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        bottom: TabBar(
+          controller: _tab,
+          tabs: const [
+            Tab(text: 'Frame / Sheet'),
+            Tab(text: 'Scrap'),
+          ],
+        ),
+      ),
       body: BlocConsumer<AdminBloc, AdminState>(
         listener: (context, state) {
           if (state is MasterLookupSaved) {
@@ -527,40 +1063,139 @@ class _SalaryWeightagesEditPage extends StatelessWidget {
         builder: (context, state) {
           if (state is AdminLoading) return const LoadingWidget();
           if (state is SalaryWeightagesLoaded) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: state.entries.length,
-              itemBuilder: (context, i) {
-                final e = state.entries[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 6),
-                  child: ListTile(
-                    title: Text('${e.variable} — ${e.label}'),
-                    subtitle: Text('Category: ${e.category}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${e.percentage}%',
-                          style: GoogleFonts.sourceCodePro(),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            size: 18,
-                            color: AppTheme.accentAmber,
-                          ),
-                          onPressed: () => _showEditDialog(context, e),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+            final frameSheet = state.entries
+                .where((e) => e.category == 'frame_sheet')
+                .toList();
+            final scrap = state.entries
+                .where((e) => e.category == 'scrap')
+                .toList();
+            return TabBarView(
+              controller: _tab,
+              children: [
+                _weightageTable(context, frameSheet),
+                _weightageTable(context, scrap),
+              ],
             );
           }
           return const LoadingWidget();
         },
+      ),
+    );
+  }
+
+  Widget _weightageTable(
+    BuildContext context,
+    List<MasterSalaryWeightageEntry> entries,
+  ) {
+    if (entries.isEmpty) {
+      return const EmptyStateWidget(message: 'No weightages configured.');
+    }
+
+    final total = entries.fold<double>(0, (s, e) => s + e.percentage);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Table header
+        Container(
+          color: AppTheme.accentAmber.withValues(alpha: 0.15),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 48,
+                child: Text(
+                  'Var',
+                  style: GoogleFonts.sourceCodePro(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'Label',
+                  style: GoogleFonts.sourceCodePro(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 70,
+                child: Text(
+                  '%',
+                  style: GoogleFonts.sourceCodePro(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+              const SizedBox(width: 48),
+            ],
+          ),
+        ),
+        const Divider(height: 1, thickness: 1),
+        Expanded(
+          child: ListView.separated(
+            itemCount: entries.length,
+            separatorBuilder: (_, _) => const Divider(height: 1),
+            itemBuilder: (context, i) => _weightageRow(context, entries[i]),
+          ),
+        ),
+        // Total row
+        Container(
+          color: Colors.grey.withValues(alpha: 0.1),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              const Spacer(),
+              Text(
+                'Total: ${total.toStringAsFixed(1)} %',
+                style: GoogleFonts.sourceCodePro(
+                  fontWeight: FontWeight.bold,
+                  color: total == 100 ? Colors.green : Colors.red,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _weightageRow(BuildContext context, MasterSalaryWeightageEntry entry) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 48,
+            child: Text(
+              entry.variable,
+              style: GoogleFonts.sourceCodePro(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(entry.label, style: const TextStyle(fontSize: 13)),
+          ),
+          SizedBox(
+            width: 70,
+            child: Text(
+              '${entry.percentage.toStringAsFixed(1)} %',
+              style: GoogleFonts.sourceCodePro(fontSize: 13),
+              textAlign: TextAlign.right,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, size: 18, color: AppTheme.accentAmber),
+            onPressed: () => _showEditDialog(context, entry),
+          ),
+        ],
       ),
     );
   }
@@ -606,3 +1241,4 @@ class _SalaryWeightagesEditPage extends StatelessWidget {
     );
   }
 }
+
