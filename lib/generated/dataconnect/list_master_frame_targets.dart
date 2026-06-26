@@ -1,18 +1,22 @@
 part of 'default.dart';
 
 class ListMasterFrameTargetsVariablesBuilder {
-  
   final FirebaseDataConnect _dataConnect;
-  ListMasterFrameTargetsVariablesBuilder(this._dataConnect, );
-  Deserializer<ListMasterFrameTargetsData> dataDeserializer = (dynamic json)  => ListMasterFrameTargetsData.fromJson(jsonDecode(json));
-  
+  ListMasterFrameTargetsVariablesBuilder(this._dataConnect);
+  Deserializer<ListMasterFrameTargetsData> dataDeserializer = (dynamic json) =>
+      ListMasterFrameTargetsData.fromJson(jsonDecode(json));
+
   Future<QueryResult<ListMasterFrameTargetsData, void>> execute() {
     return ref().execute();
   }
 
   QueryRef<ListMasterFrameTargetsData, void> ref() {
-    
-    return _dataConnect.query("ListMasterFrameTargets", dataDeserializer, emptySerializer, null);
+    return _dataConnect.query(
+      "ListMasterFrameTargets",
+      dataDeserializer,
+      emptySerializer,
+      null,
+    );
   }
 }
 
@@ -22,31 +26,35 @@ class ListMasterFrameTargetsMasterFrameTargets {
   final String section;
   final String density;
   final double targetKgPerHour;
-  ListMasterFrameTargetsMasterFrameTargets.fromJson(dynamic json):
-  
-  id = nativeFromJson<String>(json['id']),
-  section = nativeFromJson<String>(json['section']),
-  density = nativeFromJson<String>(json['density']),
-  targetKgPerHour = nativeFromJson<double>(json['targetKgPerHour']);
+  ListMasterFrameTargetsMasterFrameTargets.fromJson(dynamic json)
+    : id = nativeFromJson<String>(json['id']),
+      section = nativeFromJson<String>(json['section']),
+      density = nativeFromJson<String>(json['density'] ?? ''),
+      targetKgPerHour = nativeFromJson<double>(json['targetKgPerHour']);
   @override
   bool operator ==(Object other) {
-    if(identical(this, other)) {
+    if (identical(this, other)) {
       return true;
     }
-    if(other.runtimeType != runtimeType) {
+    if (other.runtimeType != runtimeType) {
       return false;
     }
 
-    final ListMasterFrameTargetsMasterFrameTargets otherTyped = other as ListMasterFrameTargetsMasterFrameTargets;
-    return id == otherTyped.id && 
-    section == otherTyped.section && 
-    density == otherTyped.density &&
-    targetKgPerHour == otherTyped.targetKgPerHour;
-    
+    final ListMasterFrameTargetsMasterFrameTargets otherTyped =
+        other as ListMasterFrameTargetsMasterFrameTargets;
+    return id == otherTyped.id &&
+        section == otherTyped.section &&
+        density == otherTyped.density &&
+        targetKgPerHour == otherTyped.targetKgPerHour;
   }
+
   @override
-  int get hashCode => Object.hashAll([id.hashCode, section.hashCode, density.hashCode, targetKgPerHour.hashCode]);
-  
+  int get hashCode => Object.hashAll([
+    id.hashCode,
+    section.hashCode,
+    density.hashCode,
+    targetKgPerHour.hashCode,
+  ]);
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
@@ -68,36 +76,34 @@ class ListMasterFrameTargetsMasterFrameTargets {
 @immutable
 class ListMasterFrameTargetsData {
   final List<ListMasterFrameTargetsMasterFrameTargets> masterFrameTargets;
-  ListMasterFrameTargetsData.fromJson(dynamic json):
-  
-  masterFrameTargets = (json['masterFrameTargets'] as List<dynamic>)
-        .map((e) => ListMasterFrameTargetsMasterFrameTargets.fromJson(e))
-        .toList();
+  ListMasterFrameTargetsData.fromJson(dynamic json)
+    : masterFrameTargets = (json['masterFrameTargets'] as List<dynamic>)
+          .map((e) => ListMasterFrameTargetsMasterFrameTargets.fromJson(e))
+          .toList();
   @override
   bool operator ==(Object other) {
-    if(identical(this, other)) {
+    if (identical(this, other)) {
       return true;
     }
-    if(other.runtimeType != runtimeType) {
+    if (other.runtimeType != runtimeType) {
       return false;
     }
 
-    final ListMasterFrameTargetsData otherTyped = other as ListMasterFrameTargetsData;
+    final ListMasterFrameTargetsData otherTyped =
+        other as ListMasterFrameTargetsData;
     return masterFrameTargets == otherTyped.masterFrameTargets;
-    
   }
+
   @override
   int get hashCode => masterFrameTargets.hashCode;
-  
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['masterFrameTargets'] = masterFrameTargets.map((e) => e.toJson()).toList();
+    json['masterFrameTargets'] = masterFrameTargets
+        .map((e) => e.toJson())
+        .toList();
     return json;
   }
 
-  ListMasterFrameTargetsData({
-    required this.masterFrameTargets,
-  });
+  ListMasterFrameTargetsData({required this.masterFrameTargets});
 }
-

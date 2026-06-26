@@ -29,7 +29,7 @@ class ListMasterSheetTargetsMasterSheetTargets {
   ListMasterSheetTargetsMasterSheetTargets.fromJson(dynamic json)
     : id = nativeFromJson<String>(json['id']),
       thickness = nativeFromJson<String>(json['thickness']),
-      density = nativeFromJson<String>(json['density']),
+      density = nativeFromJson<String>(json['density'] ?? ''),
       targetFeetPerHour = nativeFromJson<double>(json['targetFeetPerHour']);
   @override
   bool operator ==(Object other) {
