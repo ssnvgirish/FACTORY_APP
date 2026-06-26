@@ -103,12 +103,14 @@ type MasterSheetWeight @table {
 }
 
 type MasterFrameTarget @table {
-  section: String! @unique
+  section: String!
+  density: String!
   targetKgPerHour: Float!
 }
 
 type MasterSheetTarget @table {
-  thickness: String! @unique
+  thickness: String!
+  density: String!
   targetFeetPerHour: Float!
 }
 

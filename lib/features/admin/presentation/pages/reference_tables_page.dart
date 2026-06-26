@@ -28,12 +28,12 @@ class ReferenceTablesPage extends StatelessWidget {
           ),
           _LookupTile(
             title: 'Frame Production Targets',
-            subtitle: 'Target weight per hour by section',
+            subtitle: 'Section × Density → Target kg/hr',
             lookupType: MasterLookupType.frameTargets,
           ),
           _LookupTile(
             title: 'Sheet Production Targets',
-            subtitle: 'Target running feet per hour by thickness',
+            subtitle: 'Thickness × Density → Target ft/hr',
             lookupType: MasterLookupType.sheetTargets,
           ),
           _LookupTile(
@@ -291,12 +291,22 @@ class _WeightTableEditPage extends StatelessWidget {
   }
 }
 
-// ─── Target Table Editor (key → target value) ───
+// ─── Target Table Editor (key × density → target value) ───
 
 class _TargetTableEditPage extends StatelessWidget {
   final String title;
   final MasterLookupType lookupType;
   const _TargetTableEditPage({required this.title, required this.lookupType});
+
+  bool get _hasDensity =>
+      lookupType == MasterLookupType.frameTargets ||
+      lookupType == MasterLookupType.sheetTargets;
+
+  String get _keyLabel {
+    if (lookupType == MasterLookupType.frameTargets) return 'Section';
+    if (lookupType == MasterLookupType.sheetTargets) return 'Thickness';
+    return 'Key';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -326,17 +336,26 @@ class _TargetTableEditPage extends StatelessWidget {
             if (state.entries.isEmpty) {
               return const EmptyStateWidget(message: 'No entries');
             }
+            final sorted = List<MasterTargetEntry>.from(state.entries)
+              ..sort((a, b) {
+                final k = a.key.compareTo(b.key);
+                if (k != 0) return k;
+                return (a.density ?? '').compareTo(b.density ?? '');
+              });
             return ListView.builder(
               padding: const EdgeInsets.all(12),
-              itemCount: state.entries.length,
+              itemCount: sorted.length,
               itemBuilder: (context, i) {
-                final e = state.entries[i];
+                final e = sorted[i];
+                final displayKey = _hasDensity && e.density != null
+                    ? '${e.key} × ${e.density}'
+                    : e.key;
                 return Card(
                   margin: const EdgeInsets.only(bottom: 6),
                   child: ListTile(
                     dense: true,
                     title: Text(
-                      e.key,
+                      displayKey,
                       style: GoogleFonts.sourceCodePro(fontSize: 13),
                     ),
                     trailing: Row(
@@ -381,6 +400,7 @@ class _TargetTableEditPage extends StatelessWidget {
 
   void _showAddDialog(BuildContext context) {
     final kCtrl = TextEditingController();
+    final dCtrl = TextEditingController();
     final vCtrl = TextEditingController();
     showDialog(
       context: context,
@@ -391,8 +411,15 @@ class _TargetTableEditPage extends StatelessWidget {
           children: [
             TextField(
               controller: kCtrl,
-              decoration: const InputDecoration(labelText: 'Key'),
+              decoration: InputDecoration(labelText: _keyLabel),
             ),
+            if (_hasDensity) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: dCtrl,
+                decoration: const InputDecoration(labelText: 'Density'),
+              ),
+            ],
             const SizedBox(height: 8),
             TextField(
               controller: vCtrl,
@@ -414,6 +441,7 @@ class _TargetTableEditPage extends StatelessWidget {
                   MasterTargetEntry(
                     id: '',
                     key: kCtrl.text.trim(),
+                    density: _hasDensity ? dCtrl.text.trim() : null,
                     target: double.tryParse(vCtrl.text) ?? 0,
                   ),
                   isNew: true,
@@ -432,10 +460,13 @@ class _TargetTableEditPage extends StatelessWidget {
     final vCtrl = TextEditingController(
       text: existing.target.toStringAsFixed(1),
     );
+    final displayKey = _hasDensity && existing.density != null
+        ? '${existing.key} × ${existing.density}'
+        : existing.key;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(existing.key),
+        title: Text(displayKey),
         content: TextField(
           controller: vCtrl,
           decoration: const InputDecoration(labelText: 'Target'),
@@ -454,6 +485,7 @@ class _TargetTableEditPage extends StatelessWidget {
                   MasterTargetEntry(
                     id: existing.id,
                     key: existing.key,
+                    density: existing.density,
                     target: double.tryParse(vCtrl.text) ?? 0,
                   ),
                 ),

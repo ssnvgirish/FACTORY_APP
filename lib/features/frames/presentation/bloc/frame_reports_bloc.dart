@@ -465,14 +465,15 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     final productionWeight = report.totalWeight;
     if (productionWeight == 0) return;
 
-    // Build time-segments from line items grouped by section.
-    // Each section's share of the 12-hour shift is proportional to its weight
-    // contribution.
+    // Build time-segments from line items grouped by section and density.
+    // Each section+density combination's share of the 12-hour shift is
+    // proportional to its weight contribution.
     const shiftHours = 12.0;
-    final sectionWeights = <String, double>{};
+    final sectionDensityWeights = <String, double>{}; // key = "section|density"
     for (final li in report.lineItems) {
-      sectionWeights[li.section] =
-          (sectionWeights[li.section] ?? 0) + li.totalWeight;
+      final key = '${li.section}|${li.density}';
+      sectionDensityWeights[key] =
+          (sectionDensityWeights[key] ?? 0) + li.totalWeight;
     }
 
     final lineItemsTotal = report.lineItems.fold<double>(
@@ -481,14 +482,14 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     );
     if (lineItemsTotal == 0) return;
 
-    final segments = sectionWeights.entries
-        .map(
-          (e) => <String, dynamic>{
-            'section': e.key,
-            'durationHours': (e.value / lineItemsTotal) * shiftHours,
-          },
-        )
-        .toList();
+    final segments = sectionDensityWeights.entries.map((e) {
+      final parts = e.key.split('|');
+      return <String, dynamic>{
+        'section': parts[0],
+        'density': parts.length > 1 ? parts[1] : '',
+        'durationHours': (e.value / lineItemsTotal) * shiftHours,
+      };
+    }).toList();
 
     final targetWeight = Calculations.calculateTargetWeight(
       segments: segments,

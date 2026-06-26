@@ -20,7 +20,7 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
   String _shift = ddp.shifts.first;
-  late String _selectedMachine;
+  String? _selectedMachine;
   String? _selectedMaintenanceItem;
 
   DateTime? _startTime;
@@ -36,11 +36,10 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
   @override
   void initState() {
     super.initState();
-    _selectedMachine = widget.machineId.isNotEmpty
-        ? widget.machineId
-        : ddp.sheetMachines.first;
+    _selectedMachine =
+        widget.machineId.isNotEmpty ? widget.machineId : null;
     context.read<SheetReportsBloc>().add(
-      LoadSheetHealthReports(machineNumber: _selectedMachine),
+      LoadSheetHealthReports(machineNumber: _selectedMachine ?? ''),
     );
   }
 
@@ -126,6 +125,16 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
                 const SizedBox(height: 12),
               ],
             ),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedMachine,
+            decoration: const InputDecoration(labelText: 'Machine Number'),
+            items: ddp.sheetMachines
+                .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+                .toList(),
+            onChanged: (v) => setState(() => _selectedMachine = v),
+            validator: (v) => v == null ? 'Select a machine' : null,
           ),
           const SizedBox(height: 12),
           const SectionHeader(title: 'Maintenance Item'),
@@ -267,6 +276,12 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
 
   void _submitReport() {
     if (!_formKey.currentState!.validate()) return;
+    if (_selectedMachine == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a machine')),
+      );
+      return;
+    }
     if (_selectedMaintenanceItem == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Select a maintenance item')),
@@ -291,7 +306,7 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
 
     final report = MachineHealthReport(
       date: _selectedDate,
-      machineNumber: _selectedMachine,
+      machineNumber: _selectedMachine!,
       shift: _shift,
       entries: [entry],
       totalMaintenanceDurationHours: _durationHours,

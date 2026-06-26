@@ -105,16 +105,18 @@ class MasterWeightEntry extends Equatable {
 class MasterTargetEntry extends Equatable {
   final String id;
   final String key; // section (frame) or thickness (sheet) or product (scrap)
+  final String? density; // non-null for frame/sheet targets; null for scrap
   final double target;
 
   const MasterTargetEntry({
     required this.id,
     required this.key,
+    this.density,
     required this.target,
   });
 
   @override
-  List<Object?> get props => [id, key, target];
+  List<Object?> get props => [id, key, density, target];
 }
 
 /// Row in the salary-weightage table.

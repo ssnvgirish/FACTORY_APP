@@ -238,11 +238,15 @@ class MasterTableSeeder {
     }
 
     // ── Frame Targets ──
+    // Frame/sheet targets now require both section/thickness AND density.
+    // Seed each section with the most common frame density (0.80) as a starting
+    // point; the admin can add density-specific entries via the reference tables.
     for (final entry in AppConstants.defaultFrameTargets.entries) {
       await run(
         () => c
             .insertMasterFrameTarget(
               section: entry.key,
+              density: '0.80',
               targetKgPerHour: entry.value,
             )
             .execute(),
@@ -250,11 +254,13 @@ class MasterTableSeeder {
     }
 
     // ── Sheet Targets ──
+    // Seed each thickness with density 0.60 as a starting point.
     for (final entry in AppConstants.defaultSheetTargets.entries) {
       await run(
         () => c
             .insertMasterSheetTarget(
               thickness: entry.key,
+              density: '0.60',
               targetFeetPerHour: entry.value,
             )
             .execute(),

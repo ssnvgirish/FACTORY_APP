@@ -109,7 +109,12 @@ class DropdownConfigProvider {
     try {
       final entries = await _adminRepository.getTargetTable(type);
       if (entries.isNotEmpty) {
-        assign({for (final e in entries) e.key: e.target});
+        // For frame/sheet targets, use "key|density" as the combined lookup key.
+        // For scrap targets (no density), use just "key".
+        assign({
+          for (final e in entries)
+            e.density != null ? '${e.key}|${e.density}' : e.key: e.target,
+        });
       }
     } catch (_) {}
   }

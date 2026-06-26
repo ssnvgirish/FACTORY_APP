@@ -155,7 +155,8 @@ class Calculations {
   }
 
   /// Calculate target weight using time-of-change timestamps.
-  /// Each segment has a section and duration, multiply by target per hour.
+  /// Each segment has a section, optional density, and duration.
+  /// Looks up by "section|density" first, then falls back to "section" alone.
   static double calculateTargetWeight({
     required List<Map<String, dynamic>> segments,
     required Map<String, double> targetPerHour,
@@ -163,8 +164,10 @@ class Calculations {
     double total = 0;
     for (final segment in segments) {
       final section = segment['section'] as String;
+      final density = segment['density'] as String? ?? '';
       final hours = segment['durationHours'] as double;
-      final targetRate = targetPerHour[section] ?? 0;
+      final targetRate =
+          targetPerHour['$section|$density'] ?? targetPerHour[section] ?? 0;
       total += hours * targetRate;
     }
     return double.parse(total.toStringAsFixed(3));

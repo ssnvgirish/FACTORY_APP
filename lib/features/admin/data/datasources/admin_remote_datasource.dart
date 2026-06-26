@@ -644,6 +644,7 @@ class AdminRemoteDatasource {
               (t) => MasterTargetEntry(
                 id: t.id,
                 key: t.section,
+                density: t.density,
                 target: t.targetKgPerHour,
               ),
             )
@@ -655,6 +656,7 @@ class AdminRemoteDatasource {
               (t) => MasterTargetEntry(
                 id: t.id,
                 key: t.thickness,
+                density: t.density,
                 target: t.targetFeetPerHour,
               ),
             )
@@ -684,6 +686,7 @@ class AdminRemoteDatasource {
         await _connector
             .insertMasterFrameTarget(
               section: entry.key,
+              density: entry.density ?? '',
               targetKgPerHour: entry.target,
             )
             .execute();
@@ -691,6 +694,7 @@ class AdminRemoteDatasource {
         await _connector
             .insertMasterSheetTarget(
               thickness: entry.key,
+              density: entry.density ?? '',
               targetFeetPerHour: entry.target,
             )
             .execute();
@@ -716,6 +720,7 @@ class AdminRemoteDatasource {
             .updateMasterFrameTarget(
               id: UpdateMasterFrameTargetVariablesId(id: entry.id),
               section: entry.key,
+              density: entry.density ?? '',
               targetKgPerHour: entry.target,
             )
             .execute();
@@ -724,6 +729,7 @@ class AdminRemoteDatasource {
             .updateMasterSheetTarget(
               id: UpdateMasterSheetTargetVariablesId(id: entry.id),
               thickness: entry.key,
+              density: entry.density ?? '',
               targetFeetPerHour: entry.target,
             )
             .execute();

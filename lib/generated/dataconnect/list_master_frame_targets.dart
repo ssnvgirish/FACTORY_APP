@@ -20,11 +20,13 @@ class ListMasterFrameTargetsVariablesBuilder {
 class ListMasterFrameTargetsMasterFrameTargets {
   final String id;
   final String section;
+  final String density;
   final double targetKgPerHour;
   ListMasterFrameTargetsMasterFrameTargets.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   section = nativeFromJson<String>(json['section']),
+  density = nativeFromJson<String>(json['density']),
   targetKgPerHour = nativeFromJson<double>(json['targetKgPerHour']);
   @override
   bool operator ==(Object other) {
@@ -38,17 +40,19 @@ class ListMasterFrameTargetsMasterFrameTargets {
     final ListMasterFrameTargetsMasterFrameTargets otherTyped = other as ListMasterFrameTargetsMasterFrameTargets;
     return id == otherTyped.id && 
     section == otherTyped.section && 
+    density == otherTyped.density &&
     targetKgPerHour == otherTyped.targetKgPerHour;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, section.hashCode, targetKgPerHour.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, section.hashCode, density.hashCode, targetKgPerHour.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['section'] = nativeToJson<String>(section);
+    json['density'] = nativeToJson<String>(density);
     json['targetKgPerHour'] = nativeToJson<double>(targetKgPerHour);
     return json;
   }
@@ -56,6 +60,7 @@ class ListMasterFrameTargetsMasterFrameTargets {
   ListMasterFrameTargetsMasterFrameTargets({
     required this.id,
     required this.section,
+    required this.density,
     required this.targetKgPerHour,
   });
 }

@@ -274,6 +274,7 @@ void main() {
         () => c
             .insertMasterFrameTarget(
               section: entry.key,
+              density: '0.80',
               targetKgPerHour: entry.value,
             )
             .execute(),
@@ -288,6 +289,7 @@ void main() {
         () => c
             .insertMasterSheetTarget(
               thickness: entry.key,
+              density: '0.60',
               targetFeetPerHour: entry.value,
             )
             .execute(),

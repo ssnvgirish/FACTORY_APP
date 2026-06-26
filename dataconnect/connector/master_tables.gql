@@ -270,16 +270,16 @@ mutation DeleteMasterSheetWeight($id: MasterSheetWeight_Key!) @auth(level: PUBLI
 
 query ListMasterFrameTargets @auth(level: PUBLIC) {
   masterFrameTargets {
-    id section targetKgPerHour
+    id section density targetKgPerHour
   }
 }
 
-mutation InsertMasterFrameTarget($section: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
-  masterFrameTarget_insert(data: { section: $section, targetKgPerHour: $targetKgPerHour })
+mutation InsertMasterFrameTarget($section: String!, $density: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
+  masterFrameTarget_insert(data: { section: $section, density: $density, targetKgPerHour: $targetKgPerHour })
 }
 
-mutation UpdateMasterFrameTarget($id: MasterFrameTarget_Key!, $section: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
-  masterFrameTarget_update(key: $id, data: { section: $section, targetKgPerHour: $targetKgPerHour })
+mutation UpdateMasterFrameTarget($id: MasterFrameTarget_Key!, $section: String!, $density: String!, $targetKgPerHour: Float!) @auth(level: PUBLIC) {
+  masterFrameTarget_update(key: $id, data: { section: $section, density: $density, targetKgPerHour: $targetKgPerHour })
 }
 
 mutation DeleteMasterFrameTarget($id: MasterFrameTarget_Key!) @auth(level: PUBLIC) {
@@ -290,20 +290,16 @@ mutation DeleteMasterFrameTarget($id: MasterFrameTarget_Key!) @auth(level: PUBLI
 
 query ListMasterSheetTargets @auth(level: PUBLIC) {
   masterSheetTargets {
-    id thickness targetFeetPerHour
+    id thickness density targetFeetPerHour
   }
 }
 
-mutation InsertMasterSheetTarget($thickness: String!, $targetFeetPerHour: Float!) @auth(level: PUBLIC) {
-  masterSheetTarget_insert(data: { thickness: $thickness, targetFeetPerHour: $targetFeetPerHour })
+mutation InsertMasterSheetTarget($thickness: String!, $density: String!, $targetFeetPerHour: Float!) @auth(level: PUBLIC) {
+  masterSheetTarget_insert(data: { thickness: $thickness, density: $density, targetFeetPerHour: $targetFeetPerHour })
 }
 
-mutation UpdateMasterSheetTarget($id: MasterSheetTarget_Key!, $thickness: String!, $targetFeetPerHour: Float!) @auth(level: PUBLIC) {
-  masterSheetTarget_update(key: $id, data: { thickness: $thickness, targetFeetPerHour: $targetFeetPerHour })
-}
-
-mutation DeleteMasterSheetTarget($id: MasterSheetTarget_Key!) @auth(level: PUBLIC) {
-  masterSheetTarget_delete(key: $id)
+mutation UpdateMasterSheetTarget($id: MasterSheetTarget_Key!, $thickness: String!, $density: String!, $targetFeetPerHour: Float!) @auth(level: PUBLIC) {
+  masterSheetTarget_update(key: $id, data: { thickness: $thickness, density: $density, targetFeetPerHour: $targetFeetPerHour })
 }
 
 # ── MasterSalaryWeightage ──

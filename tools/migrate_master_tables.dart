@@ -266,6 +266,7 @@ Future<void> main() async {
       () => c
           .insertMasterFrameTarget(
             section: entry.key,
+            density: '0.80',
             targetKgPerHour: entry.value,
           )
           .execute(),
@@ -280,6 +281,7 @@ Future<void> main() async {
       () => c
           .insertMasterSheetTarget(
             thickness: entry.key,
+            density: '0.60',
             targetFeetPerHour: entry.value,
           )
           .execute(),

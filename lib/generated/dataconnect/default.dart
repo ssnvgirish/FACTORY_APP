@@ -1167,11 +1167,13 @@ class DefaultConnector {
 
   InsertMasterFrameTargetVariablesBuilder insertMasterFrameTarget({
     required String section,
+    required String density,
     required double targetKgPerHour,
   }) {
     return InsertMasterFrameTargetVariablesBuilder(
       dataConnect,
       section: section,
+      density: density,
       targetKgPerHour: targetKgPerHour,
     );
   }
@@ -1179,12 +1181,14 @@ class DefaultConnector {
   UpdateMasterFrameTargetVariablesBuilder updateMasterFrameTarget({
     required UpdateMasterFrameTargetVariablesId id,
     required String section,
+    required String density,
     required double targetKgPerHour,
   }) {
     return UpdateMasterFrameTargetVariablesBuilder(
       dataConnect,
       id: id,
       section: section,
+      density: density,
       targetKgPerHour: targetKgPerHour,
     );
   }
@@ -1201,11 +1205,13 @@ class DefaultConnector {
 
   InsertMasterSheetTargetVariablesBuilder insertMasterSheetTarget({
     required String thickness,
+    required String density,
     required double targetFeetPerHour,
   }) {
     return InsertMasterSheetTargetVariablesBuilder(
       dataConnect,
       thickness: thickness,
+      density: density,
       targetFeetPerHour: targetFeetPerHour,
     );
   }
@@ -1213,12 +1219,14 @@ class DefaultConnector {
   UpdateMasterSheetTargetVariablesBuilder updateMasterSheetTarget({
     required UpdateMasterSheetTargetVariablesId id,
     required String thickness,
+    required String density,
     required double targetFeetPerHour,
   }) {
     return UpdateMasterSheetTargetVariablesBuilder(
       dataConnect,
       id: id,
       thickness: thickness,
+      density: density,
       targetFeetPerHour: targetFeetPerHour,
     );
   }
