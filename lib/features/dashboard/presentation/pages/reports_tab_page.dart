@@ -2,19 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../admin/domain/repositories/admin_repository.dart';
 
 enum ReportGenerationType { machineAndTimeRange, operatorWise }
 
+enum ReportShiftFilter { both, day, night }
+
+extension ReportShiftFilterX on ReportShiftFilter {
+  String get label => switch (this) {
+    ReportShiftFilter.both => 'Both',
+    ReportShiftFilter.day => AppConstants.dayShift,
+    ReportShiftFilter.night => AppConstants.nightShift,
+  };
+
+  String? get shiftValue => switch (this) {
+    ReportShiftFilter.both => null,
+    ReportShiftFilter.day => AppConstants.dayShift,
+    ReportShiftFilter.night => AppConstants.nightShift,
+  };
+}
+
 class ReportTarget {
-  const ReportTarget({required this.id, required this.name});
+  const ReportTarget({
+    required this.id,
+    required this.name,
+    this.assignedMachines = const [],
+  });
 
   final String id;
   final String name;
+  final List<String> assignedMachines;
 
-  String get displayLabel => '$id - $name';
+  String get displayLabel => id == name ? name : '$name ($id)';
 }
 
 class ReportRequest {
@@ -23,12 +46,16 @@ class ReportRequest {
     required this.target,
     this.start,
     this.end,
+    this.shiftFilter = ReportShiftFilter.both,
   });
 
   final ReportGenerationType type;
   final ReportTarget target;
   final DateTime? start;
   final DateTime? end;
+  final ReportShiftFilter shiftFilter;
+
+  String? get selectedShift => shiftFilter.shiftValue;
 }
 
 class ReportsTabController extends ChangeNotifier {
@@ -43,6 +70,7 @@ class ReportsTabController extends ChangeNotifier {
   ReportGenerationType selectedType = ReportGenerationType.machineAndTimeRange;
 
   ReportTarget? selectedMachine;
+  ReportShiftFilter machineShiftFilter = ReportShiftFilter.both;
   DateTime? machineStart;
   DateTime? machineEnd;
 
@@ -67,10 +95,10 @@ class ReportsTabController extends ChangeNotifier {
       return null;
     }
     if (machineStart == null || machineEnd == null) {
-      return 'Please select both start and end date/time.';
+      return 'Please select both start and end date.';
     }
     if (machineEnd!.isBefore(machineStart!)) {
-      return 'End date/time must be after start date/time.';
+      return 'End date must be after start date.';
     }
     return null;
   }
@@ -91,7 +119,7 @@ class ReportsTabController extends ChangeNotifier {
     if (operatorStart != null &&
         operatorEnd != null &&
         operatorEnd!.isBefore(operatorStart!)) {
-      return 'End date/time must be after start date/time.';
+      return 'End date must be after start date.';
     }
     return null;
   }
@@ -107,11 +135,9 @@ class ReportsTabController extends ChangeNotifier {
     }
 
     if (selectedOperator == null) return false;
-
     if (operatorStart != null && operatorEnd != null) {
       return !operatorEnd!.isBefore(operatorStart!);
     }
-
     return true;
   }
 
@@ -123,6 +149,11 @@ class ReportsTabController extends ChangeNotifier {
 
   void setMachine(ReportTarget? machine) {
     selectedMachine = machine;
+    notifyListeners();
+  }
+
+  void setMachineShiftFilter(ReportShiftFilter value) {
+    machineShiftFilter = value;
     notifyListeners();
   }
 
@@ -165,6 +196,7 @@ class ReportsTabController extends ChangeNotifier {
         target: selectedMachine!,
         start: machineStart,
         end: machineEnd,
+        shiftFilter: machineShiftFilter,
       );
     }
 
@@ -186,7 +218,6 @@ class ReportsTabController extends ChangeNotifier {
 
     isSubmitting = true;
     notifyListeners();
-
     return request;
   }
 
@@ -206,8 +237,6 @@ class ReportsTabPage extends StatefulWidget {
 
   final List<ReportTarget>? machineOptions;
   final List<ReportTarget>? operatorOptions;
-
-  // Inject your real repository/API callback here.
   final Future<void> Function(ReportRequest request)? onGenerateReport;
 
   @override
@@ -216,7 +245,7 @@ class ReportsTabPage extends StatefulWidget {
 
 class _ReportsTabPageState extends State<ReportsTabPage> {
   late ReportsTabController _controller;
-  final DateFormat _dateTimeFormat = DateFormat('dd MMM yyyy, hh:mm a');
+  final DateFormat _dateFormat = DateFormat('dd MMM yyyy');
   late List<ReportTarget> _machines;
   late List<ReportTarget> _operators;
   bool _isLoaded = false;
@@ -236,57 +265,67 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
   Future<void> _loadMasterData() async {
     try {
       final provider = sl<DropdownConfigProvider>();
-      
-      // Get machines from provider
-      final machineNames = widget.machineOptions?.map((m) => m.name).toList() ?? provider.allMachines;
-      _machines = machineNames
-          .asMap()
-          .entries
-          .map((e) => ReportTarget(id: 'MC-${e.key + 1}', name: e.value))
-          .toList();
+      final adminRepository = sl<AdminRepository>();
 
-      // For operators, use mock data (update this to call your operator API if available)
-      _operators = widget.operatorOptions ??
-          const [
-            ReportTarget(id: 'OP-101', name: 'Arjun Patel'),
-            ReportTarget(id: 'OP-102', name: 'Meera Rao'),
-            ReportTarget(id: 'OP-103', name: 'Ravi Kumar'),
-            ReportTarget(id: 'OP-104', name: 'Nisha Sharma'),
-          ];
+      final machineOptions =
+          widget.machineOptions ??
+          provider.allMachines
+              .map((machine) => ReportTarget(id: machine, name: machine))
+              .toList();
 
-      if (mounted) {
-        setState(() {
-          _controller = ReportsTabController(
-            machineOptions: _machines,
-            operatorOptions: _operators,
-          );
-          _isLoaded = true;
-        });
-      }
+      final users =
+          widget.operatorOptions ?? await _loadOperators(adminRepository);
+
+      if (!mounted) return;
+      setState(() {
+        _machines = machineOptions;
+        _operators = users;
+        _controller = ReportsTabController(
+          machineOptions: _machines,
+          operatorOptions: _operators,
+        );
+        _isLoaded = true;
+      });
     } catch (error) {
       debugPrint('Error loading master data: $error');
-      // Fallback to defaults
-      if (mounted) {
-        setState(() {
-          _machines = widget.machineOptions ??
-              const [
-                ReportTarget(id: 'MC-001', name: 'Frame Cutter'),
-                ReportTarget(id: 'MC-002', name: 'Edge Sealer'),
-                ReportTarget(id: 'MC-003', name: 'Auto Laminator'),
-              ];
-          _operators = widget.operatorOptions ??
-              const [
-                ReportTarget(id: 'OP-101', name: 'Arjun Patel'),
-                ReportTarget(id: 'OP-102', name: 'Meera Rao'),
-              ];
-          _controller = ReportsTabController(
-            machineOptions: _machines,
-            operatorOptions: _operators,
-          );
-          _isLoaded = true;
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _machines =
+            widget.machineOptions ??
+            AppConstants.allMachines
+                .map((machine) => ReportTarget(id: machine, name: machine))
+                .toList();
+        _operators = widget.operatorOptions ?? const [];
+        _controller = ReportsTabController(
+          machineOptions: _machines,
+          operatorOptions: _operators,
+        );
+        _isLoaded = true;
+      });
     }
+  }
+
+  Future<List<ReportTarget>> _loadOperators(
+    AdminRepository adminRepository,
+  ) async {
+    final users = await adminRepository.getAllUsers();
+    final operators = users
+        .where(
+          (user) =>
+              user.isActive &&
+              user.roles.contains(AppConstants.roleMachineOperator),
+        )
+        .map(
+          (user) => ReportTarget(
+            id: user.uid,
+            name: user.name,
+            assignedMachines: user.assignedMachines,
+          ),
+        )
+        .toList();
+
+    operators.sort((a, b) => a.name.compareTo(b.name));
+    return operators;
   }
 
   @override
@@ -297,7 +336,6 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Show loading while machines are being fetched
     if (!_isLoaded) {
       return Scaffold(
         appBar: AppBar(title: const Text('Reports')),
@@ -377,18 +415,16 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
         ButtonSegment<ReportGenerationType>(
           value: ReportGenerationType.machineAndTimeRange,
           icon: Icon(Icons.precision_manufacturing),
-          label: Text('Machine & Time Range'),
+          label: Text('Machine Report'),
         ),
         ButtonSegment<ReportGenerationType>(
           value: ReportGenerationType.operatorWise,
           icon: Icon(Icons.engineering),
-          label: Text('Operator Wise'),
+          label: Text('Operator Report'),
         ),
       ],
       selected: {_controller.selectedType},
-      onSelectionChanged: (value) {
-        _controller.setType(value.first);
-      },
+      onSelectionChanged: (value) => _controller.setType(value.first),
       style: SegmentedButton.styleFrom(
         minimumSize: const Size(0, 48),
         textStyle: Theme.of(context).textTheme.titleSmall,
@@ -397,9 +433,8 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
   }
 
   Widget _buildTypeDescription(BuildContext context) {
-    final selectedType = _controller.selectedType;
     final isMachineType =
-        selectedType == ReportGenerationType.machineAndTimeRange;
+        _controller.selectedType == ReportGenerationType.machineAndTimeRange;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -418,8 +453,8 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
           Expanded(
             child: Text(
               isMachineType
-                  ? 'Generate reports by selecting a machine and exact start/end date-time.'
-                  : 'Generate reports by operator with optional date filters.',
+                  ? 'Select a machine, shift, and date range. Shift supports Day Shift, Night Shift, or Both.'
+                  : 'Select an operator to calculate monthly averages and target achievement.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
@@ -434,7 +469,7 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SelectionDropdown<ReportTarget>(
-          label: 'Machine ID / Machine Name',
+          label: 'Machine',
           hintText: 'Search machine...',
           value: _controller.selectedMachine,
           entries: _controller.machineOptions,
@@ -444,22 +479,35 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
           leadingIcon: Icons.precision_manufacturing,
         ),
         const SizedBox(height: 16),
-        _DateTimeRangeSection(
-          title: 'Date-Time Range',
-          startLabel: 'Start Date/Time',
-          endLabel: 'End Date/Time',
+        DropdownButtonFormField<ReportShiftFilter>(
+          initialValue: _controller.machineShiftFilter,
+          decoration: const InputDecoration(labelText: 'Shift'),
+          items: ReportShiftFilter.values
+              .map(
+                (shift) =>
+                    DropdownMenuItem(value: shift, child: Text(shift.label)),
+              )
+              .toList(),
+          onChanged: (value) {
+            if (value != null) {
+              _controller.setMachineShiftFilter(value);
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        _DateRangeSection(
+          title: 'Date Range',
+          startLabel: 'Start Date',
+          endLabel: 'End Date',
           startValue: _controller.machineStart,
           endValue: _controller.machineEnd,
-          dateTimeFormat: _dateTimeFormat,
+          dateFormat: _dateFormat,
           onPickStart: () async {
-            final picked = await _pickDateTime(
-              context,
-              _controller.machineStart,
-            );
+            final picked = await _pickDate(context, _controller.machineStart);
             _controller.setMachineStart(picked);
           },
           onPickEnd: () async {
-            final picked = await _pickDateTime(context, _controller.machineEnd);
+            final picked = await _pickDate(context, _controller.machineEnd);
             _controller.setMachineEnd(picked);
           },
           errorText: _controller.machineRangeError,
@@ -480,7 +528,7 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SelectionDropdown<ReportTarget>(
-          label: 'Operator ID / Operator Name',
+          label: 'Operator',
           hintText: 'Search operator...',
           value: _controller.selectedOperator,
           entries: _controller.operatorOptions,
@@ -490,25 +538,19 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
           leadingIcon: Icons.engineering,
         ),
         const SizedBox(height: 16),
-        _DateTimeRangeSection(
-          title: 'Date-Time Filter (Optional)',
-          startLabel: 'Start Date/Time',
-          endLabel: 'End Date/Time',
+        _DateRangeSection(
+          title: 'Date Filter (Optional)',
+          startLabel: 'Start Date',
+          endLabel: 'End Date',
           startValue: _controller.operatorStart,
           endValue: _controller.operatorEnd,
-          dateTimeFormat: _dateTimeFormat,
+          dateFormat: _dateFormat,
           onPickStart: () async {
-            final picked = await _pickDateTime(
-              context,
-              _controller.operatorStart,
-            );
+            final picked = await _pickDate(context, _controller.operatorStart);
             _controller.setOperatorStart(picked);
           },
           onPickEnd: () async {
-            final picked = await _pickDateTime(
-              context,
-              _controller.operatorEnd,
-            );
+            final picked = await _pickDate(context, _controller.operatorEnd);
             _controller.setOperatorEnd(picked);
           },
           onClear: _controller.clearOperatorDateFilters,
@@ -534,17 +576,7 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
       }
 
       if (!mounted) return;
-
-      // Navigate to results page with request data
-      final typeParam = request.type == ReportGenerationType.machineAndTimeRange
-          ? 'machine'
-          : 'operator';
-      final startParam = request.start?.millisecondsSinceEpoch.toString() ?? '0';
-      final endParam = request.end?.millisecondsSinceEpoch.toString() ?? '0';
-
-      final uri = '/report/results/$typeParam/${request.target.id}/${request.target.name}/$startParam/$endParam';
-
-      context.push(uri);
+      context.push('/report/results', extra: request);
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -555,35 +587,13 @@ class _ReportsTabPageState extends State<ReportsTabPage> {
     }
   }
 
-  Future<DateTime?> _pickDateTime(
-    BuildContext context,
-    DateTime? initial,
-  ) async {
+  Future<DateTime?> _pickDate(BuildContext context, DateTime? initial) async {
     final now = DateTime.now();
-    final initialDate = initial ?? now;
-
-    final pickedDate = await showDatePicker(
+    return showDatePicker(
       context: context,
-      initialDate: initialDate,
+      initialDate: initial ?? now,
       firstDate: DateTime(2020),
       lastDate: DateTime(now.year + 3),
-    );
-
-    if (pickedDate == null || !context.mounted) return null;
-
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initialDate),
-    );
-
-    if (pickedTime == null) return null;
-
-    return DateTime(
-      pickedDate.year,
-      pickedDate.month,
-      pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
     );
   }
 }
@@ -614,6 +624,7 @@ class _SelectionDropdown<T> extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return DropdownMenu<T>(
+          key: ValueKey('$label-${value.toString()}-${entries.length}'),
           width: constraints.maxWidth,
           initialSelection: value,
           requestFocusOnTap: true,
@@ -635,14 +646,14 @@ class _SelectionDropdown<T> extends StatelessWidget {
   }
 }
 
-class _DateTimeRangeSection extends StatelessWidget {
-  const _DateTimeRangeSection({
+class _DateRangeSection extends StatelessWidget {
+  const _DateRangeSection({
     required this.title,
     required this.startLabel,
     required this.endLabel,
     required this.startValue,
     required this.endValue,
-    required this.dateTimeFormat,
+    required this.dateFormat,
     required this.onPickStart,
     required this.onPickEnd,
     this.onClear,
@@ -654,7 +665,7 @@ class _DateTimeRangeSection extends StatelessWidget {
   final String endLabel;
   final DateTime? startValue;
   final DateTime? endValue;
-  final DateFormat dateTimeFormat;
+  final DateFormat dateFormat;
   final VoidCallback onPickStart;
   final VoidCallback onPickEnd;
   final VoidCallback? onClear;
@@ -688,19 +699,19 @@ class _DateTimeRangeSection extends StatelessWidget {
               return Row(
                 children: [
                   Expanded(
-                    child: _DateTimeField(
+                    child: _DateField(
                       label: startLabel,
                       value: startValue,
-                      dateTimeFormat: dateTimeFormat,
+                      dateFormat: dateFormat,
                       onTap: onPickStart,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _DateTimeField(
+                    child: _DateField(
                       label: endLabel,
                       value: endValue,
-                      dateTimeFormat: dateTimeFormat,
+                      dateFormat: dateFormat,
                       onTap: onPickEnd,
                     ),
                   ),
@@ -711,17 +722,17 @@ class _DateTimeRangeSection extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _DateTimeField(
+                _DateField(
                   label: startLabel,
                   value: startValue,
-                  dateTimeFormat: dateTimeFormat,
+                  dateFormat: dateFormat,
                   onTap: onPickStart,
                 ),
                 const SizedBox(height: 12),
-                _DateTimeField(
+                _DateField(
                   label: endLabel,
                   value: endValue,
-                  dateTimeFormat: dateTimeFormat,
+                  dateFormat: dateFormat,
                   onTap: onPickEnd,
                 ),
               ],
@@ -742,24 +753,24 @@ class _DateTimeRangeSection extends StatelessWidget {
   }
 }
 
-class _DateTimeField extends StatelessWidget {
-  const _DateTimeField({
+class _DateField extends StatelessWidget {
+  const _DateField({
     required this.label,
     required this.value,
-    required this.dateTimeFormat,
+    required this.dateFormat,
     required this.onTap,
   });
 
   final String label;
   final DateTime? value;
-  final DateFormat dateTimeFormat;
+  final DateFormat dateFormat;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final displayText = value == null
-        ? 'Select date and time'
-        : dateTimeFormat.format(value!);
+        ? 'Select date'
+        : dateFormat.format(value!);
 
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(

@@ -153,7 +153,7 @@ class FrameRepositoryImpl implements FrameRepository {
       endDate: endDate,
     );
     final operatorCleaning = cleaningReports
-        .where((r) => r.createdBy == operatorId || true)
+        .where((r) => r.createdBy == operatorId)
         .toList();
     final a = operatorCleaning.isEmpty
         ? 0.0
@@ -166,7 +166,7 @@ class FrameRepositoryImpl implements FrameRepository {
       endDate: endDate,
     );
     final operatorTools = toolsReports
-        .where((r) => r.createdBy == operatorId || true)
+        .where((r) => r.createdBy == operatorId)
         .toList();
     final b = operatorTools.isEmpty
         ? 0.0
@@ -195,7 +195,9 @@ class FrameRepositoryImpl implements FrameRepository {
       startDate: startDate,
       endDate: endDate,
     );
-    final operatorPacking = packingReports.toList();
+    final operatorPacking = packingReports
+        .where((r) => r.createdBy == operatorId)
+        .toList();
     final d = operatorPacking.isEmpty
         ? 0.0
         : operatorPacking

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../frames/domain/entities/frame_entities.dart';
 import '../../../frames/domain/repositories/frame_repository.dart';
+import '../../../sheets/domain/repositories/sheet_repository.dart';
 import 'reports_tab_page.dart';
 
 class ReportResultsPage extends StatefulWidget {
@@ -18,7 +20,7 @@ class ReportResultsPage extends StatefulWidget {
 }
 
 class _ReportResultsPageState extends State<ReportResultsPage> {
-  late Future<List<FrameProductionDetailsReport>> _reportDataFuture;
+  late Future<_ReportResultsData> _reportDataFuture;
 
   @override
   void initState() {
@@ -26,29 +28,181 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     _reportDataFuture = _fetchReportData();
   }
 
-  Future<List<FrameProductionDetailsReport>> _fetchReportData() async {
-    try {
-      final frameRepository = sl<FrameRepository>();
-      final isMachineType =
-          widget.request.type == ReportGenerationType.machineAndTimeRange;
-
-      if (isMachineType) {
-        // Fetch production details for the selected machine
-        final reports = await frameRepository.getProductionDetailsReports(
-          machineNumber: widget.request.target.id,
-          startDate: widget.request.start,
-          endDate: widget.request.end,
-        );
-        return reports;
-      } else {
-        // For operator reports, return empty list (will handle separately)
-        return [];
-      }
-    } catch (error) {
-      debugPrint('Error fetching report data: $error');
-      rethrow;
+  Future<_ReportResultsData> _fetchReportData() async {
+    final isMachineType =
+        widget.request.type == ReportGenerationType.machineAndTimeRange;
+    if (isMachineType) {
+      return _ReportResultsData(machineData: await _fetchMachineReportData());
     }
+
+    return _ReportResultsData(operatorData: await _fetchOperatorReportData());
   }
+
+  Future<_MachineReportData> _fetchMachineReportData() async {
+    final machine = widget.request.target.id;
+    final selectedShift = widget.request.selectedShift;
+    final startDate = _startOfDay(widget.request.start ?? DateTime.now());
+    final endDate = _endOfDay(
+      widget.request.end ?? widget.request.start ?? DateTime.now(),
+    );
+
+    if (_isFrameMachine(machine)) {
+      final frameRepository = sl<FrameRepository>();
+      final details = await frameRepository.getProductionDetailsReports(
+        machineNumber: machine,
+        startDate: startDate,
+        endDate: endDate,
+      );
+      final weights = await frameRepository.getProductionWeightReports(
+        machineNumber: machine,
+        startDate: startDate,
+        endDate: endDate,
+      );
+
+      final filteredDetails = details
+          .where(
+            (report) => selectedShift == null || report.shift == selectedShift,
+          )
+          .toList()
+        ..sort((a, b) {
+          final dateCompare = a.date.compareTo(b.date);
+          if (dateCompare != 0) return dateCompare;
+          return a.shift.compareTo(b.shift);
+        });
+
+      final efficiencyByShift = {
+        for (final report in weights)
+          _rowKey(report.date, report.shift): report.efficiencyPercentage,
+      };
+
+      final rows = filteredDetails
+          .map(
+            (report) => _MachineReportRow(
+              date: report.date,
+              shift: report.shift,
+              producedWeight: report.totalWeight,
+              efficiency:
+                  efficiencyByShift[_rowKey(report.date, report.shift)] ?? 0,
+            ),
+          )
+          .toList();
+
+      return _MachineReportData(
+        machineName: machine,
+        reportFamily: 'Frame',
+        selectedShift: selectedShift,
+        startDate: startDate,
+        endDate: endDate,
+        rows: rows,
+      );
+    }
+
+    final sheetRepository = sl<SheetRepository>();
+    final details = await sheetRepository.getProductionDetailsReports(
+      machineNumber: machine,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    final runningFeetReports = await sheetRepository.getProductionRunningFeetReports(
+      machineNumber: machine,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
+    final filteredDetails = details
+        .where((report) => selectedShift == null || report.shift == selectedShift)
+        .toList()
+      ..sort((a, b) {
+        final dateCompare = a.date.compareTo(b.date);
+        if (dateCompare != 0) return dateCompare;
+        return a.shift.compareTo(b.shift);
+      });
+
+    final efficiencyByShift = {
+      for (final report in runningFeetReports)
+        _rowKey(report.date, report.shift): report.efficiencyPercentage,
+    };
+
+    final rows = filteredDetails
+        .map(
+          (report) => _MachineReportRow(
+            date: report.date,
+            shift: report.shift,
+            producedWeight: report.totalWeight,
+            efficiency: efficiencyByShift[_rowKey(report.date, report.shift)] ?? 0,
+          ),
+        )
+        .toList();
+
+    return _MachineReportData(
+      machineName: machine,
+      reportFamily: 'Sheet',
+      selectedShift: selectedShift,
+      startDate: startDate,
+      endDate: endDate,
+      rows: rows,
+    );
+  }
+
+  Future<_OperatorReportData> _fetchOperatorReportData() async {
+    final monthAnchor = widget.request.start ?? widget.request.end ?? DateTime.now();
+    final includeFrame = widget.request.target.assignedMachines.isEmpty ||
+        widget.request.target.assignedMachines.any(_isFrameMachine);
+    final includeSheet = widget.request.target.assignedMachines.isEmpty ||
+        widget.request.target.assignedMachines.any(_isSheetMachine);
+
+    final frameMetrics = includeFrame
+        ? await sl<FrameRepository>().getMonthlyAggregates(
+            widget.request.target.id,
+            monthAnchor.year,
+            monthAnchor.month,
+          )
+        : <String, double>{};
+
+    final sheetMetrics = includeSheet
+        ? await sl<SheetRepository>().getMonthlyAggregates(
+            widget.request.target.id,
+            monthAnchor.year,
+            monthAnchor.month,
+          )
+        : <String, double>{};
+
+    final combined = <String, double>{};
+    for (final key in {'a', 'b', 'c', 'd', 'e', 'f'}) {
+      final values = <double>[];
+      if (frameMetrics.containsKey(key)) values.add(frameMetrics[key]!);
+      if (sheetMetrics.containsKey(key)) values.add(sheetMetrics[key]!);
+      combined[key] = values.isEmpty
+          ? 0
+          : values.reduce((a, b) => a + b) / values.length;
+    }
+
+    return _OperatorReportData(
+      operatorName: widget.request.target.name,
+      month: DateTime(monthAnchor.year, monthAnchor.month),
+      metrics: combined,
+      assignedMachines: widget.request.target.assignedMachines,
+    );
+  }
+
+  bool _isFrameMachine(String machine) {
+    return ddp.frameMachines.contains(machine) ||
+        AppConstants.frameMachines.contains(machine);
+  }
+
+  bool _isSheetMachine(String machine) {
+    return ddp.sheetMachines.contains(machine) ||
+        AppConstants.sheetMachines.contains(machine);
+  }
+
+  DateTime _startOfDay(DateTime value) =>
+      DateTime(value.year, value.month, value.day);
+
+  DateTime _endOfDay(DateTime value) =>
+      DateTime(value.year, value.month, value.day, 23, 59, 59, 999);
+
+  String _rowKey(DateTime date, String shift) =>
+      '${date.year}-${date.month}-${date.day}|$shift';
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +214,7 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: FutureBuilder<List<FrameProductionDetailsReport>>(
+      body: FutureBuilder<_ReportResultsData>(
         future: _reportDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -74,11 +228,7 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
                     const SizedBox(height: 16),
                     const Text('Error loading report data'),
                     const SizedBox(height: 8),
@@ -98,6 +248,7 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
             );
           }
 
+          final data = snapshot.data!;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Center(
@@ -106,11 +257,11 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildReportSummaryCard(context),
+                    _buildReportSummaryCard(context, data),
                     const SizedBox(height: 20),
-                    _buildReportDetailsCard(context),
+                    _buildReportDetailsCard(context, data),
                     const SizedBox(height: 20),
-                    _buildReportDataSection(context, snapshot.data ?? []),
+                    _buildReportDataSection(context, data),
                     const SizedBox(height: 20),
                     _buildBackButton(context),
                   ],
@@ -123,9 +274,18 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     );
   }
 
-  Widget _buildReportSummaryCard(BuildContext context) {
+  Widget _buildReportSummaryCard(
+    BuildContext context,
+    _ReportResultsData data,
+  ) {
     final isMachineType =
         widget.request.type == ReportGenerationType.machineAndTimeRange;
+    final metricTitle = isMachineType
+        ? 'Overall Production Weight'
+        : 'Monthly Avg Production Efficiency';
+    final metricValue = isMachineType
+        ? '${data.machineData!.overallProductionWeight.toStringAsFixed(2)} kg'
+        : '${data.operatorData!.productionEfficiency.toStringAsFixed(1)}%';
 
     return Card(
       child: Padding(
@@ -154,14 +314,12 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Report Type',
-                        style: Theme.of(context).textTheme.labelSmall,
+                        isMachineType ? 'Machine Report' : 'Operator Report',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        isMachineType
-                            ? 'Machine & Time Range'
-                            : 'Operator Wise',
-                        style: Theme.of(context).textTheme.titleMedium,
+                        'Target: ${widget.request.target.displayLabel}',
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),
@@ -169,11 +327,24 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            Text(
-              'Target: ${widget.request.target.displayLabel}',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            Row(
+              children: [
+                Expanded(
+                  child: _SummaryMetricTile(
+                    label: metricTitle,
+                    value: metricValue,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _SummaryMetricTile(
+                    label: isMachineType ? 'Average Efficiency' : 'Target',
+                    value: isMachineType
+                        ? '${data.machineData!.averageEfficiency.toStringAsFixed(1)}%'
+                        : '100%',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -181,8 +352,14 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     );
   }
 
-  Widget _buildReportDetailsCard(BuildContext context) {
-    final dateFormat = DateFormat('dd MMM yyyy, hh:mm a');
+  Widget _buildReportDetailsCard(
+    BuildContext context,
+    _ReportResultsData data,
+  ) {
+    final dateFormat = DateFormat('dd MMM yyyy');
+    final monthFormat = DateFormat('MMMM yyyy');
+    final isMachineType =
+        widget.request.type == ReportGenerationType.machineAndTimeRange;
 
     return Card(
       child: Padding(
@@ -195,27 +372,44 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            _DetailRow(label: 'ID', value: widget.request.target.id),
-            const SizedBox(height: 8),
-            _DetailRow(label: 'Name', value: widget.request.target.name),
-            if (widget.request.start != null) ...[
+            if (isMachineType) ...[
+              _DetailRow(label: 'Machine', value: data.machineData!.machineName),
+              const SizedBox(height: 8),
+              _DetailRow(label: 'Category', value: data.machineData!.reportFamily),
               const SizedBox(height: 8),
               _DetailRow(
-                label: 'Start Date/Time',
-                value: dateFormat.format(widget.request.start!),
+                label: 'Shift',
+                value: data.machineData!.selectedShift ?? 'Both',
               ),
-            ],
-            if (widget.request.end != null) ...[
               const SizedBox(height: 8),
               _DetailRow(
-                label: 'End Date/Time',
-                value: dateFormat.format(widget.request.end!),
+                label: 'Start Date',
+                value: dateFormat.format(data.machineData!.startDate),
+              ),
+              const SizedBox(height: 8),
+              _DetailRow(
+                label: 'End Date',
+                value: dateFormat.format(data.machineData!.endDate),
+              ),
+            ] else ...[
+              _DetailRow(label: 'Operator', value: data.operatorData!.operatorName),
+              const SizedBox(height: 8),
+              _DetailRow(
+                label: 'Month',
+                value: monthFormat.format(data.operatorData!.month),
+              ),
+              const SizedBox(height: 8),
+              _DetailRow(
+                label: 'Assigned Machines',
+                value: data.operatorData!.assignedMachines.isEmpty
+                    ? 'All'
+                    : data.operatorData!.assignedMachines.join(', '),
               ),
             ],
             const SizedBox(height: 8),
             _DetailRow(
               label: 'Generated At',
-              value: dateFormat.format(DateTime.now()),
+              value: DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now()),
             ),
           ],
         ),
@@ -225,7 +419,7 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
 
   Widget _buildReportDataSection(
     BuildContext context,
-    List<FrameProductionDetailsReport> data,
+    _ReportResultsData data,
   ) {
     final isMachineType =
         widget.request.type == ReportGenerationType.machineAndTimeRange;
@@ -237,16 +431,14 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              isMachineType
-                  ? 'Machine Production Data'
-                  : 'Operator Performance Data',
+              isMachineType ? 'Production Data' : 'Monthly Averages vs Target',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
             if (isMachineType)
-              _buildMachineDataTable(context, data)
+              _buildMachineDataTable(context, data.machineData!)
             else
-              _buildOperatorDataTable(context, []),
+              _buildOperatorDataTable(context, data.operatorData!),
           ],
         ),
       ),
@@ -255,24 +447,10 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
 
   Widget _buildMachineDataTable(
     BuildContext context,
-    List<FrameProductionDetailsReport> data,
+    _MachineReportData data,
   ) {
     final dateFormat = DateFormat('dd MMM yyyy');
-
-    // Convert reports to display data
-    final displayData = data
-        .map(
-          (report) => {
-            'date': dateFormat.format(report.date),
-            'shift': report.shift,
-            'produced': '${report.totalWeight.toStringAsFixed(2)} kg',
-            'efficiency': '${_calculateEfficiency(report).toStringAsFixed(1)}%',
-            'status': _getProductionStatus(report),
-          },
-        )
-        .toList();
-
-    if (displayData.isEmpty) {
+    if (data.rows.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -291,18 +469,18 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
         columns: const [
           DataColumn(label: Text('Date')),
           DataColumn(label: Text('Shift')),
-          DataColumn(label: Text('Produced')),
+          DataColumn(label: Text('Produced Weight')),
           DataColumn(label: Text('Efficiency')),
           DataColumn(label: Text('Status')),
         ],
-        rows: displayData
+        rows: data.rows
             .map(
-              (item) => DataRow(
+              (row) => DataRow(
                 cells: [
-                  DataCell(Text(item['date']!)),
-                  DataCell(Text(item['shift']!)),
-                  DataCell(Text(item['produced']!)),
-                  DataCell(Text(item['efficiency']!)),
+                  DataCell(Text(dateFormat.format(row.date))),
+                  DataCell(Text(row.shift)),
+                  DataCell(Text('${row.producedWeight.toStringAsFixed(2)} kg')),
+                  DataCell(Text('${row.efficiency.toStringAsFixed(1)}%')),
                   DataCell(
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -310,15 +488,13 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(
-                          item['status']!,
-                        ).withValues(alpha: 0.15),
+                        color: _getStatusColor(row.status).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        item['status']!,
+                        row.status,
                         style: TextStyle(
-                          color: _getStatusColor(item['status']!),
+                          color: _getStatusColor(row.status),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -333,16 +509,41 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     );
   }
 
-  Widget _buildOperatorDataTable(BuildContext context, List<dynamic> data) {
-    // Placeholder for operator data - to be implemented
-    // For now, returning empty state
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(
-          'Operator report data not yet implemented',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+  Widget _buildOperatorDataTable(
+    BuildContext context,
+    _OperatorReportData data,
+  ) {
+    final rows = [
+      ('Machine Cleaning', data.metric('a')),
+      ('Tools Count', data.metric('b')),
+      ('Production Efficiency', data.metric('c')),
+      ('Quality Acceptance', data.metric('d')),
+      ('Packing Efficiency', data.metric('e')),
+      ('Report Writing', data.metric('f')),
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columnSpacing: 24,
+        columns: const [
+          DataColumn(label: Text('Metric')),
+          DataColumn(label: Text('Monthly Average')),
+          DataColumn(label: Text('Target')),
+          DataColumn(label: Text('Gap')),
+        ],
+        rows: rows
+            .map(
+              (row) => DataRow(
+                cells: [
+                  DataCell(Text(row.$1)),
+                  DataCell(Text('${row.$2.toStringAsFixed(1)}%')),
+                  const DataCell(Text('100.0%')),
+                  DataCell(Text('${(100 - row.$2).toStringAsFixed(1)}%')),
+                ],
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -360,26 +561,113 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     }
   }
 
-  double _calculateEfficiency(FrameProductionDetailsReport report) {
-    // Simple efficiency calculation based on weight produced
-    // Normalized to a base of 1000 kg per shift
-    if (report.totalWeight <= 0) return 0;
-    return (report.totalWeight / 1000) * 100;
-  }
-
-  String _getProductionStatus(FrameProductionDetailsReport report) {
-    final efficiency = _calculateEfficiency(report);
-    if (efficiency >= 90) return 'Excellent';
-    if (efficiency >= 80) return 'Good';
-    if (efficiency >= 70) return 'Fair';
-    return 'Poor';
-  }
-
   Widget _buildBackButton(BuildContext context) {
     return OutlinedButton.icon(
       icon: const Icon(Icons.arrow_back),
       label: const Text('Back to Reports'),
       onPressed: () => context.pop(),
+    );
+  }
+}
+
+class _ReportResultsData {
+  const _ReportResultsData({this.machineData, this.operatorData});
+
+  final _MachineReportData? machineData;
+  final _OperatorReportData? operatorData;
+}
+
+class _MachineReportData {
+  const _MachineReportData({
+    required this.machineName,
+    required this.reportFamily,
+    required this.selectedShift,
+    required this.startDate,
+    required this.endDate,
+    required this.rows,
+  });
+
+  final String machineName;
+  final String reportFamily;
+  final String? selectedShift;
+  final DateTime startDate;
+  final DateTime endDate;
+  final List<_MachineReportRow> rows;
+
+  double get overallProductionWeight =>
+      rows.fold(0, (sum, row) => sum + row.producedWeight);
+
+  double get averageEfficiency => rows.isEmpty
+      ? 0
+      : rows.map((row) => row.efficiency).reduce((a, b) => a + b) / rows.length;
+}
+
+class _MachineReportRow {
+  const _MachineReportRow({
+    required this.date,
+    required this.shift,
+    required this.producedWeight,
+    required this.efficiency,
+  });
+
+  final DateTime date;
+  final String shift;
+  final double producedWeight;
+  final double efficiency;
+
+  String get status {
+    if (efficiency >= 90) return 'Excellent';
+    if (efficiency >= 80) return 'Good';
+    if (efficiency >= 70) return 'Fair';
+    return 'Poor';
+  }
+}
+
+class _OperatorReportData {
+  const _OperatorReportData({
+    required this.operatorName,
+    required this.month,
+    required this.metrics,
+    required this.assignedMachines,
+  });
+
+  final String operatorName;
+  final DateTime month;
+  final Map<String, double> metrics;
+  final List<String> assignedMachines;
+
+  double metric(String key) => metrics[key] ?? 0;
+
+  double get productionEfficiency => metric('c');
+}
+
+class _SummaryMetricTile extends StatelessWidget {
+  const _SummaryMetricTile({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryNavy.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.labelMedium),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
     );
   }
 }

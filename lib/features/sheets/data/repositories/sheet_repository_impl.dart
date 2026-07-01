@@ -136,21 +136,27 @@ class SheetRepositoryImpl implements SheetRepository {
       startDate: startDate,
       endDate: endDate,
     );
-    final a = cleaningReports.isEmpty
+    final operatorCleaning = cleaningReports
+        .where((r) => r.createdBy == operatorId)
+        .toList();
+    final a = operatorCleaning.isEmpty
         ? 0.0
-        : cleaningReports.map((r) => r.percentage).reduce((a, b) => a + b) /
-              cleaningReports.length;
+        : operatorCleaning.map((r) => r.percentage).reduce((a, b) => a + b) /
+              operatorCleaning.length;
 
     final toolsReports = await getToolsCountReports(
       startDate: startDate,
       endDate: endDate,
     );
-    final b = toolsReports.isEmpty
+    final operatorTools = toolsReports
+        .where((r) => r.createdBy == operatorId)
+        .toList();
+    final b = operatorTools.isEmpty
         ? 0.0
-        : toolsReports
+        : operatorTools
                   .map((r) => r.percentageAvailable)
                   .reduce((a, b) => a + b) /
-              toolsReports.length;
+              operatorTools.length;
 
     final rfReports = await getProductionRunningFeetReports(
       startDate: startDate,
@@ -170,18 +176,21 @@ class SheetRepositoryImpl implements SheetRepository {
       startDate: startDate,
       endDate: endDate,
     );
-    final d = packingReports.isEmpty
+    final operatorPacking = packingReports
+        .where((r) => r.createdBy == operatorId)
+        .toList();
+    final d = operatorPacking.isEmpty
         ? 0.0
-        : packingReports
+        : operatorPacking
                   .map((r) => r.qualityAcceptancePercentage)
                   .reduce((a, b) => a + b) /
-              packingReports.length;
-    final e = packingReports.isEmpty
+              operatorPacking.length;
+    final e = operatorPacking.isEmpty
         ? 0.0
-        : packingReports
+        : operatorPacking
                   .map((r) => r.packingEfficiency)
                   .reduce((a, b) => a + b) /
-              packingReports.length;
+              operatorPacking.length;
 
     final rwReports = await getReportWritingEfficiency(
       operatorId: operatorId,

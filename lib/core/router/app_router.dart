@@ -85,27 +85,9 @@ class AppRouter {
               builder: (_, s) => const ReportsTabPage(),
               routes: [
                 GoRoute(
-                  path: 'results/:type/:targetId/:targetName/:startTime/:endTime',
+                  path: 'results',
                   builder: (_, s) {
-                    final type = s.pathParameters['type'] == 'machine'
-                        ? ReportGenerationType.machineAndTimeRange
-                        : ReportGenerationType.operatorWise;
-                    final targetId = s.pathParameters['targetId'] ?? '';
-                    final targetName = s.pathParameters['targetName'] ?? '';
-                    final startTime =
-                        int.tryParse(s.pathParameters['startTime'] ?? '0');
-                    final endTime =
-                        int.tryParse(s.pathParameters['endTime'] ?? '0');
-                    final request = ReportRequest(
-                      type: type,
-                      target: ReportTarget(id: targetId, name: targetName),
-                      start: startTime != null && startTime > 0
-                          ? DateTime.fromMillisecondsSinceEpoch(startTime)
-                          : null,
-                      end: endTime != null && endTime > 0
-                          ? DateTime.fromMillisecondsSinceEpoch(endTime)
-                          : null,
-                    );
+                    final request = s.extra as ReportRequest;
                     return ReportResultsPage(request: request);
                   },
                 ),

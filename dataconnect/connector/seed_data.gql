@@ -413,8 +413,7 @@ mutation SeedFrameHealth1 @auth(level: PUBLIC) {
     date: "2025-07-14"
     machineNumber: "Frame Machine 1"
     shift: "Day Shift"
-    totalScore: 42
-    percentage: 60.0
+    totalMaintenanceDurationHours: 4.2
     createdBy: "op-1"
     submittedAt: "2025-07-14T10:00:00Z"
   })
@@ -425,8 +424,7 @@ mutation SeedFrameHealth2 @auth(level: PUBLIC) {
     date: "2025-07-12"
     machineNumber: "Frame Machine 2"
     shift: "Night Shift"
-    totalScore: 49
-    percentage: 70.0
+    totalMaintenanceDurationHours: 4.9
     createdBy: "op-2"
     submittedAt: "2025-07-12T22:00:00Z"
   })
@@ -437,8 +435,7 @@ mutation SeedFrameHealth3 @auth(level: PUBLIC) {
     date: "2025-07-10"
     machineNumber: "Frame Machine 1"
     shift: "Day Shift"
-    totalScore: 56
-    percentage: 80.0
+    totalMaintenanceDurationHours: 5.6
     createdBy: "op-1"
     submittedAt: "2025-07-10T10:00:00Z"
   })

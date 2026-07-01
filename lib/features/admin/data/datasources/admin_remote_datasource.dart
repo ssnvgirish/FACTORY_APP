@@ -575,6 +575,7 @@ class AdminRemoteDatasource {
               weightPerFoot: entry.weight,
             )
             .execute();
+        break;
       case MasterLookupType.sheetWeights:
         await _connector
             .insertMasterSheetWeight(
@@ -583,6 +584,7 @@ class AdminRemoteDatasource {
               weightPerSqft: entry.weight,
             )
             .execute();
+        break;
       default:
         break;
     }
@@ -602,6 +604,7 @@ class AdminRemoteDatasource {
               weightPerFoot: entry.weight,
             )
             .execute();
+        break;
       case MasterLookupType.sheetWeights:
         await _connector
             .updateMasterSheetWeight(
@@ -611,6 +614,7 @@ class AdminRemoteDatasource {
               weightPerSqft: entry.weight,
             )
             .execute();
+        break;
       default:
         break;
     }
@@ -624,12 +628,14 @@ class AdminRemoteDatasource {
               id: DeleteMasterFrameWeightVariablesId(id: id),
             )
             .execute();
+        break;
       case MasterLookupType.sheetWeights:
         await _connector
             .deleteMasterSheetWeight(
               id: DeleteMasterSheetWeightVariablesId(id: id),
             )
             .execute();
+        break;
       default:
         break;
     }
@@ -693,6 +699,7 @@ class AdminRemoteDatasource {
               targetKgPerHour: entry.target,
             )
             .execute();
+        break;
       case MasterLookupType.sheetTargets:
         if (entry.density == null || entry.density!.isEmpty) {
           throw ArgumentError('Density is required for sheet targets');
@@ -704,6 +711,7 @@ class AdminRemoteDatasource {
               targetFeetPerHour: entry.target,
             )
             .execute();
+        break;
       case MasterLookupType.scrapTargets:
         await _connector
             .insertMasterScrapTarget(
@@ -711,6 +719,7 @@ class AdminRemoteDatasource {
               targetKgPerHour: entry.target,
             )
             .execute();
+        break;
       default:
         break;
     }
@@ -733,6 +742,7 @@ class AdminRemoteDatasource {
               targetKgPerHour: entry.target,
             )
             .execute();
+        break;
       case MasterLookupType.sheetTargets:
         if (entry.density == null || entry.density!.isEmpty) {
           throw ArgumentError('Density is required for sheet targets');
@@ -745,6 +755,7 @@ class AdminRemoteDatasource {
               targetFeetPerHour: entry.target,
             )
             .execute();
+        break;
       case MasterLookupType.scrapTargets:
         await _connector
             .updateMasterScrapTarget(
@@ -753,6 +764,7 @@ class AdminRemoteDatasource {
               targetKgPerHour: entry.target,
             )
             .execute();
+        break;
       default:
         break;
     }
@@ -766,18 +778,21 @@ class AdminRemoteDatasource {
               id: DeleteMasterFrameTargetVariablesId(id: id),
             )
             .execute();
+        break;
       case MasterLookupType.sheetTargets:
         await _connector
             .deleteMasterSheetTarget(
               id: DeleteMasterSheetTargetVariablesId(id: id),
             )
             .execute();
+        break;
       case MasterLookupType.scrapTargets:
         await _connector
             .deleteMasterScrapTarget(
               id: DeleteMasterScrapTargetVariablesId(id: id),
             )
             .execute();
+        break;
       default:
         break;
     }

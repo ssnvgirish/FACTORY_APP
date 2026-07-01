@@ -116,6 +116,12 @@ CREATE TABLE public.master_frame_weight (
     section         VARCHAR NOT NULL,
     density         VARCHAR NOT NULL,
     weight_per_foot FLOAT   NOT NULL,
+    CONSTRAINT fk_frame_weight_section FOREIGN KEY (section)
+        REFERENCES public.master_frame_section(name)
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_frame_weight_density FOREIGN KEY (density)
+        REFERENCES public.master_frame_density(value)
+        ON DELETE RESTRICT,
     CONSTRAINT uq_frame_weight UNIQUE (section, density)
 );
 
@@ -127,6 +133,12 @@ CREATE TABLE public.master_sheet_weight (
     thickness        VARCHAR NOT NULL,
     density          VARCHAR NOT NULL,
     weight_per_sqft  FLOAT   NOT NULL,
+    CONSTRAINT fk_sheet_weight_thickness FOREIGN KEY (thickness)
+        REFERENCES public.master_sheet_thickness(value)
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_sheet_weight_density FOREIGN KEY (density)
+        REFERENCES public.master_sheet_density(value)
+        ON DELETE RESTRICT,
     CONSTRAINT uq_sheet_weight UNIQUE (thickness, density)
 );
 
@@ -138,6 +150,12 @@ CREATE TABLE public.master_frame_target (
     section           VARCHAR NOT NULL,
     density           VARCHAR NOT NULL,
     target_kg_per_hour FLOAT  NOT NULL,
+    CONSTRAINT fk_frame_target_section FOREIGN KEY (section)
+        REFERENCES public.master_frame_section(name)
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_frame_target_density FOREIGN KEY (density)
+        REFERENCES public.master_frame_density(value)
+        ON DELETE RESTRICT,
     CONSTRAINT uq_frame_target UNIQUE (section, density)
 );
 
@@ -149,6 +167,12 @@ CREATE TABLE public.master_sheet_target (
     thickness             VARCHAR NOT NULL,
     density               VARCHAR NOT NULL,
     target_feet_per_hour  FLOAT   NOT NULL,
+    CONSTRAINT fk_sheet_target_thickness FOREIGN KEY (thickness)
+        REFERENCES public.master_sheet_thickness(value)
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_sheet_target_density FOREIGN KEY (density)
+        REFERENCES public.master_sheet_density(value)
+        ON DELETE RESTRICT,
     CONSTRAINT uq_sheet_target UNIQUE (thickness, density)
 );
 
@@ -158,7 +182,10 @@ CREATE TABLE public.master_sheet_target (
 CREATE TABLE public.master_scrap_target (
     id                UUID    PRIMARY KEY DEFAULT uuid_generate_v4(),
     product           VARCHAR NOT NULL UNIQUE,
-    target_kg_per_hour FLOAT  NOT NULL
+    target_kg_per_hour FLOAT  NOT NULL,
+    CONSTRAINT fk_scrap_target_product FOREIGN KEY (product)
+        REFERENCES public.master_scrap_product(name)
+        ON DELETE RESTRICT
 );
 
 -- Salary Weightage Table
