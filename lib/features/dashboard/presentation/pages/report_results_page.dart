@@ -59,16 +59,18 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
         endDate: endDate,
       );
 
-      final filteredDetails = details
-          .where(
-            (report) => selectedShift == null || report.shift == selectedShift,
-          )
-          .toList()
-        ..sort((a, b) {
-          final dateCompare = a.date.compareTo(b.date);
-          if (dateCompare != 0) return dateCompare;
-          return a.shift.compareTo(b.shift);
-        });
+      final filteredDetails =
+          details
+              .where(
+                (report) =>
+                    selectedShift == null || report.shift == selectedShift,
+              )
+              .toList()
+            ..sort((a, b) {
+              final dateCompare = a.date.compareTo(b.date);
+              if (dateCompare != 0) return dateCompare;
+              return a.shift.compareTo(b.shift);
+            });
 
       final efficiencyByShift = {
         for (final report in weights)
@@ -103,20 +105,25 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
       startDate: startDate,
       endDate: endDate,
     );
-    final runningFeetReports = await sheetRepository.getProductionRunningFeetReports(
-      machineNumber: machine,
-      startDate: startDate,
-      endDate: endDate,
-    );
+    final runningFeetReports = await sheetRepository
+        .getProductionRunningFeetReports(
+          machineNumber: machine,
+          startDate: startDate,
+          endDate: endDate,
+        );
 
-    final filteredDetails = details
-        .where((report) => selectedShift == null || report.shift == selectedShift)
-        .toList()
-      ..sort((a, b) {
-        final dateCompare = a.date.compareTo(b.date);
-        if (dateCompare != 0) return dateCompare;
-        return a.shift.compareTo(b.shift);
-      });
+    final filteredDetails =
+        details
+            .where(
+              (report) =>
+                  selectedShift == null || report.shift == selectedShift,
+            )
+            .toList()
+          ..sort((a, b) {
+            final dateCompare = a.date.compareTo(b.date);
+            if (dateCompare != 0) return dateCompare;
+            return a.shift.compareTo(b.shift);
+          });
 
     final efficiencyByShift = {
       for (final report in runningFeetReports)
@@ -129,7 +136,8 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
             date: report.date,
             shift: report.shift,
             producedWeight: report.totalWeight,
-            efficiency: efficiencyByShift[_rowKey(report.date, report.shift)] ?? 0,
+            efficiency:
+                efficiencyByShift[_rowKey(report.date, report.shift)] ?? 0,
           ),
         )
         .toList();
@@ -145,10 +153,13 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
   }
 
   Future<_OperatorReportData> _fetchOperatorReportData() async {
-    final monthAnchor = widget.request.start ?? widget.request.end ?? DateTime.now();
-    final includeFrame = widget.request.target.assignedMachines.isEmpty ||
+    final monthAnchor =
+        widget.request.start ?? widget.request.end ?? DateTime.now();
+    final includeFrame =
+        widget.request.target.assignedMachines.isEmpty ||
         widget.request.target.assignedMachines.any(_isFrameMachine);
-    final includeSheet = widget.request.target.assignedMachines.isEmpty ||
+    final includeSheet =
+        widget.request.target.assignedMachines.isEmpty ||
         widget.request.target.assignedMachines.any(_isSheetMachine);
 
     final frameMetrics = includeFrame
@@ -228,7 +239,11 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     const Text('Error loading report data'),
                     const SizedBox(height: 8),
@@ -373,9 +388,15 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
             ),
             const SizedBox(height: 12),
             if (isMachineType) ...[
-              _DetailRow(label: 'Machine', value: data.machineData!.machineName),
+              _DetailRow(
+                label: 'Machine',
+                value: data.machineData!.machineName,
+              ),
               const SizedBox(height: 8),
-              _DetailRow(label: 'Category', value: data.machineData!.reportFamily),
+              _DetailRow(
+                label: 'Category',
+                value: data.machineData!.reportFamily,
+              ),
               const SizedBox(height: 8),
               _DetailRow(
                 label: 'Shift',
@@ -392,7 +413,10 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                 value: dateFormat.format(data.machineData!.endDate),
               ),
             ] else ...[
-              _DetailRow(label: 'Operator', value: data.operatorData!.operatorName),
+              _DetailRow(
+                label: 'Operator',
+                value: data.operatorData!.operatorName,
+              ),
               const SizedBox(height: 8),
               _DetailRow(
                 label: 'Month',
@@ -445,10 +469,7 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
     );
   }
 
-  Widget _buildMachineDataTable(
-    BuildContext context,
-    _MachineReportData data,
-  ) {
+  Widget _buildMachineDataTable(BuildContext context, _MachineReportData data) {
     final dateFormat = DateFormat('dd MMM yyyy');
     if (data.rows.isEmpty) {
       return Center(
@@ -488,7 +509,9 @@ class _ReportResultsPageState extends State<ReportResultsPage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(row.status).withValues(alpha: 0.15),
+                        color: _getStatusColor(
+                          row.status,
+                        ).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
