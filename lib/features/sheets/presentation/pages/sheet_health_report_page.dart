@@ -5,6 +5,7 @@ import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/calculations.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../frames/domain/entities/frame_entities.dart';
 import '../bloc/sheet_reports_bloc.dart';
 
@@ -67,8 +68,8 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
           }
           if (state is SheetReportsError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Something went wrong'),
+              SnackBar(
+                content: Text(state.message),
                 backgroundColor: AppTheme.errorRed,
               ),
             );
@@ -274,7 +275,7 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
     );
   }
 
-  void _submitReport() {
+  void _submitReport() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedMachine == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -295,6 +296,15 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
       return;
     }
 
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => const ConfirmSubmitDialog(),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) return;
+
     final entry = FrameMaintenanceEntry(
       maintenanceItem: _selectedMaintenanceItem!,
       startTime: _startTime!,
@@ -310,7 +320,8 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
       shift: _shift,
       entries: [entry],
       totalMaintenanceDurationHours: _durationHours,
-      createdBy: '',
+      createdBy: authState.user.uid,
+      submittedAt: DateTime.now(),
     );
     context.read<SheetReportsBloc>().add(SubmitSheetHealthReport(report));
   }

@@ -159,6 +159,8 @@ class FrameReportsSubmitting extends FrameReportsState {}
 class FrameReportsSubmitted extends FrameReportsState {
   final String message;
   FrameReportsSubmitted([this.message = 'Report submitted successfully']);
+  @override
+  List<Object?> get props => [message];
 }
 
 class FrameReportsError extends FrameReportsState {

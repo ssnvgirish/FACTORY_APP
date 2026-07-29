@@ -104,8 +104,8 @@ class _FrameHealthReportFormPageState extends State<FrameHealthReportFormPage> {
         }
         if (state is FrameReportsError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong'),
+            SnackBar(
+              content: Text(state.message),
               backgroundColor: AppTheme.errorRed,
             ),
           );

@@ -161,8 +161,8 @@ class _FrameProductionDetailsFormPageState
         if (state is FrameReportsError) {
           debugPrint('FrameReportsError: ${state.message}');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong'),
+            SnackBar(
+              content: Text(state.message),
               backgroundColor: AppTheme.errorRed,
             ),
           );

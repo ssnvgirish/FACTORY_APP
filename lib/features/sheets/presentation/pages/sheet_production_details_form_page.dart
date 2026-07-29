@@ -141,8 +141,8 @@ class _SheetProductionDetailsFormPageState
         if (state is SheetReportsError) {
           debugPrint('SheetReportsError: ${state.message}');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong'),
+            SnackBar(
+              content: Text(state.message),
               backgroundColor: AppTheme.errorRed,
             ),
           );

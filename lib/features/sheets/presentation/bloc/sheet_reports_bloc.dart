@@ -121,6 +121,8 @@ class SheetReportsSubmitting extends SheetReportsState {}
 class SheetReportsSubmitted extends SheetReportsState {
   final String message;
   SheetReportsSubmitted([this.message = 'Report submitted successfully']);
+  @override
+  List<Object?> get props => [message];
 }
 
 class SheetReportsError extends SheetReportsState {

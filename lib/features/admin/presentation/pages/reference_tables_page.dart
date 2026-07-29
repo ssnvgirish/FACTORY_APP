@@ -82,7 +82,6 @@ class _LookupTile extends StatelessWidget {
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          context.read<AdminBloc>().add(LoadMasterLookup(lookupType));
           final page = switch (lookupType) {
             MasterLookupType.frameWeights || MasterLookupType.sheetWeights =>
               _WeightMatrixPage(title: title, lookupType: lookupType),
@@ -114,6 +113,8 @@ class _WeightMatrixPage extends StatefulWidget {
 class _WeightMatrixPageState extends State<_WeightMatrixPage> {
   List<MasterTableItem> _sections = [];
   List<MasterTableItem> _densities = [];
+  List<MasterWeightEntry>? _entries;
+  String? _error;
 
   bool get _isFrame => widget.lookupType == MasterLookupType.frameWeights;
 
@@ -131,8 +132,51 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
         ? MasterTableType.frameDensities
         : MasterTableType.sheetDensities;
 
-    context.read<AdminBloc>().add(LoadMasterTable(sectionTableType));
-    context.read<AdminBloc>().add(LoadMasterTable(densityTableType));
+    final bloc = context.read<AdminBloc>();
+    bloc.add(LoadMasterLookup(widget.lookupType));
+    bloc.add(LoadMasterTable(sectionTableType));
+    bloc.add(LoadMasterTable(densityTableType));
+  }
+
+  void _reloadEntries() {
+    setState(() {
+      _entries = null;
+      _error = null;
+    });
+    context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
+  }
+
+  void _onAdminState(BuildContext context, AdminState state) {
+    if (state is MasterTableLoaded) {
+      setState(() {
+        if (_isFrame) {
+          if (state.tableType == MasterTableType.frameSections) {
+            _sections = state.items;
+          } else if (state.tableType == MasterTableType.frameDensities) {
+            _densities = state.items;
+          }
+        } else {
+          if (state.tableType == MasterTableType.sheetThicknesses) {
+            _sections = state.items;
+          } else if (state.tableType == MasterTableType.sheetDensities) {
+            _densities = state.items;
+          }
+        }
+      });
+    } else if (state is MasterWeightsLoaded &&
+        state.lookupType == widget.lookupType) {
+      setState(() {
+        _entries = state.entries;
+        _error = null;
+      });
+    } else if (state is MasterLookupSaved) {
+      _reloadEntries();
+    } else if (state is AdminError) {
+      setState(() => _error = state.message);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -144,55 +188,28 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
         child: const Icon(Icons.add),
       ),
       body: BlocListener<AdminBloc, AdminState>(
-        listener: (context, state) {
-          if (state is MasterTableLoaded) {
-            setState(() {
-              if (_isFrame) {
-                if (state.tableType == MasterTableType.frameSections) {
-                  _sections = state.items;
-                } else if (state.tableType == MasterTableType.frameDensities) {
-                  _densities = state.items;
-                }
-              } else {
-                if (state.tableType == MasterTableType.sheetThicknesses) {
-                  _sections = state.items;
-                } else if (state.tableType == MasterTableType.sheetDensities) {
-                  _densities = state.items;
-                }
-              }
-            });
-          }
-        },
-        child: BlocConsumer<AdminBloc, AdminState>(
-          listener: (context, state) {
-            if (state is MasterLookupSaved) {
-              context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
-            }
-            if (state is AdminError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            if (state is AdminLoading) return const LoadingWidget();
-            if (state is MasterWeightsLoaded &&
-                state.lookupType == widget.lookupType) {
-              if (state.entries.isEmpty) {
-                return const EmptyStateWidget(
-                  message: 'No entries yet. Tap + to add.',
-                );
-              }
-              return _buildMatrix(context, state.entries);
-            }
-            return const LoadingWidget();
-          },
-        ),
+        listener: _onAdminState,
+        child: _buildBody(context),
       ),
     );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    final error = _error;
+    if (error != null) {
+      return EmptyStateWidget(
+        message: 'Could not load this table.\n$error',
+        icon: Icons.error_outline,
+        actionLabel: 'Retry',
+        onAction: _reloadEntries,
+      );
+    }
+    final entries = _entries;
+    if (entries == null) return const LoadingWidget();
+    if (entries.isEmpty) {
+      return const EmptyStateWidget(message: 'No entries yet. Tap + to add.');
+    }
+    return _buildMatrix(context, entries);
   }
 
   Widget _buildMatrix(BuildContext context, List<MasterWeightEntry> entries) {
@@ -551,6 +568,8 @@ class _TargetMatrixPage extends StatefulWidget {
 class _TargetMatrixPageState extends State<_TargetMatrixPage> {
   List<MasterTableItem> _sections = [];
   List<MasterTableItem> _densities = [];
+  List<MasterTargetEntry>? _entries;
+  String? _error;
 
   bool get _isFrame => widget.lookupType == MasterLookupType.frameTargets;
 
@@ -568,8 +587,51 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
         ? MasterTableType.frameDensities
         : MasterTableType.sheetDensities;
 
-    context.read<AdminBloc>().add(LoadMasterTable(sectionTableType));
-    context.read<AdminBloc>().add(LoadMasterTable(densityTableType));
+    final bloc = context.read<AdminBloc>();
+    bloc.add(LoadMasterLookup(widget.lookupType));
+    bloc.add(LoadMasterTable(sectionTableType));
+    bloc.add(LoadMasterTable(densityTableType));
+  }
+
+  void _reloadEntries() {
+    setState(() {
+      _entries = null;
+      _error = null;
+    });
+    context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
+  }
+
+  void _onAdminState(BuildContext context, AdminState state) {
+    if (state is MasterTableLoaded) {
+      setState(() {
+        if (_isFrame) {
+          if (state.tableType == MasterTableType.frameSections) {
+            _sections = state.items;
+          } else if (state.tableType == MasterTableType.frameDensities) {
+            _densities = state.items;
+          }
+        } else {
+          if (state.tableType == MasterTableType.sheetThicknesses) {
+            _sections = state.items;
+          } else if (state.tableType == MasterTableType.sheetDensities) {
+            _densities = state.items;
+          }
+        }
+      });
+    } else if (state is MasterTargetsLoaded &&
+        state.lookupType == widget.lookupType) {
+      setState(() {
+        _entries = state.entries;
+        _error = null;
+      });
+    } else if (state is MasterLookupSaved) {
+      _reloadEntries();
+    } else if (state is AdminError) {
+      setState(() => _error = state.message);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -581,55 +643,28 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
         child: const Icon(Icons.add),
       ),
       body: BlocListener<AdminBloc, AdminState>(
-        listener: (context, state) {
-          if (state is MasterTableLoaded) {
-            setState(() {
-              if (_isFrame) {
-                if (state.tableType == MasterTableType.frameSections) {
-                  _sections = state.items;
-                } else if (state.tableType == MasterTableType.frameDensities) {
-                  _densities = state.items;
-                }
-              } else {
-                if (state.tableType == MasterTableType.sheetThicknesses) {
-                  _sections = state.items;
-                } else if (state.tableType == MasterTableType.sheetDensities) {
-                  _densities = state.items;
-                }
-              }
-            });
-          }
-        },
-        child: BlocConsumer<AdminBloc, AdminState>(
-          listener: (context, state) {
-            if (state is MasterLookupSaved) {
-              context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
-            }
-            if (state is AdminError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            if (state is AdminLoading) return const LoadingWidget();
-            if (state is MasterTargetsLoaded &&
-                state.lookupType == widget.lookupType) {
-              if (state.entries.isEmpty) {
-                return const EmptyStateWidget(
-                  message: 'No entries yet. Tap + to add.',
-                );
-              }
-              return _buildMatrix(context, state.entries);
-            }
-            return const LoadingWidget();
-          },
-        ),
+        listener: _onAdminState,
+        child: _buildBody(context),
       ),
     );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    final error = _error;
+    if (error != null) {
+      return EmptyStateWidget(
+        message: 'Could not load this table.\n$error',
+        icon: Icons.error_outline,
+        actionLabel: 'Retry',
+        onAction: _reloadEntries,
+      );
+    }
+    final entries = _entries;
+    if (entries == null) return const LoadingWidget();
+    if (entries.isEmpty) {
+      return const EmptyStateWidget(message: 'No entries yet. Tap + to add.');
+    }
+    return _buildMatrix(context, entries);
   }
 
   Widget _buildMatrix(BuildContext context, List<MasterTargetEntry> entries) {
@@ -1025,14 +1060,27 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
 
 // ─── Scrap Target Page (simple product → target table) ────────────────────
 
-class _ScrapTargetPage extends StatelessWidget {
+class _ScrapTargetPage extends StatefulWidget {
   final String title;
   const _ScrapTargetPage({required this.title});
 
   @override
+  State<_ScrapTargetPage> createState() => _ScrapTargetPageState();
+}
+
+class _ScrapTargetPageState extends State<_ScrapTargetPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AdminBloc>().add(
+      const LoadMasterLookup(MasterLookupType.scrapTargets),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(widget.title)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
         child: const Icon(Icons.add),
@@ -1261,6 +1309,7 @@ class _SalaryWeightagesPageState extends State<_SalaryWeightagesPage>
   void initState() {
     super.initState();
     _tab = TabController(length: 2, vsync: this);
+    context.read<AdminBloc>().add(const LoadSalaryWeightages());
   }
 
   @override

@@ -162,6 +162,8 @@ class ScrapRegrindSubmitting extends ScrapRegrindState {}
 class ScrapRegrindSubmitted extends ScrapRegrindState {
   final String message;
   ScrapRegrindSubmitted([this.message = 'Report submitted successfully']);
+  @override
+  List<Object?> get props => [message];
 }
 
 class ScrapRegrindError extends ScrapRegrindState {

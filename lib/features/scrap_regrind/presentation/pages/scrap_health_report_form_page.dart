@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/utils/calculations.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
 import '../bloc/scrap_regrind_bloc.dart';
 
@@ -146,9 +147,9 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
                                   if (time != null) {
                                     setState(() {
                                       _startTime = DateTime(
-                                        DateTime.now().year,
-                                        DateTime.now().month,
-                                        DateTime.now().day,
+                                        _selectedDate.year,
+                                        _selectedDate.month,
+                                        _selectedDate.day,
                                         time.hour,
                                         time.minute,
                                       );
@@ -174,9 +175,9 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
                                   if (time != null) {
                                     setState(() {
                                       _endTime = DateTime(
-                                        DateTime.now().year,
-                                        DateTime.now().month,
-                                        DateTime.now().day,
+                                        _selectedDate.year,
+                                        _selectedDate.month,
+                                        _selectedDate.day,
                                         time.hour,
                                         time.minute,
                                       );
@@ -241,7 +242,7 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
     );
   }
 
-  void _submitReport() {
+  void _submitReport() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedMaintenanceItem == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -255,6 +256,15 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
       );
       return;
     }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => const ConfirmSubmitDialog(),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) return;
 
     final entry = ScrapMaintenanceEntry(
       maintenanceItem: _selectedMaintenanceItem!,
@@ -271,7 +281,8 @@ class _ScrapHealthReportFormPageState extends State<ScrapHealthReportFormPage> {
       shift: _selectedShift!,
       entries: [entry],
       totalMaintenanceDurationHours: _durationHours,
-      createdBy: '', // Set from auth
+      createdBy: authState.user.uid,
+      submittedAt: DateTime.now(),
     );
 
     context.read<ScrapRegrindBloc>().add(SubmitScrapHealthReport(report));
