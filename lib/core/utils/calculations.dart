@@ -120,7 +120,28 @@ class Calculations {
     required String density,
     required Map<String, Map<String, double>> weightTable,
   }) {
-    return weightTable[section]?[density];
+    return _lookupWeight(weightTable, section, density);
+  }
+
+  /// Two-level weight lookup that tolerates numeric formatting differences
+  /// between master tables, e.g. a density of `0.8` matching a `0.80` row.
+  static double? _lookupWeight(
+    Map<String, Map<String, double>> table,
+    String key1,
+    String key2,
+  ) {
+    final row = table[key1] ?? _numericKeyMatch(table, key1);
+    if (row == null) return null;
+    return row[key2] ?? _numericKeyMatch(row, key2);
+  }
+
+  static V? _numericKeyMatch<V>(Map<String, V> map, String key) {
+    final target = double.tryParse(key.trim());
+    if (target == null) return null;
+    for (final entry in map.entries) {
+      if (double.tryParse(entry.key.trim()) == target) return entry.value;
+    }
+    return null;
   }
 
   // ═══════════════════════════════════════
@@ -137,6 +158,15 @@ class Calculations {
   /// Per piece weight for sheets: SQFT × Weight_per_sqft
   static double sheetPerPieceWeight(double sqft, double weightPerSqft) {
     return double.parse((sqft * weightPerSqft).toStringAsFixed(3));
+  }
+
+  /// Look up sheet weight per sqft from the weight table.
+  static double? sheetWeightPerSqft({
+    required String thickness,
+    required String density,
+    required Map<String, Map<String, double>> weightTable,
+  }) {
+    return _lookupWeight(weightTable, thickness, density);
   }
 
   /// Total running feet = (Length × Quantity) / 12

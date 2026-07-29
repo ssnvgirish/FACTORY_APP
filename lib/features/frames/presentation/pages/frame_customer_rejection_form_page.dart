@@ -39,7 +39,13 @@ class _FrameCustomerRejectionFormPageState
       if (item.density == 'Others') {
         wpf = double.tryParse(item.manualWeightCtrl.text) ?? 0;
       } else {
-        wpf = _weightTable[item.section]?[item.density] ?? 0;
+        wpf =
+            Calculations.frameWeightPerFoot(
+              section: item.section!,
+              density: item.density!,
+              weightTable: _weightTable,
+            ) ??
+            0;
       }
       total += qty * length * wpf;
     }
@@ -78,7 +84,13 @@ class _FrameCustomerRejectionFormPageState
       if (item.density == 'Others') {
         wpf = double.parse(item.manualWeightCtrl.text);
       } else {
-        wpf = _weightTable[item.section]?[item.density] ?? 0;
+        wpf =
+            Calculations.frameWeightPerFoot(
+              section: item.section!,
+              density: item.density!,
+              weightTable: _weightTable,
+            ) ??
+            0;
       }
       final ppw = Calculations.framePerPieceWeight(
         lengthFeet: length,

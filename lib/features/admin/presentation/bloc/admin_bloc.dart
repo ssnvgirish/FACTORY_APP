@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../domain/entities/admin_entities.dart';
 import '../../domain/repositories/admin_repository.dart';
 
@@ -225,7 +226,13 @@ class AdminError extends AdminState {
 class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final AdminRepository _repository;
 
-  AdminBloc(this._repository) : super(AdminInitial()) {
+  /// Operator forms read master data from a cache built once at startup.
+  /// Without refreshing it here, admin edits stay invisible until restart.
+  final DropdownConfigProvider? _configProvider;
+
+  AdminBloc(this._repository, {DropdownConfigProvider? configProvider})
+    : _configProvider = configProvider,
+      super(AdminInitial()) {
     on<LoadUsers>(_onLoadUsers);
     on<CreateUserRequested>(_onCreateUser);
     on<UpdateUserRequested>(_onUpdateUser);
@@ -241,6 +248,14 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<DeleteMasterTargetEntry>(_onDeleteTargetEntry);
     on<LoadSalaryWeightages>(_onLoadSalaryWeightages);
     on<SaveSalaryWeightage>(_onSaveSalaryWeightage);
+  }
+
+  /// Rebuilds the app-wide master-data cache after a write. Never allowed to
+  /// fail the write itself — the edit already succeeded at this point.
+  Future<void> _refreshMasterDataCache() async {
+    try {
+      await _configProvider?.refresh();
+    } catch (_) {}
   }
 
   Future<void> _onLoadUsers(LoadUsers event, Emitter<AdminState> emit) async {
@@ -320,6 +335,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     emit(AdminLoading());
     try {
       await _repository.insertMasterItem(event.tableType, event.item);
+      await _refreshMasterDataCache();
       emit(MasterItemSaved(event.tableType));
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -333,6 +349,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     emit(AdminLoading());
     try {
       await _repository.updateMasterItem(event.tableType, event.item);
+      await _refreshMasterDataCache();
       emit(MasterItemSaved(event.tableType));
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -346,6 +363,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     emit(AdminLoading());
     try {
       await _repository.deleteMasterItem(event.tableType, event.id);
+      await _refreshMasterDataCache();
       emit(MasterItemSaved(event.tableType));
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -390,6 +408,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } else {
         await _repository.updateWeightEntry(event.lookupType, event.entry);
       }
+      await _refreshMasterDataCache();
       emit(MasterLookupSaved());
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -403,6 +422,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     emit(AdminLoading());
     try {
       await _repository.deleteWeightEntry(event.lookupType, event.id);
+      await _refreshMasterDataCache();
       emit(MasterLookupSaved());
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -420,6 +440,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } else {
         await _repository.updateTargetEntry(event.lookupType, event.entry);
       }
+      await _refreshMasterDataCache();
       emit(MasterLookupSaved());
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -433,6 +454,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     emit(AdminLoading());
     try {
       await _repository.deleteTargetEntry(event.lookupType, event.id);
+      await _refreshMasterDataCache();
       emit(MasterLookupSaved());
     } catch (e) {
       emit(AdminError(e.toString()));
@@ -465,6 +487,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } else {
         await _repository.updateSalaryWeightage(event.entry);
       }
+      await _refreshMasterDataCache();
       emit(MasterLookupSaved());
     } catch (e) {
       emit(AdminError(e.toString()));

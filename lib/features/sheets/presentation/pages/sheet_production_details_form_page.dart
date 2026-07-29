@@ -51,9 +51,26 @@ class _SheetProductionDetailsFormPageState
       final manual = double.tryParse(item.manualWeightCtrl.text) ?? 0;
       return Calculations.sheetPerPieceWeight(sqft, manual);
     }
-    final wpsqft = ddp.sheetWeights[item.thickness]?[item.density];
+    final wpsqft = Calculations.sheetWeightPerSqft(
+      thickness: item.thickness!,
+      density: item.density!,
+      weightTable: ddp.sheetWeights,
+    );
     if (wpsqft == null) return 0;
     return Calculations.sheetPerPieceWeight(sqft, wpsqft);
+  }
+
+  /// True when the chosen thickness/density pair has no row in the weight
+  /// table, which would otherwise silently submit a zero-weight line item.
+  bool _missingWeightRow(_SheetLineItemData item) {
+    if (item.thickness == null || item.density == null) return false;
+    if (item.density == 'Others') return false;
+    return Calculations.sheetWeightPerSqft(
+          thickness: item.thickness!,
+          density: item.density!,
+          weightTable: ddp.sheetWeights,
+        ) ==
+        null;
   }
 
   void _addItem() => setState(() => _items.add(_SheetLineItemData()));
@@ -193,6 +210,26 @@ class _SheetProductionDetailsFormPageState
               ),
               const SizedBox(height: 24),
               const SectionHeader(title: 'Production Line Items'),
+              if (!ddp.isLoaded) ...[
+                const SizedBox(height: 8),
+                ListTile(
+                  dense: true,
+                  tileColor: AppTheme.warningYellow.withValues(alpha: 0.15),
+                  leading: const Icon(
+                    Icons.cloud_off,
+                    color: AppTheme.warningYellow,
+                  ),
+                  title: const Text(
+                    'Master data could not be loaded',
+                    style: TextStyle(fontSize: 13),
+                  ),
+                  subtitle: const Text(
+                    'Weights shown come from built-in defaults and may be out '
+                    'of date. Reconnect and restart before submitting.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
               ...List.generate(_items.length, (index) {
                 final item = _items[index];
                 final showChange = _needsTimeOfChange(index);
@@ -314,6 +351,29 @@ class _SheetProductionDetailsFormPageState
                           value: _sqft(item).toStringAsFixed(3),
                         ),
                         const SizedBox(height: 8),
+                        if (_missingWeightRow(item)) ...[
+                          ListTile(
+                            dense: true,
+                            tileColor: AppTheme.errorRed.withValues(alpha: 0.1),
+                            leading: const Icon(
+                              Icons.error_outline,
+                              color: AppTheme.errorRed,
+                            ),
+                            title: Text(
+                              'No weight configured for ${item.thickness} × ${item.density}',
+                              style: const TextStyle(
+                                color: AppTheme.errorRed,
+                                fontSize: 13,
+                              ),
+                            ),
+                            subtitle: const Text(
+                              'Add it in Admin → Reference Tables → Sheet Weight Table, '
+                              'or choose density "Others" to enter it manually.',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                         AutoCalculatedField(
                           label: 'Per Piece Weight',
                           value: '${_ppw(item).toStringAsFixed(3)} kg',

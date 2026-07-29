@@ -90,6 +90,50 @@ void main() {
       });
     });
 
+    group('frameWeightPerFoot() numeric key tolerance', () {
+      // Master tables are edited by hand, so the density dropdown can hold
+      // '0.8' while the weight table stores '0.80'. Both must resolve.
+      test("'0.8' matches a '0.80' row", () {
+        expect(Calculations.frameWeightPerFoot(section: '4x2', density: '0.8', weightTable: weightTable), 0.690);
+      });
+
+      test("'0.9' matches a '0.90' row", () {
+        expect(Calculations.frameWeightPerFoot(section: '4x2', density: '0.9', weightTable: weightTable), 0.777);
+      });
+
+      test("'.75' matches a '0.75' row", () {
+        expect(Calculations.frameWeightPerFoot(section: '4x2', density: '.75', weightTable: weightTable), 0.647);
+      });
+
+      test('surrounding whitespace is tolerated', () {
+        expect(Calculations.frameWeightPerFoot(section: '4x2', density: ' 0.80 ', weightTable: weightTable), 0.690);
+      });
+
+      test('a genuinely absent density still returns null', () {
+        expect(Calculations.frameWeightPerFoot(section: '4x2', density: '0.85', weightTable: weightTable), isNull);
+      });
+
+      test('non-numeric section is still matched exactly only', () {
+        expect(Calculations.frameWeightPerFoot(section: '4X2', density: '0.80', weightTable: weightTable), isNull);
+      });
+    });
+
+    group('sheetWeightPerSqft() numeric key tolerance', () {
+      final sheetTable = AppConstants.defaultSheetWeights;
+
+      test("6mm / '0.45' resolves exactly", () {
+        expect(Calculations.sheetWeightPerSqft(thickness: '6mm', density: '0.45', weightTable: sheetTable), 0.199);
+      });
+
+      test("6mm / '0.5' matches a '0.50' row", () {
+        expect(Calculations.sheetWeightPerSqft(thickness: '6mm', density: '0.5', weightTable: sheetTable), 0.221);
+      });
+
+      test('unknown thickness returns null', () {
+        expect(Calculations.sheetWeightPerSqft(thickness: '99mm', density: '0.45', weightTable: sheetTable), isNull);
+      });
+    });
+
     group('framePerPieceWeight()', () {
       test('3x2, 0.75, length=10 → 10 × 0.486 = 4.86', () {
         expect(Calculations.framePerPieceWeight(lengthFeet: 10, weightPerFoot: 0.486), 4.86);

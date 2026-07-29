@@ -61,6 +61,19 @@ class _FrameProductionDetailsFormPageState
     );
   }
 
+  /// True when the chosen section/density pair has no row in the weight
+  /// table, which would otherwise silently submit a zero-weight line item.
+  bool _missingWeightRow(_LineItemData item) {
+    if (item.section == null || item.density == null) return false;
+    if (item.density == 'Others') return false;
+    return Calculations.frameWeightPerFoot(
+          section: item.section!,
+          density: item.density!,
+          weightTable: _weightTable,
+        ) ==
+        null;
+  }
+
   void _addLineItem() {
     setState(() {
       _lineItems.add(_LineItemData());
@@ -213,6 +226,26 @@ class _FrameProductionDetailsFormPageState
               ),
               const SizedBox(height: 24),
               const SectionHeader(title: 'Production Line Items'),
+              if (!ddp.isLoaded) ...[
+                const SizedBox(height: 8),
+                ListTile(
+                  dense: true,
+                  tileColor: AppTheme.warningYellow.withValues(alpha: 0.15),
+                  leading: const Icon(
+                    Icons.cloud_off,
+                    color: AppTheme.warningYellow,
+                  ),
+                  title: const Text(
+                    'Master data could not be loaded',
+                    style: TextStyle(fontSize: 13),
+                  ),
+                  subtitle: const Text(
+                    'Weights shown come from built-in defaults and may be out '
+                    'of date. Reconnect and restart before submitting.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
               ...List.generate(_lineItems.length, (index) {
                 final item = _lineItems[index];
                 final showTimeChange = _needsTimeOfChange(index);
@@ -318,6 +351,29 @@ class _FrameProductionDetailsFormPageState
                           onChanged: (_) => setState(() {}),
                         ),
                         const SizedBox(height: 12),
+                        if (_missingWeightRow(item)) ...[
+                          ListTile(
+                            dense: true,
+                            tileColor: AppTheme.errorRed.withValues(alpha: 0.1),
+                            leading: const Icon(
+                              Icons.error_outline,
+                              color: AppTheme.errorRed,
+                            ),
+                            title: Text(
+                              'No weight configured for ${item.section} × ${item.density}',
+                              style: const TextStyle(
+                                color: AppTheme.errorRed,
+                                fontSize: 13,
+                              ),
+                            ),
+                            subtitle: const Text(
+                              'Add it in Admin → Reference Tables → Frame Weight Table, '
+                              'or choose density "Others" to enter it manually.',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                         AutoCalculatedField(
                           label: 'Per Piece Weight',
                           value:

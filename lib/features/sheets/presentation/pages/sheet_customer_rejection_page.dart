@@ -51,7 +51,11 @@ class _SheetCustomerRejectionPageState
       final manual = double.tryParse(item.manualWeightCtrl.text) ?? 0;
       return Calculations.sheetPerPieceWeight(sqft, manual);
     }
-    final wpsqft = ddp.sheetWeights[item.thickness]?[item.density];
+    final wpsqft = Calculations.sheetWeightPerSqft(
+      thickness: item.thickness!,
+      density: item.density!,
+      weightTable: ddp.sheetWeights,
+    );
     if (wpsqft == null) return 0;
     return Calculations.sheetPerPieceWeight(sqft, wpsqft);
   }

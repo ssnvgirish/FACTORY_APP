@@ -95,7 +95,9 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory(() => SheetReportsBloc(sheetRepository: sl()));
   sl.registerFactory(() => SalaryBloc(salaryRepository: sl()));
-  sl.registerFactory(() => AdminBloc(sl()));
+  sl.registerFactory(
+    () => AdminBloc(sl(), configProvider: sl<DropdownConfigProvider>()),
+  );
   sl.registerFactory(() => DashboardBloc(sl()));
   sl.registerFactory(() => ScrapRegrindBloc(scrapRegrindRepository: sl()));
 }
