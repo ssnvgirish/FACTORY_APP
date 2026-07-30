@@ -216,6 +216,12 @@ class PaginatedListView<T> extends StatefulWidget {
   final int pageSize;
   final EdgeInsetsGeometry padding;
 
+  /// When set, "Load More" fetches the next page from the server instead of
+  /// revealing more already-loaded items.
+  final VoidCallback? onLoadMore;
+  final bool hasMore;
+  final bool isLoadingMore;
+
   const PaginatedListView({
     super.key,
     required this.items,
@@ -225,6 +231,9 @@ class PaginatedListView<T> extends StatefulWidget {
     this.emptyIcon = Icons.inbox_outlined,
     this.pageSize = 30,
     this.padding = const EdgeInsets.all(8),
+    this.onLoadMore,
+    this.hasMore = false,
+    this.isLoadingMore = false,
   });
 
   @override
@@ -233,6 +242,8 @@ class PaginatedListView<T> extends StatefulWidget {
 
 class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
   late int _visibleCount;
+
+  bool get _serverPaging => widget.onLoadMore != null;
 
   @override
   void initState() {
@@ -252,32 +263,24 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (widget.items.isEmpty) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          EmptyStateWidget(
-            message: widget.emptyMessage,
-            icon: widget.emptyIcon,
-          ),
-        ],
+  Widget _buildLoadMoreFooter() {
+    if (widget.isLoadingMore) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Center(child: CircularProgressIndicator()),
       );
     }
 
-    final hasMore = _visibleCount < widget.items.length;
-    final listView = ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: widget.padding,
-      itemCount: _visibleCount + (hasMore ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index >= _visibleCount) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Center(
-              child: OutlinedButton.icon(
-                onPressed: () {
+    final remaining = _serverPaging
+        ? null
+        : widget.items.length - _visibleCount;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Center(
+        child: OutlinedButton.icon(
+          onPressed: _serverPaging
+              ? widget.onLoadMore
+              : () {
                   setState(() {
                     _visibleCount = math.min(
                       _visibleCount + widget.pageSize,
@@ -285,14 +288,43 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
                     );
                   });
                 },
-                icon: const Icon(Icons.expand_more),
-                label: Text(
-                  'Load More (${widget.items.length - _visibleCount})',
-                ),
-              ),
-            ),
-          );
-        }
+          icon: const Icon(Icons.expand_more),
+          label: Text(
+            remaining == null ? 'Load More' : 'Load More ($remaining)',
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleCount = _serverPaging ? widget.items.length : _visibleCount;
+    final showLoadMore = _serverPaging
+        ? widget.hasMore
+        : visibleCount < widget.items.length;
+
+    if (widget.items.isEmpty) {
+      final listView = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          EmptyStateWidget(
+            message: widget.emptyMessage,
+            icon: widget.emptyIcon,
+          ),
+          if (showLoadMore) _buildLoadMoreFooter(),
+        ],
+      );
+      if (widget.onRefresh == null) return listView;
+      return RefreshIndicator(onRefresh: widget.onRefresh!, child: listView);
+    }
+
+    final listView = ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: widget.padding,
+      itemCount: visibleCount + (showLoadMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index >= visibleCount) return _buildLoadMoreFooter();
         return widget.itemBuilder(context, widget.items[index], index);
       },
     );

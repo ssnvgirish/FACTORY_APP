@@ -37,8 +37,7 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
   @override
   void initState() {
     super.initState();
-    _selectedMachine =
-        widget.machineId.isNotEmpty ? widget.machineId : null;
+    _selectedMachine = widget.machineId.isNotEmpty ? widget.machineId : null;
     context.read<SheetReportsBloc>().add(
       LoadSheetHealthReports(machineNumber: _selectedMachine ?? ''),
     );
@@ -278,9 +277,9 @@ class _SheetHealthReportPageState extends State<SheetHealthReportPage> {
   void _submitReport() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedMachine == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select a machine')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Select a machine')));
       return;
     }
     if (_selectedMaintenanceItem == null) {

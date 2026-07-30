@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../frames/domain/entities/frame_entities.dart';
 import '../../domain/entities/sheet_entities.dart';
 import '../../domain/repositories/sheet_repository.dart';
+import '../../../../core/utils/report_list_pagination.dart';
 
 // ═══════════════════════════════════════
 // EVENTS
@@ -15,7 +16,15 @@ abstract class SheetReportsEvent extends Equatable {
 
 class LoadSheetCleaningReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetCleaningReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetCleaningReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetCleaningReport extends SheetReportsEvent {
@@ -25,7 +34,15 @@ class SubmitSheetCleaningReport extends SheetReportsEvent {
 
 class LoadSheetToolsCountReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetToolsCountReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetToolsCountReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetToolsCountReport extends SheetReportsEvent {
@@ -35,7 +52,15 @@ class SubmitSheetToolsCountReport extends SheetReportsEvent {
 
 class LoadSheetHealthReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetHealthReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetHealthReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetHealthReport extends SheetReportsEvent {
@@ -47,7 +72,15 @@ class LoadSheetPendingApprovals extends SheetReportsEvent {}
 
 class LoadSheetProductionDetailsReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetProductionDetailsReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetProductionDetailsReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetProductionDetailsReport extends SheetReportsEvent {
@@ -68,7 +101,15 @@ class LoadSheetProductionDetailsForShift extends SheetReportsEvent {
 
 class LoadSheetRunningFeetReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetRunningFeetReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetRunningFeetReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetRunningFeetReport extends SheetReportsEvent {
@@ -78,7 +119,15 @@ class SubmitSheetRunningFeetReport extends SheetReportsEvent {
 
 class LoadSheetPackingReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetPackingReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetPackingReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetPackingReport extends SheetReportsEvent {
@@ -88,7 +137,15 @@ class SubmitSheetPackingReport extends SheetReportsEvent {
 
 class LoadSheetCustomerRejectionReports extends SheetReportsEvent {
   final String? machineNumber;
-  LoadSheetCustomerRejectionReports({this.machineNumber});
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool append;
+  LoadSheetCustomerRejectionReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitSheetCustomerRejectionReport extends SheetReportsEvent {
@@ -100,7 +157,13 @@ class LoadSheetWritingEfficiency extends SheetReportsEvent {
   final String? operatorId;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadSheetWritingEfficiency({this.operatorId, this.startDate, this.endDate});
+  final bool append;
+  LoadSheetWritingEfficiency({
+    this.operatorId,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 // ═══════════════════════════════════════
@@ -134,17 +197,62 @@ class SheetReportsError extends SheetReportsState {
 
 class SheetCleaningReportsLoaded extends SheetReportsState {
   final List<MachineCleaningReport> reports;
-  SheetCleaningReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetCleaningReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetToolsCountReportsLoaded extends SheetReportsState {
   final List<ToolsCountReport> reports;
-  SheetToolsCountReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetToolsCountReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetHealthReportsLoaded extends SheetReportsState {
   final List<MachineHealthReport> reports;
-  SheetHealthReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetHealthReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetPendingApprovalsLoaded extends SheetReportsState {
@@ -154,7 +262,22 @@ class SheetPendingApprovalsLoaded extends SheetReportsState {
 
 class SheetProductionDetailsLoaded extends SheetReportsState {
   final List<SheetProductionDetailsReport> reports;
-  SheetProductionDetailsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetProductionDetailsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetProductionDetailsForShiftLoaded extends SheetReportsState {
@@ -164,22 +287,82 @@ class SheetProductionDetailsForShiftLoaded extends SheetReportsState {
 
 class SheetRunningFeetReportsLoaded extends SheetReportsState {
   final List<SheetProductionRunningFeetReport> reports;
-  SheetRunningFeetReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetRunningFeetReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetPackingReportsLoaded extends SheetReportsState {
   final List<SheetShiftPackingReport> reports;
-  SheetPackingReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetPackingReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetCustomerRejectionReportsLoaded extends SheetReportsState {
   final List<SheetCustomerRejectionReport> reports;
-  SheetCustomerRejectionReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetCustomerRejectionReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class SheetWritingEfficiencyLoaded extends SheetReportsState {
   final List<ReportWritingEfficiencyRecord> records;
-  SheetWritingEfficiencyLoaded(this.records);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  SheetWritingEfficiencyLoaded(
+    this.records, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
+  @override
+  List<Object?> get props => [
+    records,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // ═══════════════════════════════════════
@@ -192,12 +375,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
   SheetReportsBloc({required this.sheetRepository})
     : super(SheetReportsInitial()) {
     on<LoadSheetCleaningReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetCleaningReportsLoaded
+          ? state as SheetCleaningReportsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetCleaningReportsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getMachineCleaningReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetCleaningReportsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetCleaningReportsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -225,12 +437,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetToolsCountReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetToolsCountReportsLoaded
+          ? state as SheetToolsCountReportsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetToolsCountReportsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getToolsCountReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetToolsCountReportsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetToolsCountReportsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -258,12 +499,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetHealthReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetHealthReportsLoaded
+          ? state as SheetHealthReportsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetHealthReportsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getMachineHealthReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetHealthReportsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetHealthReportsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -300,12 +570,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetProductionDetailsReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetProductionDetailsLoaded
+          ? state as SheetProductionDetailsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetProductionDetailsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getProductionDetailsReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetProductionDetailsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetProductionDetailsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -346,12 +645,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetRunningFeetReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetRunningFeetReportsLoaded
+          ? state as SheetRunningFeetReportsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetRunningFeetReportsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getProductionRunningFeetReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetRunningFeetReportsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetRunningFeetReportsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -379,12 +707,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetPackingReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetPackingReportsLoaded
+          ? state as SheetPackingReportsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetPackingReportsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getShiftPackingReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetPackingReportsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetPackingReportsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -412,12 +769,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetCustomerRejectionReports>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetCustomerRejectionReportsLoaded
+          ? state as SheetCustomerRejectionReportsLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetCustomerRejectionReportsLoaded(
+            previous.reports,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final r = await sheetRepository.getCustomerRejectionReports(
           machineNumber: e.machineNumber,
+          startDate: e.startDate,
+          endDate: e.endDate,
         );
-        emit(SheetCustomerRejectionReportsLoaded(r));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.reports,
+          fetched: r,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetCustomerRejectionReportsLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }
@@ -445,14 +831,41 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       }
     });
     on<LoadSheetWritingEfficiency>((e, emit) async {
-      emit(SheetReportsLoading());
+      final previous = state is SheetWritingEfficiencyLoaded
+          ? state as SheetWritingEfficiencyLoaded
+          : null;
+      if (e.append && previous != null) {
+        emit(
+          SheetWritingEfficiencyLoaded(
+            previous.records,
+            hasMore: previous.hasMore,
+            isLoadingMore: true,
+            oldestLoadedStart: previous.oldestLoadedStart,
+          ),
+        );
+      } else {
+        emit(SheetReportsLoading());
+      }
       try {
         final records = await sheetRepository.getReportWritingEfficiency(
           operatorId: e.operatorId,
           startDate: e.startDate,
           endDate: e.endDate,
         );
-        emit(SheetWritingEfficiencyLoaded(records));
+        final merged = mergeReportPage(
+          append: e.append && previous != null,
+          existing: previous?.records,
+          fetched: records,
+          requestStart: e.startDate,
+          previousOldestStart: previous?.oldestLoadedStart,
+        );
+        emit(
+          SheetWritingEfficiencyLoaded(
+            merged.items,
+            hasMore: merged.hasMore,
+            oldestLoadedStart: merged.oldestLoadedStart,
+          ),
+        );
       } catch (err) {
         emit(SheetReportsError(err.toString()));
       }

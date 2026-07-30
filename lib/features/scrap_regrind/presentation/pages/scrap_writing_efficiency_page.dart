@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../bloc/scrap_regrind_bloc.dart';
 
@@ -25,8 +26,29 @@ class ScrapWritingEfficiencyPage extends StatelessWidget {
     if (state is ScrapWritingEfficiencyLoaded) {
       return PaginatedListView(
         items: state.records,
+        hasMore: state.hasMore,
+        isLoadingMore: state.isLoadingMore,
+        onLoadMore: () {
+          if (state.oldestLoadedStart == null || state.isLoadingMore) {
+            return;
+          }
+          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
+          context.read<ScrapRegrindBloc>().add(
+            LoadScrapWritingEfficiency(
+              startDate: range.start,
+              endDate: range.end,
+              append: true,
+            ),
+          );
+        },
         onRefresh: () async {
-          context.read<ScrapRegrindBloc>().add(LoadScrapWritingEfficiency());
+          final range = ReportWeekRange.initial();
+          context.read<ScrapRegrindBloc>().add(
+            LoadScrapWritingEfficiency(
+              startDate: range.start,
+              endDate: range.end,
+            ),
+          );
         },
         emptyMessage: 'No writing efficiency records yet',
         itemBuilder: (context, record, index) {
@@ -45,7 +67,10 @@ class ScrapWritingEfficiencyPage extends StatelessWidget {
       );
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ScrapRegrindBloc>().add(LoadScrapWritingEfficiency());
+      final range = ReportWeekRange.initial();
+      context.read<ScrapRegrindBloc>().add(
+        LoadScrapWritingEfficiency(startDate: range.start, endDate: range.end),
+      );
     });
     return const LoadingWidget();
   }

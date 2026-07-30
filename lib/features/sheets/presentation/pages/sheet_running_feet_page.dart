@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../bloc/sheet_reports_bloc.dart';
 
@@ -19,9 +20,30 @@ class SheetRunningFeetPage extends StatelessWidget {
           if (state is SheetRunningFeetReportsLoaded) {
             return PaginatedListView(
               items: state.reports,
-              onRefresh: () async {
+              hasMore: state.hasMore,
+              isLoadingMore: state.isLoadingMore,
+              onLoadMore: () {
+                if (state.oldestLoadedStart == null || state.isLoadingMore) {
+                  return;
+                }
+                final range = ReportWeekRange.previousWeek(
+                  state.oldestLoadedStart!,
+                );
                 context.read<SheetReportsBloc>().add(
-                  LoadSheetRunningFeetReports(),
+                  LoadSheetRunningFeetReports(
+                    startDate: range.start,
+                    endDate: range.end,
+                    append: true,
+                  ),
+                );
+              },
+              onRefresh: () async {
+                final range = ReportWeekRange.initial();
+                context.read<SheetReportsBloc>().add(
+                  LoadSheetRunningFeetReports(
+                    startDate: range.start,
+                    endDate: range.end,
+                  ),
                 );
               },
               emptyMessage:
@@ -73,7 +95,13 @@ class SheetRunningFeetPage extends StatelessWidget {
             );
           }
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<SheetReportsBloc>().add(LoadSheetRunningFeetReports());
+            final range = ReportWeekRange.initial();
+            context.read<SheetReportsBloc>().add(
+              LoadSheetRunningFeetReports(
+                startDate: range.start,
+                endDate: range.end,
+              ),
+            );
           });
           return const LoadingWidget();
         },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../bloc/sheet_reports_bloc.dart';
@@ -35,9 +36,28 @@ class SheetProductionDetailsListPage extends StatelessWidget {
     if (state is SheetProductionDetailsLoaded) {
       return PaginatedListView(
         items: state.reports,
-        onRefresh: () async {
+        hasMore: state.hasMore,
+        isLoadingMore: state.isLoadingMore,
+        onLoadMore: () {
+          if (state.oldestLoadedStart == null || state.isLoadingMore) {
+            return;
+          }
+          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
           context.read<SheetReportsBloc>().add(
-            LoadSheetProductionDetailsReports(),
+            LoadSheetProductionDetailsReports(
+              startDate: range.start,
+              endDate: range.end,
+              append: true,
+            ),
+          );
+        },
+        onRefresh: () async {
+          final range = ReportWeekRange.initial();
+          context.read<SheetReportsBloc>().add(
+            LoadSheetProductionDetailsReports(
+              startDate: range.start,
+              endDate: range.end,
+            ),
           );
         },
         emptyMessage: 'No sheet production reports yet',
@@ -109,7 +129,13 @@ class SheetProductionDetailsListPage extends StatelessWidget {
       );
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SheetReportsBloc>().add(LoadSheetProductionDetailsReports());
+      final range = ReportWeekRange.initial();
+      context.read<SheetReportsBloc>().add(
+        LoadSheetProductionDetailsReports(
+          startDate: range.start,
+          endDate: range.end,
+        ),
+      );
     });
     return const LoadingWidget();
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../bloc/frame_reports_bloc.dart';
@@ -35,8 +36,29 @@ class FrameProductionDetailsListPage extends StatelessWidget {
     if (state is ProductionDetailsReportsLoaded) {
       return PaginatedListView(
         items: state.reports,
+        hasMore: state.hasMore,
+        isLoadingMore: state.isLoadingMore,
+        onLoadMore: () {
+          if (state.oldestLoadedStart == null || state.isLoadingMore) {
+            return;
+          }
+          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
+          context.read<FrameReportsBloc>().add(
+            LoadProductionDetailsReports(
+              startDate: range.start,
+              endDate: range.end,
+              append: true,
+            ),
+          );
+        },
         onRefresh: () async {
-          context.read<FrameReportsBloc>().add(LoadProductionDetailsReports());
+          final range = ReportWeekRange.initial();
+          context.read<FrameReportsBloc>().add(
+            LoadProductionDetailsReports(
+              startDate: range.start,
+              endDate: range.end,
+            ),
+          );
         },
         emptyMessage: 'No production details reports yet',
         itemBuilder: (context, report, index) {
@@ -100,7 +122,13 @@ class FrameProductionDetailsListPage extends StatelessWidget {
       );
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<FrameReportsBloc>().add(LoadProductionDetailsReports());
+      final range = ReportWeekRange.initial();
+      context.read<FrameReportsBloc>().add(
+        LoadProductionDetailsReports(
+          startDate: range.start,
+          endDate: range.end,
+        ),
+      );
     });
     return const LoadingWidget();
   }

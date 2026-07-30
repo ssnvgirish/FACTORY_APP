@@ -270,14 +270,17 @@ class _OperatorCalendarViewState extends State<_OperatorCalendarView> {
                   date: r.date,
                   createdBy: r.createdBy,
                   shift: r.shift,
-                  summaryLabel: '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
+                  summaryLabel:
+                      '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
                   details: {
                     'Machine': r.machineNumber,
                     'Shift': r.shift,
-                    'Total Duration': '${r.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
+                    'Total Duration':
+                        '${r.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
                     ...{
                       for (final entry in r.entries)
-                        entry.maintenanceItem: '${entry.durationHours.toStringAsFixed(2)}h',
+                        entry.maintenanceItem:
+                            '${entry.durationHours.toStringAsFixed(2)}h',
                     },
                   },
                 ),

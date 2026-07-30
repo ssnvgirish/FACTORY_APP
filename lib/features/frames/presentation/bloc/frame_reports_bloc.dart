@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/calculations.dart';
 import '../../domain/entities/frame_entities.dart';
 import '../../domain/repositories/frame_repository.dart';
+import '../../../../core/utils/report_list_pagination.dart';
 
 // ═══════════════════════════════════════
 // EVENTS
@@ -18,10 +19,12 @@ class LoadMachineCleaningReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadMachineCleaningReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -35,7 +38,13 @@ class LoadToolsCountReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadToolsCountReports({this.machineNumber, this.startDate, this.endDate});
+  final bool append;
+  LoadToolsCountReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitToolsCountReport extends FrameReportsEvent {
@@ -48,7 +57,13 @@ class LoadMachineHealthReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadMachineHealthReports({this.machineNumber, this.startDate, this.endDate});
+  final bool append;
+  LoadMachineHealthReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitMachineHealthReport extends FrameReportsEvent {
@@ -63,10 +78,12 @@ class LoadProductionDetailsReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadProductionDetailsReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -91,10 +108,12 @@ class LoadProductionWeightReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadProductionWeightReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -108,7 +127,13 @@ class LoadShiftPackingReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadShiftPackingReports({this.machineNumber, this.startDate, this.endDate});
+  final bool append;
+  LoadShiftPackingReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitShiftPackingReport extends FrameReportsEvent {
@@ -121,10 +146,12 @@ class LoadCustomerRejectionReports extends FrameReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadCustomerRejectionReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -138,7 +165,13 @@ class LoadFrameWritingEfficiency extends FrameReportsEvent {
   final String? operatorId;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadFrameWritingEfficiency({this.operatorId, this.startDate, this.endDate});
+  final bool append;
+  LoadFrameWritingEfficiency({
+    this.operatorId,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 // ═══════════════════════════════════════
@@ -172,23 +205,62 @@ class FrameReportsError extends FrameReportsState {
 
 class MachineCleaningReportsLoaded extends FrameReportsState {
   final List<MachineCleaningReport> reports;
-  MachineCleaningReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  MachineCleaningReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class ToolsCountReportsLoaded extends FrameReportsState {
   final List<ToolsCountReport> reports;
-  ToolsCountReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ToolsCountReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class MachineHealthReportsLoaded extends FrameReportsState {
   final List<MachineHealthReport> reports;
-  MachineHealthReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  MachineHealthReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class PendingApprovalsLoaded extends FrameReportsState {
@@ -200,9 +272,22 @@ class PendingApprovalsLoaded extends FrameReportsState {
 
 class ProductionDetailsReportsLoaded extends FrameReportsState {
   final List<FrameProductionDetailsReport> reports;
-  ProductionDetailsReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ProductionDetailsReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class ProductionDetailsForShiftLoaded extends FrameReportsState {
@@ -214,30 +299,82 @@ class ProductionDetailsForShiftLoaded extends FrameReportsState {
 
 class ProductionWeightReportsLoaded extends FrameReportsState {
   final List<FrameProductionWeightReport> reports;
-  ProductionWeightReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ProductionWeightReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class ShiftPackingReportsLoaded extends FrameReportsState {
   final List<FrameShiftPackingReport> reports;
-  ShiftPackingReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ShiftPackingReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class CustomerRejectionReportsLoaded extends FrameReportsState {
   final List<FrameCustomerRejectionReport> reports;
-  CustomerRejectionReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  CustomerRejectionReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class FrameWritingEfficiencyLoaded extends FrameReportsState {
   final List<ReportWritingEfficiencyRecord> records;
-  FrameWritingEfficiencyLoaded(this.records);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  FrameWritingEfficiencyLoaded(
+    this.records, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [records];
+  List<Object?> get props => [
+    records,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // ═══════════════════════════════════════
@@ -273,14 +410,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadMachineCleaningReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is MachineCleaningReportsLoaded
+        ? state as MachineCleaningReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        MachineCleaningReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getMachineCleaningReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(MachineCleaningReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        MachineCleaningReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -317,14 +481,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadToolsCountReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is ToolsCountReportsLoaded
+        ? state as ToolsCountReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ToolsCountReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getToolsCountReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ToolsCountReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ToolsCountReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -360,14 +551,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadMachineHealthReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is MachineHealthReportsLoaded
+        ? state as MachineHealthReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        MachineHealthReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getMachineHealthReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(MachineHealthReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        MachineHealthReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -416,14 +634,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadProductionDetailsReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is ProductionDetailsReportsLoaded
+        ? state as ProductionDetailsReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ProductionDetailsReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getProductionDetailsReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ProductionDetailsReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ProductionDetailsReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -544,14 +789,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadProductionWeightReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is ProductionWeightReportsLoaded
+        ? state as ProductionWeightReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ProductionWeightReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getProductionWeightReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ProductionWeightReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ProductionWeightReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -574,14 +846,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadShiftPackingReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is ShiftPackingReportsLoaded
+        ? state as ShiftPackingReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ShiftPackingReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getShiftPackingReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ShiftPackingReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ShiftPackingReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -617,14 +916,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadCustomerRejectionReports event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is CustomerRejectionReportsLoaded
+        ? state as CustomerRejectionReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        CustomerRejectionReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final reports = await frameRepository.getCustomerRejectionReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(CustomerRejectionReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        CustomerRejectionReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -660,14 +986,41 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     LoadFrameWritingEfficiency event,
     Emitter<FrameReportsState> emit,
   ) async {
-    emit(FrameReportsLoading());
+    final previous = state is FrameWritingEfficiencyLoaded
+        ? state as FrameWritingEfficiencyLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        FrameWritingEfficiencyLoaded(
+          previous.records,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(FrameReportsLoading());
+    }
     try {
       final records = await frameRepository.getReportWritingEfficiency(
         operatorId: event.operatorId,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(FrameWritingEfficiencyLoaded(records));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.records,
+        fetched: records,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        FrameWritingEfficiencyLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }

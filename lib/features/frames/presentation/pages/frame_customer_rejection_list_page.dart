@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../bloc/frame_reports_bloc.dart';
@@ -43,9 +44,15 @@ class FrameCustomerRejectionListPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
-                    onPressed: () => context.read<FrameReportsBloc>().add(
-                      LoadCustomerRejectionReports(),
-                    ),
+                    onPressed: () {
+                      final range = ReportWeekRange.initial();
+                      context.read<FrameReportsBloc>().add(
+                        LoadCustomerRejectionReports(
+                          startDate: range.start,
+                          endDate: range.end,
+                        ),
+                      );
+                    },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
                   ),
@@ -56,9 +63,30 @@ class FrameCustomerRejectionListPage extends StatelessWidget {
           if (state is CustomerRejectionReportsLoaded) {
             return PaginatedListView(
               items: state.reports,
-              onRefresh: () async {
+              hasMore: state.hasMore,
+              isLoadingMore: state.isLoadingMore,
+              onLoadMore: () {
+                if (state.oldestLoadedStart == null || state.isLoadingMore) {
+                  return;
+                }
+                final range = ReportWeekRange.previousWeek(
+                  state.oldestLoadedStart!,
+                );
                 context.read<FrameReportsBloc>().add(
-                  LoadCustomerRejectionReports(),
+                  LoadCustomerRejectionReports(
+                    startDate: range.start,
+                    endDate: range.end,
+                    append: true,
+                  ),
+                );
+              },
+              onRefresh: () async {
+                final range = ReportWeekRange.initial();
+                context.read<FrameReportsBloc>().add(
+                  LoadCustomerRejectionReports(
+                    startDate: range.start,
+                    endDate: range.end,
+                  ),
                 );
               },
               emptyMessage: 'No customer rejection reports',
@@ -129,8 +157,12 @@ class FrameCustomerRejectionListPage extends StatelessWidget {
             );
           }
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            final range = ReportWeekRange.initial();
             context.read<FrameReportsBloc>().add(
-              LoadCustomerRejectionReports(),
+              LoadCustomerRejectionReports(
+                startDate: range.start,
+                endDate: range.end,
+              ),
             );
           });
           return const LoadingWidget();

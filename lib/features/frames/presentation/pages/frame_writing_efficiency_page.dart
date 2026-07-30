@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../bloc/frame_reports_bloc.dart';
 
@@ -18,9 +19,30 @@ class FrameWritingEfficiencyPage extends StatelessWidget {
           if (state is FrameWritingEfficiencyLoaded) {
             return PaginatedListView(
               items: state.records,
-              onRefresh: () async {
+              hasMore: state.hasMore,
+              isLoadingMore: state.isLoadingMore,
+              onLoadMore: () {
+                if (state.oldestLoadedStart == null || state.isLoadingMore) {
+                  return;
+                }
+                final range = ReportWeekRange.previousWeek(
+                  state.oldestLoadedStart!,
+                );
                 context.read<FrameReportsBloc>().add(
-                  LoadFrameWritingEfficiency(),
+                  LoadFrameWritingEfficiency(
+                    startDate: range.start,
+                    endDate: range.end,
+                    append: true,
+                  ),
+                );
+              },
+              onRefresh: () async {
+                final range = ReportWeekRange.initial();
+                context.read<FrameReportsBloc>().add(
+                  LoadFrameWritingEfficiency(
+                    startDate: range.start,
+                    endDate: range.end,
+                  ),
                 );
               },
               emptyMessage: 'No writing efficiency records yet',
@@ -40,7 +62,13 @@ class FrameWritingEfficiencyPage extends StatelessWidget {
             );
           }
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<FrameReportsBloc>().add(LoadFrameWritingEfficiency());
+            final range = ReportWeekRange.initial();
+            context.read<FrameReportsBloc>().add(
+              LoadFrameWritingEfficiency(
+                startDate: range.start,
+                endDate: range.end,
+              ),
+            );
           });
           return const LoadingWidget();
         },

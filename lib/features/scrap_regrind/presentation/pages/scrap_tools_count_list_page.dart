@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../bloc/scrap_regrind_bloc.dart';
@@ -36,8 +37,29 @@ class ScrapToolsCountListPage extends StatelessWidget {
     if (state is ScrapToolsCountReportsLoaded) {
       return PaginatedListView(
         items: state.reports,
+        hasMore: state.hasMore,
+        isLoadingMore: state.isLoadingMore,
+        onLoadMore: () {
+          if (state.oldestLoadedStart == null || state.isLoadingMore) {
+            return;
+          }
+          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
+          context.read<ScrapRegrindBloc>().add(
+            LoadScrapToolsCountReports(
+              startDate: range.start,
+              endDate: range.end,
+              append: true,
+            ),
+          );
+        },
         onRefresh: () async {
-          context.read<ScrapRegrindBloc>().add(LoadScrapToolsCountReports());
+          final range = ReportWeekRange.initial();
+          context.read<ScrapRegrindBloc>().add(
+            LoadScrapToolsCountReports(
+              startDate: range.start,
+              endDate: range.end,
+            ),
+          );
         },
         emptyMessage: 'No tools count reports yet',
         itemBuilder: (context, report, index) {
@@ -77,7 +99,10 @@ class ScrapToolsCountListPage extends StatelessWidget {
       );
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ScrapRegrindBloc>().add(LoadScrapToolsCountReports());
+      final range = ReportWeekRange.initial();
+      context.read<ScrapRegrindBloc>().add(
+        LoadScrapToolsCountReports(startDate: range.start, endDate: range.end),
+      );
     });
     return const LoadingWidget();
   }

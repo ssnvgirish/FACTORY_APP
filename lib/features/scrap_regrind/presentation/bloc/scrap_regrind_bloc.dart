@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
 import '../../domain/repositories/scrap_regrind_repository.dart';
+import '../../../../core/utils/report_list_pagination.dart';
 
 // ═══════════════════════════════════════
 // EVENTS
@@ -17,7 +18,13 @@ class LoadScrapCleaningReports extends ScrapRegrindEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadScrapCleaningReports({this.machineNumber, this.startDate, this.endDate});
+  final bool append;
+  LoadScrapCleaningReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitScrapCleaningReport extends ScrapRegrindEvent {
@@ -30,10 +37,12 @@ class LoadScrapToolsCountReports extends ScrapRegrindEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadScrapToolsCountReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -47,7 +56,13 @@ class LoadScrapHealthReports extends ScrapRegrindEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadScrapHealthReports({this.machineNumber, this.startDate, this.endDate});
+  final bool append;
+  LoadScrapHealthReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitScrapHealthReport extends ScrapRegrindEvent {
@@ -71,10 +86,12 @@ class LoadScrapProductionDetailsReports extends ScrapRegrindEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadScrapProductionDetailsReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -99,10 +116,12 @@ class LoadScrapProductionWeightReports extends ScrapRegrindEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
+  final bool append;
   LoadScrapProductionWeightReports({
     this.machineNumber,
     this.startDate,
     this.endDate,
+    this.append = false,
   });
 }
 
@@ -116,7 +135,13 @@ class LoadScrapWritingEfficiency extends ScrapRegrindEvent {
   final String? operatorId;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadScrapWritingEfficiency({this.operatorId, this.startDate, this.endDate});
+  final bool append;
+  LoadScrapWritingEfficiency({
+    this.operatorId,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 // Scrap Quality
@@ -124,7 +149,13 @@ class LoadScrapQualityReports extends ScrapRegrindEvent {
   final String? machineNumber;
   final DateTime? startDate;
   final DateTime? endDate;
-  LoadScrapQualityReports({this.machineNumber, this.startDate, this.endDate});
+  final bool append;
+  LoadScrapQualityReports({
+    this.machineNumber,
+    this.startDate,
+    this.endDate,
+    this.append = false,
+  });
 }
 
 class SubmitScrapQualityReport extends ScrapRegrindEvent {
@@ -176,25 +207,64 @@ class ScrapRegrindError extends ScrapRegrindState {
 // Machine Cleaning
 class ScrapCleaningReportsLoaded extends ScrapRegrindState {
   final List<ScrapCleaningReport> reports;
-  ScrapCleaningReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapCleaningReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // Tools Count
 class ScrapToolsCountReportsLoaded extends ScrapRegrindState {
   final List<ScrapToolsCountReport> reports;
-  ScrapToolsCountReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapToolsCountReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // Machine Health
 class ScrapHealthReportsLoaded extends ScrapRegrindState {
   final List<ScrapMachineHealthReport> reports;
-  ScrapHealthReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapHealthReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class ScrapHealthReportForShiftLoaded extends ScrapRegrindState {
@@ -207,9 +277,22 @@ class ScrapHealthReportForShiftLoaded extends ScrapRegrindState {
 // Production Details
 class ScrapProductionDetailsReportsLoaded extends ScrapRegrindState {
   final List<ScrapProductionDetailsReport> reports;
-  ScrapProductionDetailsReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapProductionDetailsReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 class ScrapProductionDetailsForShiftLoaded extends ScrapRegrindState {
@@ -222,25 +305,64 @@ class ScrapProductionDetailsForShiftLoaded extends ScrapRegrindState {
 // Production Weight
 class ScrapProductionWeightReportsLoaded extends ScrapRegrindState {
   final List<ScrapProductionWeightReport> reports;
-  ScrapProductionWeightReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapProductionWeightReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // Report Writing Efficiency
 class ScrapWritingEfficiencyLoaded extends ScrapRegrindState {
   final List<ScrapReportWritingEfficiency> records;
-  ScrapWritingEfficiencyLoaded(this.records);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapWritingEfficiencyLoaded(
+    this.records, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [records];
+  List<Object?> get props => [
+    records,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // Scrap Quality
 class ScrapQualityReportsLoaded extends ScrapRegrindState {
   final List<ScrapQualityReport> reports;
-  ScrapQualityReportsLoaded(this.reports);
+  final bool hasMore;
+  final bool isLoadingMore;
+  final DateTime? oldestLoadedStart;
+  ScrapQualityReportsLoaded(
+    this.reports, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.oldestLoadedStart,
+  });
   @override
-  List<Object?> get props => [reports];
+  List<Object?> get props => [
+    reports,
+    hasMore,
+    isLoadingMore,
+    oldestLoadedStart,
+  ];
 }
 
 // Salary
@@ -299,14 +421,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapCleaningReports event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapCleaningReportsLoaded
+        ? state as ScrapCleaningReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapCleaningReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final reports = await scrapRegrindRepository.getCleaningReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapCleaningReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapCleaningReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -344,14 +493,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapToolsCountReports event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapToolsCountReportsLoaded
+        ? state as ScrapToolsCountReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapToolsCountReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final reports = await scrapRegrindRepository.getToolsCountReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapToolsCountReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapToolsCountReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -389,14 +565,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapHealthReports event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapHealthReportsLoaded
+        ? state as ScrapHealthReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapHealthReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final reports = await scrapRegrindRepository.getMachineHealthReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapHealthReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapHealthReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -451,14 +654,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapProductionDetailsReports event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapProductionDetailsReportsLoaded
+        ? state as ScrapProductionDetailsReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapProductionDetailsReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final reports = await scrapRegrindRepository.getProductionDetailsReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapProductionDetailsReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapProductionDetailsReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -513,14 +743,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapProductionWeightReports event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapProductionWeightReportsLoaded
+        ? state as ScrapProductionWeightReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapProductionWeightReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final reports = await scrapRegrindRepository.getProductionWeightReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapProductionWeightReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapProductionWeightReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -545,14 +802,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapWritingEfficiency event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapWritingEfficiencyLoaded
+        ? state as ScrapWritingEfficiencyLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapWritingEfficiencyLoaded(
+          previous.records,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final records = await scrapRegrindRepository.getReportWritingEfficiency(
         operatorId: event.operatorId,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapWritingEfficiencyLoaded(records));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.records,
+        fetched: records,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapWritingEfficiencyLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -564,14 +848,41 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     LoadScrapQualityReports event,
     Emitter<ScrapRegrindState> emit,
   ) async {
-    emit(ScrapRegrindLoading());
+    final previous = state is ScrapQualityReportsLoaded
+        ? state as ScrapQualityReportsLoaded
+        : null;
+    if (event.append && previous != null) {
+      emit(
+        ScrapQualityReportsLoaded(
+          previous.reports,
+          hasMore: previous.hasMore,
+          isLoadingMore: true,
+          oldestLoadedStart: previous.oldestLoadedStart,
+        ),
+      );
+    } else {
+      emit(ScrapRegrindLoading());
+    }
     try {
       final reports = await scrapRegrindRepository.getScrapQualityReports(
         machineNumber: event.machineNumber,
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(ScrapQualityReportsLoaded(reports));
+      final merged = mergeReportPage(
+        append: event.append && previous != null,
+        existing: previous?.reports,
+        fetched: reports,
+        requestStart: event.startDate,
+        previousOldestStart: previous?.oldestLoadedStart,
+      );
+      emit(
+        ScrapQualityReportsLoaded(
+          merged.items,
+          hasMore: merged.hasMore,
+          oldestLoadedStart: merged.oldestLoadedStart,
+        ),
+      );
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }

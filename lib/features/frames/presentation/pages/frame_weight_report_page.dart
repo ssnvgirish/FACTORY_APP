@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -19,9 +20,30 @@ class FrameWeightReportListPage extends StatelessWidget {
           if (state is ProductionWeightReportsLoaded) {
             return PaginatedListView(
               items: state.reports,
-              onRefresh: () async {
+              hasMore: state.hasMore,
+              isLoadingMore: state.isLoadingMore,
+              onLoadMore: () {
+                if (state.oldestLoadedStart == null || state.isLoadingMore) {
+                  return;
+                }
+                final range = ReportWeekRange.previousWeek(
+                  state.oldestLoadedStart!,
+                );
                 context.read<FrameReportsBloc>().add(
-                  LoadProductionWeightReports(),
+                  LoadProductionWeightReports(
+                    startDate: range.start,
+                    endDate: range.end,
+                    append: true,
+                  ),
+                );
+              },
+              onRefresh: () async {
+                final range = ReportWeekRange.initial();
+                context.read<FrameReportsBloc>().add(
+                  LoadProductionWeightReports(
+                    startDate: range.start,
+                    endDate: range.end,
+                  ),
                 );
               },
               emptyMessage: 'No production weight reports yet',
@@ -78,7 +100,13 @@ class FrameWeightReportListPage extends StatelessWidget {
             );
           }
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<FrameReportsBloc>().add(LoadProductionWeightReports());
+            final range = ReportWeekRange.initial();
+            context.read<FrameReportsBloc>().add(
+              LoadProductionWeightReports(
+                startDate: range.start,
+                endDate: range.end,
+              ),
+            );
           });
           return const LoadingWidget();
         },

@@ -79,7 +79,8 @@ class _MaintenanceCalendarState extends State<_MaintenanceCalendar> {
         for (final r in reports) {
           final key = DateTime(r.date.year, r.date.month, r.date.day);
           final existing = dataMap[key];
-          final label = '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h';
+          final label =
+              '${r.totalMaintenanceDurationHours.toStringAsFixed(1)}h';
           if (r.shift.toLowerCase().contains('day')) {
             dataMap[key] = CalendarDayData(
               dayShiftLabel: label,
@@ -230,5 +231,4 @@ class _MaintenanceCalendarState extends State<_MaintenanceCalendar> {
       ),
     );
   }
-
 }
