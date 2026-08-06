@@ -121,153 +121,305 @@ class _MasterTableInfo {
   });
 }
 
-class _MasterTableEditPage extends StatelessWidget {
+class _MasterTableEditPage extends StatefulWidget {
   final _MasterTableInfo info;
   const _MasterTableEditPage({required this.info});
 
   @override
+  State<_MasterTableEditPage> createState() => _MasterTableEditPageState();
+}
+
+class _MasterTableEditPageState extends State<_MasterTableEditPage> {
+  /// Last successfully loaded rows. Kept so a failed save leaves the list on
+  /// screen instead of replacing it with an indefinite spinner.
+  List<MasterTableItem>? _items;
+
+  _MasterTableInfo get _info => widget.info;
+
+  void _reload() =>
+      context.read<AdminBloc>().add(LoadMasterTable(_info.tableType));
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(info.label)),
+      appBar: AppBar(title: Text(_info.label)),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showItemDialog(context, null),
+        onPressed: () => _showItemDialog(null),
         child: const Icon(Icons.add),
       ),
       body: BlocConsumer<AdminBloc, AdminState>(
         listener: (context, state) {
-          if (state is MasterItemSaved) {
-            context.read<AdminBloc>().add(LoadMasterTable(info.tableType));
+          if (state is MasterTableLoaded &&
+              state.tableType == _info.tableType) {
+            setState(() => _items = state.items);
+          }
+          if (state is MasterItemSaved && state.tableType == _info.tableType) {
+            _reload();
           }
           if (state is AdminError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(_friendlyError(state.message, _info.label)),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 6),
+                ),
+              );
           }
         },
         builder: (context, state) {
-          if (state is AdminLoading) return const LoadingWidget();
-          if (state is MasterTableLoaded && state.tableType == info.tableType) {
-            if (state.items.isEmpty) {
-              return const EmptyStateWidget(message: 'No items yet');
+          final items = _items;
+          if (items == null) {
+            if (state is AdminError) {
+              return EmptyStateWidget(
+                message: _friendlyError(state.message, _info.label),
+                icon: Icons.error_outline,
+                actionLabel: 'Retry',
+                onAction: _reload,
+              );
             }
-            return ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: state.items.length,
-              itemBuilder: (context, i) => _ItemCard(
-                item: state.items[i],
-                info: info,
-                onEdit: () => _showItemDialog(context, state.items[i]),
-                onDelete: () {
-                  context.read<AdminBloc>().add(
-                    DeleteMasterItemRequested(
-                      info.tableType,
-                      state.items[i].id,
-                    ),
-                  );
-                },
-                onToggleActive: () {
-                  final item = state.items[i];
-                  context.read<AdminBloc>().add(
-                    UpdateMasterItemRequested(
-                      info.tableType,
-                      item.copyWith(isActive: !item.isActive),
-                    ),
-                  );
-                },
-              ),
-            );
+            return const LoadingWidget();
           }
-          return const LoadingWidget();
+          if (items.isEmpty) {
+            return const EmptyStateWidget(message: 'No items yet');
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: items.length,
+            itemBuilder: (context, i) => _ItemCard(
+              item: items[i],
+              info: _info,
+              onEdit: () => _showItemDialog(items[i]),
+              onDelete: () => _confirmDelete(items[i]),
+              onToggleActive: () {
+                final item = items[i];
+                context.read<AdminBloc>().add(
+                  UpdateMasterItemRequested(
+                    _info.tableType,
+                    item.copyWith(isActive: !item.isActive),
+                  ),
+                );
+              },
+            ),
+          );
         },
       ),
     );
   }
 
-  void _showItemDialog(BuildContext context, MasterTableItem? existing) {
-    final valueCtrl = TextEditingController(text: existing?.value ?? '');
-    final typeCtrl = TextEditingController(text: existing?.type ?? '');
-    final displayCtrl = TextEditingController(
-      text: existing?.displayName ?? '',
+  Future<void> _showItemDialog(MasterTableItem? existing) async {
+    final items = _items ?? const <MasterTableItem>[];
+    final result = await showDialog<MasterTableItem>(
+      context: context,
+      builder: (_) => _ItemDialog(
+        info: _info,
+        existing: existing,
+        takenValues: items
+            .where((i) => i.id != existing?.id)
+            .map((i) => i.value.trim().toLowerCase())
+            .toSet(),
+        nextSortOrder:
+            items.fold(-1, (m, i) => i.sortOrder > m ? i.sortOrder : m) + 1,
+      ),
     );
-    final sortCtrl = TextEditingController(
-      text: (existing?.sortOrder ?? 0).toString(),
-    );
+    if (result == null || !mounted) return;
 
-    showDialog(
+    context.read<AdminBloc>().add(
+      existing == null
+          ? InsertMasterItemRequested(_info.tableType, result)
+          : UpdateMasterItemRequested(_info.tableType, result),
+    );
+  }
+
+  Future<void> _confirmDelete(MasterTableItem item) async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(existing == null ? 'Add Item' : 'Edit Item'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: valueCtrl,
-                decoration: InputDecoration(
-                  labelText: info.hasDisplayName ? 'Code' : 'Name / Value',
-                ),
-              ),
-              if (info.hasDisplayName) ...[
-                const SizedBox(height: 8),
-                TextField(
-                  controller: displayCtrl,
-                  decoration: const InputDecoration(labelText: 'Display Name'),
-                ),
-              ],
-              if (info.hasType) ...[
-                const SizedBox(height: 8),
-                TextField(
-                  controller: typeCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Type / Category',
-                    hintText: 'e.g. frame, sheet, scrap',
-                  ),
-                ),
-              ],
-              const SizedBox(height: 8),
-              TextField(
-                controller: sortCtrl,
-                decoration: const InputDecoration(labelText: 'Sort Order'),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-          ),
+        title: const Text('Delete item?'),
+        content: Text(
+          '"${item.value}" will be removed from ${_info.label}.\n\n'
+          'If it is already used in weight or production-target tables, '
+          'deactivate it instead — deleting will be rejected.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              final item = MasterTableItem(
-                id: existing?.id ?? '',
-                value: valueCtrl.text.trim(),
-                type: info.hasType ? typeCtrl.text.trim() : null,
-                displayName: info.hasDisplayName
-                    ? displayCtrl.text.trim()
-                    : null,
-                sortOrder: int.tryParse(sortCtrl.text) ?? 0,
-                isActive: existing?.isActive ?? true,
-              );
-              if (existing == null) {
-                context.read<AdminBloc>().add(
-                  InsertMasterItemRequested(info.tableType, item),
-                );
-              } else {
-                context.read<AdminBloc>().add(
-                  UpdateMasterItemRequested(info.tableType, item),
-                );
-              }
-              Navigator.pop(ctx);
-            },
-            child: Text(existing == null ? 'Add' : 'Save'),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
           ),
         ],
       ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    context.read<AdminBloc>().add(
+      DeleteMasterItemRequested(_info.tableType, item.id),
+    );
+  }
+}
+
+/// Turns raw Data Connect / Postgres failures into something an admin can act
+/// on. Master values are referenced by name from the weight and target tables,
+/// so constraint violations are the common failure here.
+String _friendlyError(String raw, String label) {
+  final lower = raw.toLowerCase();
+  if (lower.contains('foreign key') ||
+      lower.contains('still referenced') ||
+      lower.contains('violates')) {
+    return 'This $label value is still used by the weight or production-target '
+        'tables. Remove those rows under Reference Tables first, or deactivate '
+        'this item instead of deleting it.';
+  }
+  if (lower.contains('unique') || lower.contains('duplicate')) {
+    return 'That value already exists in $label.';
+  }
+  if (lower.contains('permission') || lower.contains('unauthorized')) {
+    return 'You do not have permission to change $label.';
+  }
+  if (lower.contains('socket') ||
+      lower.contains('network') ||
+      lower.contains('timeout') ||
+      lower.contains('unavailable')) {
+    return 'Could not reach the server. Check your connection and try again.';
+  }
+  return '$label could not be saved: $raw';
+}
+
+class _ItemDialog extends StatefulWidget {
+  final _MasterTableInfo info;
+  final MasterTableItem? existing;
+  final Set<String> takenValues;
+  final int nextSortOrder;
+
+  const _ItemDialog({
+    required this.info,
+    required this.existing,
+    required this.takenValues,
+    required this.nextSortOrder,
+  });
+
+  @override
+  State<_ItemDialog> createState() => _ItemDialogState();
+}
+
+class _ItemDialogState extends State<_ItemDialog> {
+  late final TextEditingController _valueCtrl;
+  late final TextEditingController _typeCtrl;
+  late final TextEditingController _displayCtrl;
+  late final TextEditingController _sortCtrl;
+  String? _valueError;
+
+  bool get _isNew => widget.existing == null;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.existing;
+    _valueCtrl = TextEditingController(text: existing?.value ?? '');
+    _typeCtrl = TextEditingController(text: existing?.type ?? '');
+    _displayCtrl = TextEditingController(text: existing?.displayName ?? '');
+    _sortCtrl = TextEditingController(
+      text: (existing?.sortOrder ?? widget.nextSortOrder).toString(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _valueCtrl.dispose();
+    _typeCtrl.dispose();
+    _displayCtrl.dispose();
+    _sortCtrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final value = _valueCtrl.text.trim();
+    if (value.isEmpty) {
+      setState(() => _valueError = 'Required');
+      return;
+    }
+    if (widget.takenValues.contains(value.toLowerCase())) {
+      setState(() => _valueError = 'This value already exists');
+      return;
+    }
+
+    Navigator.pop(
+      context,
+      MasterTableItem(
+        id: widget.existing?.id ?? '',
+        value: value,
+        type: widget.info.hasType ? _typeCtrl.text.trim() : null,
+        displayName: widget.info.hasDisplayName
+            ? _displayCtrl.text.trim()
+            : null,
+        sortOrder: int.tryParse(_sortCtrl.text.trim()) ?? 0,
+        isActive: widget.existing?.isActive ?? true,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(_isNew ? 'Add Item' : 'Edit Item'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _valueCtrl,
+              autofocus: true,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: widget.info.hasDisplayName ? 'Code' : 'Name / Value',
+                errorText: _valueError,
+              ),
+              onChanged: (_) {
+                if (_valueError != null) setState(() => _valueError = null);
+              },
+              onSubmitted: (_) => _submit(),
+            ),
+            if (widget.info.hasDisplayName) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: _displayCtrl,
+                decoration: const InputDecoration(labelText: 'Display Name'),
+              ),
+            ],
+            if (widget.info.hasType) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: _typeCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Type / Category',
+                  hintText: 'e.g. frame, sheet, scrap',
+                ),
+              ),
+            ],
+            const SizedBox(height: 8),
+            TextField(
+              controller: _sortCtrl,
+              decoration: const InputDecoration(labelText: 'Sort Order'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _submit,
+          child: Text(_isNew ? 'Add' : 'Save'),
+        ),
+      ],
     );
   }
 }

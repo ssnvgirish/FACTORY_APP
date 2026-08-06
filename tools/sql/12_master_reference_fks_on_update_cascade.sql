@@ -1,18 +1,26 @@
 -- ═══════════════════════════════════════════════════════════════
--- Factory App — Enforce Master/Reference FK Constraints
--- Run on an existing database after 01_schema.sql has already been applied.
+-- Factory App — Allow renaming master values referenced by lookups
 --
--- Behavior: CASCADE renames of parent values down to the lookup rows, and
--- RESTRICT delete on parent rows when children exist.
--- This gives a clear FK error instead of allowing inconsistent data.
+-- Run in Cloud SQL Query Editor (PostgreSQL) against database: fdcdb.
+-- Safe to re-run.
+--
+-- Why:
+-- The weight/target lookup tables reference master values by their natural
+-- key (name/value), not by id. The constraints added in 03/04 only declared
+-- ON DELETE RESTRICT, so ON UPDATE defaulted to NO ACTION. Any admin edit of
+-- a Frame Section, Frame Density, Sheet Thickness, Sheet Density or Scrap
+-- Product that already appeared in a weight or target row was rejected with
+-- "update or delete on table ... violates foreign key constraint".
+--
+-- This script switches every constraint to ON UPDATE CASCADE, so renaming a
+-- master value rewrites the referencing lookup rows in the same transaction.
+-- ON DELETE RESTRICT is kept: deleting a value that is still in use must stay
+-- a deliberate, child-first operation (see 05/06).
 -- ═══════════════════════════════════════════════════════════════
 
-SET ROLE "firebaseowner_fdcdb_public";
+BEGIN;
 
--- Optional: inspect potential orphan rows before validating constraints.
--- SELECT fw.* FROM public.master_frame_weight fw
--- LEFT JOIN public.master_frame_section s ON s.name = fw.section
--- WHERE s.id IS NULL;
+SET ROLE "firebaseowner_fdcdb_public";
 
 ALTER TABLE public.master_frame_weight
   DROP CONSTRAINT IF EXISTS fk_frame_weight_section,
@@ -85,3 +93,26 @@ ALTER TABLE public.master_scrap_target
     REFERENCES public.master_scrap_product(name)
     ON UPDATE CASCADE
     ON DELETE RESTRICT;
+
+COMMIT;
+
+-- ---------------------------------------------------------------
+-- Verification: every row below must read ON UPDATE CASCADE ON DELETE RESTRICT
+-- ---------------------------------------------------------------
+SELECT
+  conname,
+  conrelid::regclass AS table_name,
+  pg_get_constraintdef(c.oid) AS constraint_definition
+FROM pg_constraint c
+WHERE conname IN (
+  'fk_frame_weight_section',
+  'fk_frame_weight_density',
+  'fk_sheet_weight_thickness',
+  'fk_sheet_weight_density',
+  'fk_frame_target_section',
+  'fk_frame_target_density',
+  'fk_sheet_target_thickness',
+  'fk_sheet_target_density',
+  'fk_scrap_target_product'
+)
+ORDER BY conname;

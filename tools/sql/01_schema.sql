@@ -110,9 +110,11 @@ CREATE TABLE IF NOT EXISTS public.master_frame_weight (
     weight_per_foot FLOAT   NOT NULL,
     CONSTRAINT fk_frame_weight_section FOREIGN KEY (section)
         REFERENCES public.master_frame_section(name)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT fk_frame_weight_density FOREIGN KEY (density)
         REFERENCES public.master_frame_density(value)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT uq_frame_weight UNIQUE (section, density)
 );
@@ -127,9 +129,11 @@ CREATE TABLE IF NOT EXISTS public.master_sheet_weight (
     weight_per_sqft  FLOAT   NOT NULL,
     CONSTRAINT fk_sheet_weight_thickness FOREIGN KEY (thickness)
         REFERENCES public.master_sheet_thickness(value)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT fk_sheet_weight_density FOREIGN KEY (density)
         REFERENCES public.master_sheet_density(value)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT uq_sheet_weight UNIQUE (thickness, density)
 );
@@ -144,9 +148,11 @@ CREATE TABLE IF NOT EXISTS public.master_frame_target (
     target_kg_per_hour FLOAT  NOT NULL,
     CONSTRAINT fk_frame_target_section FOREIGN KEY (section)
         REFERENCES public.master_frame_section(name)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT fk_frame_target_density FOREIGN KEY (density)
         REFERENCES public.master_frame_density(value)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT uq_frame_target UNIQUE (section, density)
 );
@@ -161,9 +167,11 @@ CREATE TABLE IF NOT EXISTS public.master_sheet_target (
     target_feet_per_hour  FLOAT   NOT NULL,
     CONSTRAINT fk_sheet_target_thickness FOREIGN KEY (thickness)
         REFERENCES public.master_sheet_thickness(value)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT fk_sheet_target_density FOREIGN KEY (density)
         REFERENCES public.master_sheet_density(value)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT uq_sheet_target UNIQUE (thickness, density)
 );
@@ -177,6 +185,7 @@ CREATE TABLE IF NOT EXISTS public.master_scrap_target (
     target_kg_per_hour FLOAT  NOT NULL,
     CONSTRAINT fk_scrap_target_product FOREIGN KEY (product)
         REFERENCES public.master_scrap_product(name)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
 

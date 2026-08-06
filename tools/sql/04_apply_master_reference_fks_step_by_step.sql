@@ -5,7 +5,7 @@
 -- Behavior:
 -- 1) Validates orphan rows (child values missing in parent master tables)
 -- 2) Stops with a clear error if any orphan rows exist
--- 3) Applies all FK constraints with ON DELETE RESTRICT
+-- 3) Applies all FK constraints with ON UPDATE CASCADE / ON DELETE RESTRICT
 -- 4) Returns a verification result set
 -- ===============================================================
 
@@ -97,13 +97,15 @@ END
 $$;
 
 -- ---------------------------------------------------------------
--- Step 2: Apply FK constraints (manual delete flow via RESTRICT)
+-- Step 2: Apply FK constraints
+-- Renames cascade to the lookup rows; deletes stay a manual child-first flow.
 -- ---------------------------------------------------------------
 ALTER TABLE public.master_frame_weight
   DROP CONSTRAINT IF EXISTS fk_frame_weight_section,
   ADD CONSTRAINT fk_frame_weight_section
     FOREIGN KEY (section)
     REFERENCES public.master_frame_section(name)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_frame_weight
@@ -111,6 +113,7 @@ ALTER TABLE public.master_frame_weight
   ADD CONSTRAINT fk_frame_weight_density
     FOREIGN KEY (density)
     REFERENCES public.master_frame_density(value)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_sheet_weight
@@ -118,6 +121,7 @@ ALTER TABLE public.master_sheet_weight
   ADD CONSTRAINT fk_sheet_weight_thickness
     FOREIGN KEY (thickness)
     REFERENCES public.master_sheet_thickness(value)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_sheet_weight
@@ -125,6 +129,7 @@ ALTER TABLE public.master_sheet_weight
   ADD CONSTRAINT fk_sheet_weight_density
     FOREIGN KEY (density)
     REFERENCES public.master_sheet_density(value)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_frame_target
@@ -132,6 +137,7 @@ ALTER TABLE public.master_frame_target
   ADD CONSTRAINT fk_frame_target_section
     FOREIGN KEY (section)
     REFERENCES public.master_frame_section(name)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_frame_target
@@ -139,6 +145,7 @@ ALTER TABLE public.master_frame_target
   ADD CONSTRAINT fk_frame_target_density
     FOREIGN KEY (density)
     REFERENCES public.master_frame_density(value)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_sheet_target
@@ -146,6 +153,7 @@ ALTER TABLE public.master_sheet_target
   ADD CONSTRAINT fk_sheet_target_thickness
     FOREIGN KEY (thickness)
     REFERENCES public.master_sheet_thickness(value)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_sheet_target
@@ -153,6 +161,7 @@ ALTER TABLE public.master_sheet_target
   ADD CONSTRAINT fk_sheet_target_density
     FOREIGN KEY (density)
     REFERENCES public.master_sheet_density(value)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 ALTER TABLE public.master_scrap_target
@@ -160,6 +169,7 @@ ALTER TABLE public.master_scrap_target
   ADD CONSTRAINT fk_scrap_target_product
     FOREIGN KEY (product)
     REFERENCES public.master_scrap_product(name)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT;
 
 SELECT 'Step 2 complete: FK constraints applied' AS status;
