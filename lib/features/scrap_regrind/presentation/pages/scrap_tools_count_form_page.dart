@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -136,13 +137,16 @@ class _ScrapToolsCountFormPageState extends State<ScrapToolsCountFormPage> {
     final given = int.parse(_toolsGivenCtrl.text);
     final available = int.parse(_toolsAvailableCtrl.text);
 
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) return;
+
     final report = ScrapToolsCountReport(
       date: _selectedDate,
       machineNumber: _selectedMachine!,
       totalToolsGiven: given,
       totalToolsAvailable: available,
       percentageAvailable: _percentage,
-      createdBy: '', // Set from auth
+      createdBy: authState.user.uid,
     );
 
     context.read<ScrapRegrindBloc>().add(SubmitScrapToolsCountReport(report));

@@ -57,6 +57,7 @@ class FramePackingReportListPage extends StatelessWidget {
               emptyMessage: 'No packing reports yet',
               itemBuilder: (context, report, index) {
                 return ReportCard(
+                  key: ValueKey(report.id),
                   title: '${report.machineNumber} — ${report.shift}',
                   subtitle:
                       '${DateFormat('dd MMM yyyy').format(report.date)} — Quality: ${report.qualityAcceptancePercentage.toStringAsFixed(1)}%',
@@ -64,6 +65,11 @@ class FramePackingReportListPage extends StatelessWidget {
                   statusColor: report.packingEfficiency >= 90
                       ? AppTheme.successGreen
                       : AppTheme.warningYellow,
+                  onDelete: report.id == null
+                      ? null
+                      : () => context.read<FrameReportsBloc>().add(
+                          DeleteShiftPackingReport(report.id!),
+                        ),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(

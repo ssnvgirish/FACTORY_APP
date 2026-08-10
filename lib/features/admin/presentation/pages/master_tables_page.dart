@@ -272,8 +272,8 @@ String _friendlyError(String raw, String label) {
       lower.contains('still referenced') ||
       lower.contains('violates')) {
     return 'This $label value is still used by the weight or production-target '
-        'tables. Remove those rows under Reference Tables first, or deactivate '
-        'this item instead of deleting it.';
+        'tables. Try again — renames should retarget those rows automatically. '
+        'If it still fails, deactivate the item instead of deleting it.';
   }
   if (lower.contains('unique') || lower.contains('duplicate')) {
     return 'That value already exists in $label.';

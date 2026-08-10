@@ -32,6 +32,13 @@ class SubmitScrapCleaningReport extends ScrapRegrindEvent {
   SubmitScrapCleaningReport(this.report);
 }
 
+class DeleteScrapCleaningReport extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapCleaningReport(this.id);
+  @override
+  List<Object?> get props => [id];
+}
+
 // Tools Count
 class LoadScrapToolsCountReports extends ScrapRegrindEvent {
   final String? machineNumber;
@@ -49,6 +56,13 @@ class LoadScrapToolsCountReports extends ScrapRegrindEvent {
 class SubmitScrapToolsCountReport extends ScrapRegrindEvent {
   final ScrapToolsCountReport report;
   SubmitScrapToolsCountReport(this.report);
+}
+
+class DeleteScrapToolsCountReport extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapToolsCountReport(this.id);
+  @override
+  List<Object?> get props => [id];
 }
 
 // Machine Health
@@ -81,6 +95,13 @@ class LoadScrapHealthReportForShift extends ScrapRegrindEvent {
   });
 }
 
+class DeleteScrapHealthReport extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapHealthReport(this.id);
+  @override
+  List<Object?> get props => [id];
+}
+
 // Production Details
 class LoadScrapProductionDetailsReports extends ScrapRegrindEvent {
   final String? machineNumber;
@@ -111,6 +132,13 @@ class LoadScrapProductionDetailsForShift extends ScrapRegrindEvent {
   });
 }
 
+class DeleteScrapProductionDetailsReport extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapProductionDetailsReport(this.id);
+  @override
+  List<Object?> get props => [id];
+}
+
 // Production Weight
 class LoadScrapProductionWeightReports extends ScrapRegrindEvent {
   final String? machineNumber;
@@ -130,6 +158,13 @@ class SubmitScrapProductionWeightReport extends ScrapRegrindEvent {
   SubmitScrapProductionWeightReport(this.report);
 }
 
+class DeleteScrapProductionWeightReport extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapProductionWeightReport(this.id);
+  @override
+  List<Object?> get props => [id];
+}
+
 // Report Writing Efficiency
 class LoadScrapWritingEfficiency extends ScrapRegrindEvent {
   final String? operatorId;
@@ -142,6 +177,13 @@ class LoadScrapWritingEfficiency extends ScrapRegrindEvent {
     this.endDate,
     this.append = false,
   });
+}
+
+class DeleteScrapWritingEfficiency extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapWritingEfficiency(this.id);
+  @override
+  List<Object?> get props => [id];
 }
 
 // Scrap Quality
@@ -161,6 +203,13 @@ class LoadScrapQualityReports extends ScrapRegrindEvent {
 class SubmitScrapQualityReport extends ScrapRegrindEvent {
   final ScrapQualityReport report;
   SubmitScrapQualityReport(this.report);
+}
+
+class DeleteScrapQualityReport extends ScrapRegrindEvent {
+  final String id;
+  DeleteScrapQualityReport(this.id);
+  @override
+  List<Object?> get props => [id];
 }
 
 // Salary
@@ -385,31 +434,38 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     // Machine Cleaning
     on<LoadScrapCleaningReports>(_onLoadCleaningReports);
     on<SubmitScrapCleaningReport>(_onSubmitCleaningReport);
+    on<DeleteScrapCleaningReport>(_onDeleteCleaningReport);
 
     // Tools Count
     on<LoadScrapToolsCountReports>(_onLoadToolsCountReports);
     on<SubmitScrapToolsCountReport>(_onSubmitToolsCountReport);
+    on<DeleteScrapToolsCountReport>(_onDeleteToolsCountReport);
 
     // Machine Health
     on<LoadScrapHealthReports>(_onLoadHealthReports);
     on<SubmitScrapHealthReport>(_onSubmitHealthReport);
     on<LoadScrapHealthReportForShift>(_onLoadHealthReportForShift);
+    on<DeleteScrapHealthReport>(_onDeleteHealthReport);
 
     // Production Details
     on<LoadScrapProductionDetailsReports>(_onLoadProductionDetailsReports);
     on<SubmitScrapProductionDetailsReport>(_onSubmitProductionDetailsReport);
     on<LoadScrapProductionDetailsForShift>(_onLoadProductionDetailsForShift);
+    on<DeleteScrapProductionDetailsReport>(_onDeleteProductionDetailsReport);
 
     // Production Weight
     on<LoadScrapProductionWeightReports>(_onLoadProductionWeightReports);
     on<SubmitScrapProductionWeightReport>(_onSubmitProductionWeightReport);
+    on<DeleteScrapProductionWeightReport>(_onDeleteProductionWeightReport);
 
     // Report Writing Efficiency
     on<LoadScrapWritingEfficiency>(_onLoadWritingEfficiency);
+    on<DeleteScrapWritingEfficiency>(_onDeleteWritingEfficiency);
 
     // Scrap Quality
     on<LoadScrapQualityReports>(_onLoadQualityReports);
     on<SubmitScrapQualityReport>(_onSubmitQualityReport);
+    on<DeleteScrapQualityReport>(_onDeleteQualityReport);
 
     // Salary
     on<LoadScrapSalaryCalculation>(_onLoadSalaryCalculation);
@@ -487,6 +543,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     }
   }
 
+  Future<void> _onDeleteCleaningReport(
+    DeleteScrapCleaningReport event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteCleaningReport(event.id);
+      if (state is ScrapCleaningReportsLoaded) {
+        final current = state as ScrapCleaningReportsLoaded;
+        emit(
+          ScrapCleaningReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
   // ── Tools Count ──
 
   Future<void> _onLoadToolsCountReports(
@@ -554,6 +632,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
       }
       await scrapRegrindRepository.submitToolsCountReport(event.report);
       emit(ScrapRegrindSubmitted('Tools count report submitted'));
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteToolsCountReport(
+    DeleteScrapToolsCountReport event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteToolsCountReport(event.id);
+      if (state is ScrapToolsCountReportsLoaded) {
+        final current = state as ScrapToolsCountReportsLoaded;
+        emit(
+          ScrapToolsCountReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -648,6 +748,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     }
   }
 
+  Future<void> _onDeleteHealthReport(
+    DeleteScrapHealthReport event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteMachineHealthReport(event.id);
+      if (state is ScrapHealthReportsLoaded) {
+        final current = state as ScrapHealthReportsLoaded;
+        emit(
+          ScrapHealthReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
   // ── Production Details ──
 
   Future<void> _onLoadProductionDetailsReports(
@@ -737,6 +859,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     }
   }
 
+  Future<void> _onDeleteProductionDetailsReport(
+    DeleteScrapProductionDetailsReport event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteProductionDetailsReport(event.id);
+      if (state is ScrapProductionDetailsReportsLoaded) {
+        final current = state as ScrapProductionDetailsReportsLoaded;
+        emit(
+          ScrapProductionDetailsReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
   // ── Production Weight ──
 
   Future<void> _onLoadProductionWeightReports(
@@ -796,6 +940,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
     }
   }
 
+  Future<void> _onDeleteProductionWeightReport(
+    DeleteScrapProductionWeightReport event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteProductionWeightReport(event.id);
+      if (state is ScrapProductionWeightReportsLoaded) {
+        final current = state as ScrapProductionWeightReportsLoaded;
+        emit(
+          ScrapProductionWeightReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
   // ── Report Writing Efficiency ──
 
   Future<void> _onLoadWritingEfficiency(
@@ -837,6 +1003,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
           oldestLoadedStart: merged.oldestLoadedStart,
         ),
       );
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteWritingEfficiency(
+    DeleteScrapWritingEfficiency event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteWritingEfficiency(event.id);
+      if (state is ScrapWritingEfficiencyLoaded) {
+        final current = state as ScrapWritingEfficiencyLoaded;
+        emit(
+          ScrapWritingEfficiencyLoaded(
+            current.records.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
@@ -912,6 +1100,28 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
       }
       await scrapRegrindRepository.submitScrapQualityReport(event.report);
       emit(ScrapRegrindSubmitted('Scrap quality report submitted'));
+    } catch (e) {
+      emit(ScrapRegrindError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteQualityReport(
+    DeleteScrapQualityReport event,
+    Emitter<ScrapRegrindState> emit,
+  ) async {
+    try {
+      await scrapRegrindRepository.deleteScrapQualityReport(event.id);
+      if (state is ScrapQualityReportsLoaded) {
+        final current = state as ScrapQualityReportsLoaded;
+        emit(
+          ScrapQualityReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }

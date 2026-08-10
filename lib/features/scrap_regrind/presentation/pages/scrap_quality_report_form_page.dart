@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
@@ -142,6 +143,9 @@ class _ScrapQualityReportFormPageState
     if (!_formKey.currentState!.validate()) return;
 
     final comments = _commentsController.text.trim();
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) return;
+
     final report = ScrapQualityReport(
       date: _selectedDate,
       machineNumber: _selectedMachine!,
@@ -149,7 +153,7 @@ class _ScrapQualityReportFormPageState
       product: _selectedProduct!,
       qualityRating: _qualityRating,
       comments: comments.isNotEmpty ? comments : null,
-      createdBy: '', // Set from auth
+      createdBy: authState.user.uid,
     );
 
     context.read<ScrapRegrindBloc>().add(SubmitScrapQualityReport(report));

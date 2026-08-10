@@ -68,6 +68,7 @@ class ScrapQualityReportListPage extends StatelessWidget {
             subtitle.write('\n${report.comments}');
           }
           return ReportCard(
+            key: ValueKey(report.id),
             title: '${report.machineNumber} — ${report.product}',
             subtitle: subtitle.toString(),
             trailing: '${report.qualityRating}/10',
@@ -76,6 +77,11 @@ class ScrapQualityReportListPage extends StatelessWidget {
                 : report.qualityRating >= 4
                 ? AppTheme.warningYellow
                 : AppTheme.errorRed,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<ScrapRegrindBloc>().add(
+                    DeleteScrapQualityReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

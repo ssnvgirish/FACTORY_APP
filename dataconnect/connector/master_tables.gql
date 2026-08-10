@@ -302,6 +302,10 @@ mutation UpdateMasterSheetTarget($id: MasterSheetTarget_Key!, $thickness: String
   masterSheetTarget_update(key: $id, data: { thickness: $thickness, density: $density, targetFeetPerHour: $targetFeetPerHour })
 }
 
+mutation DeleteMasterSheetTarget($id: MasterSheetTarget_Key!) @auth(level: PUBLIC) {
+  masterSheetTarget_delete(key: $id)
+}
+
 # ── MasterSalaryWeightage ──
 
 query ListMasterSalaryWeightages @auth(level: PUBLIC) {

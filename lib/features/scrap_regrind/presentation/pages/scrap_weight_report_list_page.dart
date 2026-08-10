@@ -54,10 +54,16 @@ class ScrapWeightReportListPage extends StatelessWidget {
         emptyMessage: 'No weight reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: report.machineNumber,
             subtitle: DateFormat('dd MMM yyyy').format(report.date),
             trailing: '${report.totalProductionWeight.toStringAsFixed(1)} kg',
             statusColor: AppTheme.successGreen,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<ScrapRegrindBloc>().add(
+                    DeleteScrapProductionWeightReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

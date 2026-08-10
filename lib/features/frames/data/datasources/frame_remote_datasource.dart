@@ -9,12 +9,14 @@ abstract class FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteMachineCleaningReport(String id);
   Future<void> submitToolsCountReport(ToolsCountReport report);
   Future<List<ToolsCountReport>> getToolsCountReports({
     String? machineNumber,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteToolsCountReport(String id);
   Future<void> submitMachineHealthReport(MachineHealthReport report);
   Future<List<MachineHealthReport>> getMachineHealthReports({
     String? machineNumber,
@@ -22,6 +24,7 @@ abstract class FrameRemoteDataSource {
     DateTime? endDate,
   });
   Future<List<MachineHealthReport>> getPendingApprovals();
+  Future<void> deleteMachineHealthReport(String id);
   Future<void> submitProductionDetailsReport(
     FrameProductionDetailsReport report,
   );
@@ -35,23 +38,27 @@ abstract class FrameRemoteDataSource {
     DateTime date,
     String shift,
   );
+  Future<void> deleteProductionDetailsReport(String id);
   Future<void> submitProductionWeightReport(FrameProductionWeightReport report);
   Future<List<FrameProductionWeightReport>> getProductionWeightReports({
     String? machineNumber,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteProductionWeightReport(String id);
   Future<void> submitShiftPackingReport(FrameShiftPackingReport report);
   Future<List<FrameShiftPackingReport>> getShiftPackingReports({
     String? machineNumber,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteShiftPackingReport(String id);
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
     String? operatorId,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteWritingEfficiency(String id);
   Future<void> submitCustomerRejectionReport(
     FrameCustomerRejectionReport report,
   );
@@ -60,6 +67,7 @@ abstract class FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteCustomerRejectionReport(String id);
 }
 
 class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
@@ -581,5 +589,61 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteMachineCleaningReport(String id) async {
+    await connector
+        .deleteFrameCleaningReport(
+          id: DeleteFrameCleaningReportVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
+  Future<void> deleteToolsCountReport(String id) async {
+    await connector
+        .deleteFrameToolsCountReport(
+          id: DeleteFrameToolsCountReportVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
+  Future<void> deleteMachineHealthReport(String id) async {
+    await connector.deleteFrameHealthReport(id: id).execute();
+  }
+
+  @override
+  Future<void> deleteProductionDetailsReport(String id) async {
+    await connector.deleteFrameProductionDetailsReport(id: id).execute();
+  }
+
+  @override
+  Future<void> deleteProductionWeightReport(String id) async {
+    await connector
+        .deleteFrameProductionWeightReport(
+          id: DeleteFrameProductionWeightReportVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
+  Future<void> deleteShiftPackingReport(String id) async {
+    await connector.deleteFrameShiftPackingReport(id: id).execute();
+  }
+
+  @override
+  Future<void> deleteWritingEfficiency(String id) async {
+    await connector
+        .deleteFrameWritingEfficiency(
+          id: DeleteFrameWritingEfficiencyVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
+  Future<void> deleteCustomerRejectionReport(String id) async {
+    await connector.deleteFrameCustomerRejectionReport(id: id).execute();
   }
 }

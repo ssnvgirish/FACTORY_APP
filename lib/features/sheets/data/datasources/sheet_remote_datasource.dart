@@ -10,12 +10,14 @@ abstract class SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteMachineCleaningReport(String id);
   Future<void> submitToolsCountReport(ToolsCountReport report);
   Future<List<ToolsCountReport>> getToolsCountReports({
     String? machineNumber,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteToolsCountReport(String id);
   Future<void> submitMachineHealthReport(MachineHealthReport report);
   Future<List<MachineHealthReport>> getMachineHealthReports({
     String? machineNumber,
@@ -23,6 +25,7 @@ abstract class SheetRemoteDataSource {
     DateTime? endDate,
   });
   Future<List<MachineHealthReport>> getPendingApprovals();
+  Future<void> deleteMachineHealthReport(String id);
   Future<void> submitProductionDetailsReport(
     SheetProductionDetailsReport report,
   );
@@ -36,6 +39,7 @@ abstract class SheetRemoteDataSource {
     DateTime date,
     String shift,
   );
+  Future<void> deleteProductionDetailsReport(String id);
   Future<void> submitProductionRunningFeetReport(
     SheetProductionRunningFeetReport report,
   );
@@ -45,17 +49,20 @@ abstract class SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteProductionRunningFeetReport(String id);
   Future<void> submitShiftPackingReport(SheetShiftPackingReport report);
   Future<List<SheetShiftPackingReport>> getShiftPackingReports({
     String? machineNumber,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteShiftPackingReport(String id);
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
     String? operatorId,
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteWritingEfficiency(String id);
   Future<void> submitCustomerRejectionReport(
     SheetCustomerRejectionReport report,
   );
@@ -64,6 +71,7 @@ abstract class SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteCustomerRejectionReport(String id);
 }
 
 class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
@@ -117,6 +125,15 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
   }
 
   @override
+  Future<void> deleteMachineCleaningReport(String id) async {
+    await connector
+        .deleteSheetCleaningReport(
+          id: DeleteSheetCleaningReportVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
   Future<void> submitToolsCountReport(ToolsCountReport report) async {
     await connector
         .createSheetToolsCountReport(
@@ -155,6 +172,15 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteToolsCountReport(String id) async {
+    await connector
+        .deleteSheetToolsCountReport(
+          id: DeleteSheetToolsCountReportVariablesId(id: id),
+        )
+        .execute();
   }
 
   @override
@@ -237,6 +263,11 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
   @override
   Future<List<MachineHealthReport>> getPendingApprovals() async {
     return getMachineHealthReports();
+  }
+
+  @override
+  Future<void> deleteMachineHealthReport(String id) async {
+    await connector.deleteSheetHealthReport(id: id).execute();
   }
 
   @override
@@ -385,6 +416,11 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
   }
 
   @override
+  Future<void> deleteProductionDetailsReport(String id) async {
+    await connector.deleteSheetProductionDetailsReport(id: id).execute();
+  }
+
+  @override
   Future<void> submitProductionRunningFeetReport(
     SheetProductionRunningFeetReport report,
   ) async {
@@ -432,6 +468,15 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteProductionRunningFeetReport(String id) async {
+    await connector
+        .deleteSheetRunningFeetReport(
+          id: DeleteSheetRunningFeetReportVariablesId(id: id),
+        )
+        .execute();
   }
 
   @override
@@ -517,6 +562,11 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
   }
 
   @override
+  Future<void> deleteShiftPackingReport(String id) async {
+    await connector.deleteSheetShiftPackingReport(id: id).execute();
+  }
+
+  @override
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
     String? operatorId,
     DateTime? startDate,
@@ -541,6 +591,15 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteWritingEfficiency(String id) async {
+    await connector
+        .deleteSheetWritingEfficiency(
+          id: DeleteSheetWritingEfficiencyVariablesId(id: id),
+        )
+        .execute();
   }
 
   @override
@@ -619,5 +678,10 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteCustomerRejectionReport(String id) async {
+    await connector.deleteSheetCustomerRejectionReport(id: id).execute();
   }
 }

@@ -47,7 +47,7 @@ class ListFrameCustomerRejectionReportsFrameCustomerRejectionReports {
   
   id = nativeFromJson<String>(json['id']),
   originalProductionDate = nativeFromJson<DateTime>(json['originalProductionDate']),
-  rejectionDate = json['rejectionDate'] != null ? nativeFromJson<DateTime>(json['rejectionDate']) : nativeFromJson<DateTime>(json['originalProductionDate']),
+  rejectionDate = nativeFromJson<DateTime>(json['rejectionDate']),
   machineNumber = nativeFromJson<String>(json['machineNumber']),
   shift = nativeFromJson<String>(json['shift']),
   totalRejectedWeight = nativeFromJson<double>(json['totalRejectedWeight']),

@@ -61,12 +61,18 @@ class ScrapHealthReportListPage extends StatelessWidget {
         emptyMessage: 'No health reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: report.machineNumber,
             subtitle:
                 '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.shift}',
             trailing:
                 '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
             statusColor: AppTheme.pendingBlue,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<ScrapRegrindBloc>().add(
+                    DeleteScrapHealthReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

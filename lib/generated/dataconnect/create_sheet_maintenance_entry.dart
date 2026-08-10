@@ -1,7 +1,7 @@
 part of 'default.dart';
 
-class CreateFrameMaintenanceEntryVariablesBuilder {
-  CreateFrameMaintenanceEntryVariablesReportId reportId;
+class CreateSheetMaintenanceEntryVariablesBuilder {
+  CreateSheetMaintenanceEntryVariablesReportId reportId;
   String maintenanceItem;
   Timestamp startTime;
   Timestamp endTime;
@@ -10,23 +10,23 @@ class CreateFrameMaintenanceEntryVariablesBuilder {
   double durationHours;
 
   final FirebaseDataConnect _dataConnect;
-  CreateFrameMaintenanceEntryVariablesBuilder(this._dataConnect, {required  this.reportId,required  this.maintenanceItem,required  this.startTime,required  this.endTime,required  this.personDoingMaintenance,required  this.description,required  this.durationHours,});
-  Deserializer<CreateFrameMaintenanceEntryData> dataDeserializer = (dynamic json)  => CreateFrameMaintenanceEntryData.fromJson(jsonDecode(json));
-  Serializer<CreateFrameMaintenanceEntryVariables> varsSerializer = (CreateFrameMaintenanceEntryVariables vars) => jsonEncode(vars.toJson());
-  Future<OperationResult<CreateFrameMaintenanceEntryData, CreateFrameMaintenanceEntryVariables>> execute() {
+  CreateSheetMaintenanceEntryVariablesBuilder(this._dataConnect, {required  this.reportId,required  this.maintenanceItem,required  this.startTime,required  this.endTime,required  this.personDoingMaintenance,required  this.description,required  this.durationHours,});
+  Deserializer<CreateSheetMaintenanceEntryData> dataDeserializer = (dynamic json)  => CreateSheetMaintenanceEntryData.fromJson(jsonDecode(json));
+  Serializer<CreateSheetMaintenanceEntryVariables> varsSerializer = (CreateSheetMaintenanceEntryVariables vars) => jsonEncode(vars.toJson());
+  Future<OperationResult<CreateSheetMaintenanceEntryData, CreateSheetMaintenanceEntryVariables>> execute() {
     return ref().execute();
   }
 
-  MutationRef<CreateFrameMaintenanceEntryData, CreateFrameMaintenanceEntryVariables> ref() {
-    CreateFrameMaintenanceEntryVariables vars= CreateFrameMaintenanceEntryVariables(reportId: reportId,maintenanceItem: maintenanceItem,startTime: startTime,endTime: endTime,personDoingMaintenance: personDoingMaintenance,description: description,durationHours: durationHours,);
-    return _dataConnect.mutation("CreateFrameMaintenanceEntry", dataDeserializer, varsSerializer, vars);
+  MutationRef<CreateSheetMaintenanceEntryData, CreateSheetMaintenanceEntryVariables> ref() {
+    CreateSheetMaintenanceEntryVariables vars= CreateSheetMaintenanceEntryVariables(reportId: reportId,maintenanceItem: maintenanceItem,startTime: startTime,endTime: endTime,personDoingMaintenance: personDoingMaintenance,description: description,durationHours: durationHours,);
+    return _dataConnect.mutation("CreateSheetMaintenanceEntry", dataDeserializer, varsSerializer, vars);
   }
 }
 
 @immutable
-class CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert {
+class CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert {
   final String id;
-  CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert.fromJson(dynamic json):
+  CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -38,7 +38,7 @@ class CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert {
       return false;
     }
 
-    final CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert otherTyped = other as CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert;
+    final CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert otherTyped = other as CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert;
     return id == otherTyped.id;
     
   }
@@ -52,17 +52,17 @@ class CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert {
     return json;
   }
 
-  CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert({
+  CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert({
     required this.id,
   });
 }
 
 @immutable
-class CreateFrameMaintenanceEntryData {
-  final CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert frameMaintenanceEntry_insert;
-  CreateFrameMaintenanceEntryData.fromJson(dynamic json):
+class CreateSheetMaintenanceEntryData {
+  final CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert sheetMaintenanceEntry_insert;
+  CreateSheetMaintenanceEntryData.fromJson(dynamic json):
   
-  frameMaintenanceEntry_insert = CreateFrameMaintenanceEntryFrameMaintenanceEntryInsert.fromJson(json['frameMaintenanceEntry_insert']);
+  sheetMaintenanceEntry_insert = CreateSheetMaintenanceEntrySheetMaintenanceEntryInsert.fromJson(json['sheetMaintenanceEntry_insert']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -72,29 +72,29 @@ class CreateFrameMaintenanceEntryData {
       return false;
     }
 
-    final CreateFrameMaintenanceEntryData otherTyped = other as CreateFrameMaintenanceEntryData;
-    return frameMaintenanceEntry_insert == otherTyped.frameMaintenanceEntry_insert;
+    final CreateSheetMaintenanceEntryData otherTyped = other as CreateSheetMaintenanceEntryData;
+    return sheetMaintenanceEntry_insert == otherTyped.sheetMaintenanceEntry_insert;
     
   }
   @override
-  int get hashCode => frameMaintenanceEntry_insert.hashCode;
+  int get hashCode => sheetMaintenanceEntry_insert.hashCode;
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['frameMaintenanceEntry_insert'] = frameMaintenanceEntry_insert.toJson();
+    json['sheetMaintenanceEntry_insert'] = sheetMaintenanceEntry_insert.toJson();
     return json;
   }
 
-  CreateFrameMaintenanceEntryData({
-    required this.frameMaintenanceEntry_insert,
+  CreateSheetMaintenanceEntryData({
+    required this.sheetMaintenanceEntry_insert,
   });
 }
 
 @immutable
-class CreateFrameMaintenanceEntryVariablesReportId {
+class CreateSheetMaintenanceEntryVariablesReportId {
   final String id;
-  CreateFrameMaintenanceEntryVariablesReportId.fromJson(dynamic json):
+  CreateSheetMaintenanceEntryVariablesReportId.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -106,7 +106,7 @@ class CreateFrameMaintenanceEntryVariablesReportId {
       return false;
     }
 
-    final CreateFrameMaintenanceEntryVariablesReportId otherTyped = other as CreateFrameMaintenanceEntryVariablesReportId;
+    final CreateSheetMaintenanceEntryVariablesReportId otherTyped = other as CreateSheetMaintenanceEntryVariablesReportId;
     return id == otherTyped.id;
     
   }
@@ -120,14 +120,14 @@ class CreateFrameMaintenanceEntryVariablesReportId {
     return json;
   }
 
-  CreateFrameMaintenanceEntryVariablesReportId({
+  CreateSheetMaintenanceEntryVariablesReportId({
     required this.id,
   });
 }
 
 @immutable
-class CreateFrameMaintenanceEntryVariables {
-  final CreateFrameMaintenanceEntryVariablesReportId reportId;
+class CreateSheetMaintenanceEntryVariables {
+  final CreateSheetMaintenanceEntryVariablesReportId reportId;
   final String maintenanceItem;
   final Timestamp startTime;
   final Timestamp endTime;
@@ -135,9 +135,9 @@ class CreateFrameMaintenanceEntryVariables {
   final String description;
   final double durationHours;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
-  CreateFrameMaintenanceEntryVariables.fromJson(Map<String, dynamic> json):
+  CreateSheetMaintenanceEntryVariables.fromJson(Map<String, dynamic> json):
   
-  reportId = CreateFrameMaintenanceEntryVariablesReportId.fromJson(json['reportId']),
+  reportId = CreateSheetMaintenanceEntryVariablesReportId.fromJson(json['reportId']),
   maintenanceItem = nativeFromJson<String>(json['maintenanceItem']),
   startTime = Timestamp.fromJson(json['startTime']),
   endTime = Timestamp.fromJson(json['endTime']),
@@ -153,7 +153,7 @@ class CreateFrameMaintenanceEntryVariables {
       return false;
     }
 
-    final CreateFrameMaintenanceEntryVariables otherTyped = other as CreateFrameMaintenanceEntryVariables;
+    final CreateSheetMaintenanceEntryVariables otherTyped = other as CreateSheetMaintenanceEntryVariables;
     return reportId == otherTyped.reportId && 
     maintenanceItem == otherTyped.maintenanceItem && 
     startTime == otherTyped.startTime && 
@@ -179,7 +179,7 @@ class CreateFrameMaintenanceEntryVariables {
     return json;
   }
 
-  CreateFrameMaintenanceEntryVariables({
+  CreateSheetMaintenanceEntryVariables({
     required this.reportId,
     required this.maintenanceItem,
     required this.startTime,
@@ -189,3 +189,4 @@ class CreateFrameMaintenanceEntryVariables {
     required this.durationHours,
   });
 }
+

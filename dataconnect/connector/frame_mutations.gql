@@ -537,3 +537,43 @@ query ListFrameCustomerRejectionReports(
     }
   }
 }
+
+# ═══════════════════════════════════════
+# Frame Report Deletes
+# ═══════════════════════════════════════
+
+mutation DeleteFrameCleaningReport($id: FrameCleaningReport_Key!) @auth(level: PUBLIC) {
+  frameCleaningReport_delete(key: $id)
+}
+
+mutation DeleteFrameToolsCountReport($id: FrameToolsCountReport_Key!) @auth(level: PUBLIC) {
+  frameToolsCountReport_delete(key: $id)
+}
+
+mutation DeleteFrameHealthReport($id: UUID!) @auth(level: PUBLIC) {
+  frameMaintenanceEntry_deleteMany(where: { report: { id: { eq: $id } } })
+  frameHealthReport_delete(id: $id)
+}
+
+mutation DeleteFrameProductionDetailsReport($id: UUID!) @auth(level: PUBLIC) {
+  frameProductionLineItem_deleteMany(where: { report: { id: { eq: $id } } })
+  frameProductionDetailsReport_delete(id: $id)
+}
+
+mutation DeleteFrameProductionWeightReport($id: FrameProductionWeightReport_Key!) @auth(level: PUBLIC) {
+  frameProductionWeightReport_delete(key: $id)
+}
+
+mutation DeleteFrameShiftPackingReport($id: UUID!) @auth(level: PUBLIC) {
+  framePackingLineItem_deleteMany(where: { report: { id: { eq: $id } } })
+  frameShiftPackingReport_delete(id: $id)
+}
+
+mutation DeleteFrameWritingEfficiency($id: FrameWritingEfficiency_Key!) @auth(level: PUBLIC) {
+  frameWritingEfficiency_delete(key: $id)
+}
+
+mutation DeleteFrameCustomerRejectionReport($id: UUID!) @auth(level: PUBLIC) {
+  frameCustomerRejectionItem_deleteMany(where: { report: { id: { eq: $id } } })
+  frameCustomerRejectionReport_delete(id: $id)
+}

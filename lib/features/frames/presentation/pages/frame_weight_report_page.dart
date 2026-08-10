@@ -26,7 +26,7 @@ class FrameWeightReportListPage extends StatelessWidget {
                 if (state.oldestLoadedStart == null || state.isLoadingMore) {
                   return;
                 }
-                final range = ReportWeekRange.previousWeek(
+                final range = ReportWeekRange.previousDay(
                   state.oldestLoadedStart!,
                 );
                 context.read<FrameReportsBloc>().add(
@@ -38,7 +38,7 @@ class FrameWeightReportListPage extends StatelessWidget {
                 );
               },
               onRefresh: () async {
-                final range = ReportWeekRange.initial();
+                final range = ReportWeekRange.initialDay();
                 context.read<FrameReportsBloc>().add(
                   LoadProductionWeightReports(
                     startDate: range.start,
@@ -49,6 +49,7 @@ class FrameWeightReportListPage extends StatelessWidget {
               emptyMessage: 'No production weight reports yet',
               itemBuilder: (context, report, index) {
                 return ReportCard(
+                  key: ValueKey(report.id),
                   title: '${report.machineNumber} — ${report.shift}',
                   subtitle:
                       '${DateFormat('dd MMM yyyy').format(report.date)} — Target: ${report.targetWeight.toStringAsFixed(1)} kg',
@@ -59,6 +60,11 @@ class FrameWeightReportListPage extends StatelessWidget {
                       : report.efficiencyPercentage >= 60
                       ? AppTheme.warningYellow
                       : AppTheme.errorRed,
+                  onDelete: report.id == null
+                      ? null
+                      : () => context.read<FrameReportsBloc>().add(
+                          DeleteProductionWeightReport(report.id!),
+                        ),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -100,7 +106,7 @@ class FrameWeightReportListPage extends StatelessWidget {
             );
           }
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            final range = ReportWeekRange.initial();
+            final range = ReportWeekRange.initialDay();
             context.read<FrameReportsBloc>().add(
               LoadProductionWeightReports(
                 startDate: range.start,

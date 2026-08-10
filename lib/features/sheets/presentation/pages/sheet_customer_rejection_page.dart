@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -394,13 +395,16 @@ class _SheetCustomerRejectionPageState
       );
     }).toList();
 
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) return;
+
     final report = SheetCustomerRejectionReport(
       originalProductionDate: _productionDate,
       machineNumber: _selectedMachine,
       shift: _shift!,
       rejectedItems: rejectedItems,
       totalRejectedRunningFeet: _totalRejectedRunningFeet,
-      createdBy: '',
+      createdBy: authState.user.uid,
     );
     context.read<SheetReportsBloc>().add(
       SubmitSheetCustomerRejectionReport(report),

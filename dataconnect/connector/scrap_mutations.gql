@@ -557,3 +557,37 @@ query GetScrapMonthlyAggregates(
     qualityRating
   }
 }
+
+# ═══════════════════════════════════════
+# Scrap Report Deletes
+# ═══════════════════════════════════════
+
+mutation DeleteScrapCleaningReport($id: ScrapCleaningReport_Key!) @auth(level: PUBLIC) {
+  scrapCleaningReport_delete(key: $id)
+}
+
+mutation DeleteScrapToolsCountReport($id: ScrapToolsCountReport_Key!) @auth(level: PUBLIC) {
+  scrapToolsCountReport_delete(key: $id)
+}
+
+mutation DeleteScrapMachineHealthReport($id: UUID!) @auth(level: PUBLIC) {
+  scrapMaintenanceEntry_deleteMany(where: { report: { id: { eq: $id } } })
+  scrapMachineHealthReport_delete(id: $id)
+}
+
+mutation DeleteScrapProductionDetailsReport($id: UUID!) @auth(level: PUBLIC) {
+  scrapProductionLineItem_deleteMany(where: { report: { id: { eq: $id } } })
+  scrapProductionDetailsReport_delete(id: $id)
+}
+
+mutation DeleteScrapProductionWeightReport($id: ScrapProductionWeightReport_Key!) @auth(level: PUBLIC) {
+  scrapProductionWeightReport_delete(key: $id)
+}
+
+mutation DeleteScrapWritingEfficiency($id: ScrapWritingEfficiency_Key!) @auth(level: PUBLIC) {
+  scrapWritingEfficiency_delete(key: $id)
+}
+
+mutation DeleteScrapQualityReport($id: ScrapQualityReport_Key!) @auth(level: PUBLIC) {
+  scrapQualityReport_delete(key: $id)
+}

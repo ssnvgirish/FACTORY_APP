@@ -41,8 +41,8 @@ class _LoginPageState extends State<LoginPage> {
           if (state is AuthError) {
             debugPrint('AuthError: ${state.message}');
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Something went wrong'),
+              SnackBar(
+                content: Text(state.message),
                 backgroundColor: AppTheme.errorRed,
               ),
             );

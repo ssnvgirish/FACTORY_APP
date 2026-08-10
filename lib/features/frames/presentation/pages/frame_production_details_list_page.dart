@@ -63,10 +63,16 @@ class FrameProductionDetailsListPage extends StatelessWidget {
         emptyMessage: 'No production details reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: '${report.machineNumber} — ${report.shift}',
             subtitle:
                 '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.lineItems.length} items',
             trailing: '${report.totalWeight.toStringAsFixed(1)} kg',
+            onDelete: report.id == null
+                ? null
+                : () => context.read<FrameReportsBloc>().add(
+                    DeleteProductionDetailsReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

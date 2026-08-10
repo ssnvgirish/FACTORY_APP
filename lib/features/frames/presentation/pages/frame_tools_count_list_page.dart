@@ -61,12 +61,18 @@ class FrameToolsCountListPage extends StatelessWidget {
         emptyMessage: 'No tools count reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: report.machineNumber,
             subtitle: DateFormat('dd MMM yyyy').format(report.date),
             trailing: '${report.percentageAvailable.toStringAsFixed(1)}%',
             statusColor: report.percentageAvailable >= 80
                 ? AppTheme.successGreen
                 : AppTheme.errorRed,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<FrameReportsBloc>().add(
+                    DeleteToolsCountReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

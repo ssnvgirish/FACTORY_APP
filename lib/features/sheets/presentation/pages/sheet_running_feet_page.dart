@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -48,48 +48,23 @@ class SheetRunningFeetPage extends StatelessWidget {
               },
               emptyMessage:
                   'No running feet data yet.\nGenerated from production details.',
-              padding: const EdgeInsets.all(12),
               itemBuilder: (context, r, i) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '${r.date.day}/${r.date.month}/${r.date.year}',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            const Spacer(),
-                            Chip(label: Text(r.shift)),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            _StatColumn(
-                              label: 'Production Ft',
-                              value:
-                                  '${r.productionRunningFeet.toStringAsFixed(1)} ft',
-                            ),
-                            _StatColumn(
-                              label: 'Target Ft',
-                              value:
-                                  '${r.targetRunningFeet.toStringAsFixed(1)} ft',
-                            ),
-                            _StatColumn(
-                              label: 'Efficiency',
-                              value:
-                                  '${r.efficiencyPercentage.toStringAsFixed(1)}%',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                return ReportCard(
+                  key: ValueKey(r.id),
+                  title: '${r.machineNumber} — ${r.shift}',
+                  subtitle:
+                      '${DateFormat('dd MMM yyyy').format(r.date)} — Target: ${r.targetRunningFeet.toStringAsFixed(1)} ft',
+                  trailing: '${r.efficiencyPercentage.toStringAsFixed(1)}%',
+                  statusColor: r.efficiencyPercentage >= 80
+                      ? AppTheme.successGreen
+                      : r.efficiencyPercentage >= 60
+                      ? AppTheme.warningYellow
+                      : AppTheme.errorRed,
+                  onDelete: r.id == null
+                      ? null
+                      : () => context.read<SheetReportsBloc>().add(
+                            DeleteSheetRunningFeetReport(r.id!),
+                          ),
                 );
               },
             );
@@ -105,36 +80,6 @@ class SheetRunningFeetPage extends StatelessWidget {
           });
           return const LoadingWidget();
         },
-      ),
-    );
-  }
-}
-
-class _StatColumn extends StatelessWidget {
-  final String label;
-  final String value;
-  const _StatColumn({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: GoogleFonts.sourceCodePro(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.primaryNavy,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall,
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

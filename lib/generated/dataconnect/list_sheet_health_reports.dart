@@ -112,7 +112,6 @@ class ListSheetHealthReportsSheetHealthReports {
   });
 }
 
-
 @immutable
 class ListSheetHealthReportsSheetHealthReportsSheetMaintenanceEntriesOnReport {
   final String maintenanceItem;

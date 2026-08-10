@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -150,13 +151,16 @@ class _SheetToolsCountPageState extends State<SheetToolsCountPage> {
                 if (_formKey.currentState!.validate()) {
                   final given = int.parse(_toolsGivenCtrl.text);
                   final available = int.parse(_toolsAvailableCtrl.text);
+                  final authState = context.read<AuthBloc>().state;
+                  if (authState is! AuthAuthenticated) return;
+
                   final report = ToolsCountReport(
                     date: _selectedDate,
                     machineNumber: _selectedMachine,
                     totalToolsGiven: given,
                     totalToolsAvailable: available,
                     percentageAvailable: _percentage,
-                    createdBy: '',
+                    createdBy: authState.user.uid,
                   );
                   context.read<SheetReportsBloc>().add(
                     SubmitSheetToolsCountReport(report),

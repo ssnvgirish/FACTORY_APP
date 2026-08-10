@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -170,13 +171,16 @@ class _ScrapProductionDetailsFormPageState
         )
         .toList();
 
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) return;
+
     final report = ScrapProductionDetailsReport(
       date: _selectedDate,
       machineNumber: _selectedMachine!,
       shift: _selectedShift!,
       lineItems: items,
       totalProductionWeight: _totalWeight,
-      createdBy: '', // Set from auth
+      createdBy: authState.user.uid,
     );
 
     context.read<ScrapRegrindBloc>().add(

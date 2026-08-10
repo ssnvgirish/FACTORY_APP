@@ -33,6 +33,11 @@ class SubmitMachineCleaningReport extends FrameReportsEvent {
   SubmitMachineCleaningReport(this.report);
 }
 
+class DeleteMachineCleaningReport extends FrameReportsEvent {
+  final String id;
+  DeleteMachineCleaningReport(this.id);
+}
+
 // Tools Count
 class LoadToolsCountReports extends FrameReportsEvent {
   final String? machineNumber;
@@ -52,6 +57,11 @@ class SubmitToolsCountReport extends FrameReportsEvent {
   SubmitToolsCountReport(this.report);
 }
 
+class DeleteToolsCountReport extends FrameReportsEvent {
+  final String id;
+  DeleteToolsCountReport(this.id);
+}
+
 // Machine Health
 class LoadMachineHealthReports extends FrameReportsEvent {
   final String? machineNumber;
@@ -69,6 +79,11 @@ class LoadMachineHealthReports extends FrameReportsEvent {
 class SubmitMachineHealthReport extends FrameReportsEvent {
   final MachineHealthReport report;
   SubmitMachineHealthReport(this.report);
+}
+
+class DeleteMachineHealthReport extends FrameReportsEvent {
+  final String id;
+  DeleteMachineHealthReport(this.id);
 }
 
 class LoadPendingApprovals extends FrameReportsEvent {}
@@ -103,6 +118,11 @@ class LoadProductionDetailsForShift extends FrameReportsEvent {
   });
 }
 
+class DeleteProductionDetailsReport extends FrameReportsEvent {
+  final String id;
+  DeleteProductionDetailsReport(this.id);
+}
+
 // Production Weight
 class LoadProductionWeightReports extends FrameReportsEvent {
   final String? machineNumber;
@@ -120,6 +140,11 @@ class LoadProductionWeightReports extends FrameReportsEvent {
 class SubmitProductionWeightReport extends FrameReportsEvent {
   final FrameProductionWeightReport report;
   SubmitProductionWeightReport(this.report);
+}
+
+class DeleteProductionWeightReport extends FrameReportsEvent {
+  final String id;
+  DeleteProductionWeightReport(this.id);
 }
 
 // Shift Packing
@@ -141,6 +166,11 @@ class SubmitShiftPackingReport extends FrameReportsEvent {
   SubmitShiftPackingReport(this.report);
 }
 
+class DeleteShiftPackingReport extends FrameReportsEvent {
+  final String id;
+  DeleteShiftPackingReport(this.id);
+}
+
 // Customer Rejection
 class LoadCustomerRejectionReports extends FrameReportsEvent {
   final String? machineNumber;
@@ -160,6 +190,11 @@ class SubmitCustomerRejectionReport extends FrameReportsEvent {
   SubmitCustomerRejectionReport(this.report);
 }
 
+class DeleteCustomerRejectionReport extends FrameReportsEvent {
+  final String id;
+  DeleteCustomerRejectionReport(this.id);
+}
+
 // Writing Efficiency
 class LoadFrameWritingEfficiency extends FrameReportsEvent {
   final String? operatorId;
@@ -172,6 +207,11 @@ class LoadFrameWritingEfficiency extends FrameReportsEvent {
     this.endDate,
     this.append = false,
   });
+}
+
+class DeleteFrameWritingEfficiencyRecord extends FrameReportsEvent {
+  final String id;
+  DeleteFrameWritingEfficiencyRecord(this.id);
 }
 
 // ═══════════════════════════════════════
@@ -389,21 +429,29 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     : super(FrameReportsInitial()) {
     on<LoadMachineCleaningReports>(_onLoadCleaningReports);
     on<SubmitMachineCleaningReport>(_onSubmitCleaningReport);
+    on<DeleteMachineCleaningReport>(_onDeleteCleaningReport);
     on<LoadToolsCountReports>(_onLoadToolsReports);
     on<SubmitToolsCountReport>(_onSubmitToolsReport);
+    on<DeleteToolsCountReport>(_onDeleteToolsReport);
     on<LoadMachineHealthReports>(_onLoadHealthReports);
     on<SubmitMachineHealthReport>(_onSubmitHealthReport);
+    on<DeleteMachineHealthReport>(_onDeleteHealthReport);
     on<LoadPendingApprovals>(_onLoadPendingApprovals);
     on<LoadProductionDetailsReports>(_onLoadProductionDetails);
     on<SubmitProductionDetailsReport>(_onSubmitProductionDetails);
     on<LoadProductionDetailsForShift>(_onLoadProductionDetailsForShift);
+    on<DeleteProductionDetailsReport>(_onDeleteProductionDetails);
     on<LoadProductionWeightReports>(_onLoadWeightReports);
     on<SubmitProductionWeightReport>(_onSubmitWeightReport);
+    on<DeleteProductionWeightReport>(_onDeleteWeightReport);
     on<LoadShiftPackingReports>(_onLoadPackingReports);
     on<SubmitShiftPackingReport>(_onSubmitPackingReport);
+    on<DeleteShiftPackingReport>(_onDeletePackingReport);
     on<LoadCustomerRejectionReports>(_onLoadCustomerRejection);
     on<SubmitCustomerRejectionReport>(_onSubmitCustomerRejection);
+    on<DeleteCustomerRejectionReport>(_onDeleteCustomerRejection);
     on<LoadFrameWritingEfficiency>(_onLoadWritingEfficiency);
+    on<DeleteFrameWritingEfficiencyRecord>(_onDeleteWritingEfficiency);
   }
 
   Future<void> _onLoadCleaningReports(
@@ -472,6 +520,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
       }
       await frameRepository.submitMachineCleaningReport(event.report);
       emit(FrameReportsSubmitted('Machine Cleaning Report submitted'));
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteCleaningReport(
+    DeleteMachineCleaningReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteMachineCleaningReport(event.id);
+      if (state is MachineCleaningReportsLoaded) {
+        final current = state as MachineCleaningReportsLoaded;
+        emit(
+          MachineCleaningReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -547,6 +617,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     }
   }
 
+  Future<void> _onDeleteToolsReport(
+    DeleteToolsCountReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteToolsCountReport(event.id);
+      if (state is ToolsCountReportsLoaded) {
+        final current = state as ToolsCountReportsLoaded;
+        emit(
+          ToolsCountReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
   Future<void> _onLoadHealthReports(
     LoadMachineHealthReports event,
     Emitter<FrameReportsState> emit,
@@ -612,6 +704,35 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
       }
       await frameRepository.submitMachineHealthReport(event.report);
       emit(FrameReportsSubmitted('Machine Health Report submitted'));
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteHealthReport(
+    DeleteMachineHealthReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteMachineHealthReport(event.id);
+      if (state is MachineHealthReportsLoaded) {
+        final current = state as MachineHealthReportsLoaded;
+        emit(
+          MachineHealthReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      } else if (state is PendingApprovalsLoaded) {
+        final current = state as PendingApprovalsLoaded;
+        emit(
+          PendingApprovalsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+          ),
+        );
+      }
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -699,6 +820,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
       await _generateWeightReport(event.report);
 
       emit(FrameReportsSubmitted('Production Details Report submitted'));
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteProductionDetails(
+    DeleteProductionDetailsReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteProductionDetailsReport(event.id);
+      if (state is ProductionDetailsReportsLoaded) {
+        final current = state as ProductionDetailsReportsLoaded;
+        emit(
+          ProductionDetailsReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -842,6 +985,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     }
   }
 
+  Future<void> _onDeleteWeightReport(
+    DeleteProductionWeightReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteProductionWeightReport(event.id);
+      if (state is ProductionWeightReportsLoaded) {
+        final current = state as ProductionWeightReportsLoaded;
+        emit(
+          ProductionWeightReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
   Future<void> _onLoadPackingReports(
     LoadShiftPackingReports event,
     Emitter<FrameReportsState> emit,
@@ -907,6 +1072,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
       }
       await frameRepository.submitShiftPackingReport(event.report);
       emit(FrameReportsSubmitted('Shift Packing Report submitted'));
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeletePackingReport(
+    DeleteShiftPackingReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteShiftPackingReport(event.id);
+      if (state is ShiftPackingReportsLoaded) {
+        final current = state as ShiftPackingReportsLoaded;
+        emit(
+          ShiftPackingReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }
@@ -982,6 +1169,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
     }
   }
 
+  Future<void> _onDeleteCustomerRejection(
+    DeleteCustomerRejectionReport event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteCustomerRejectionReport(event.id);
+      if (state is CustomerRejectionReportsLoaded) {
+        final current = state as CustomerRejectionReportsLoaded;
+        emit(
+          CustomerRejectionReportsLoaded(
+            current.reports.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
   Future<void> _onLoadWritingEfficiency(
     LoadFrameWritingEfficiency event,
     Emitter<FrameReportsState> emit,
@@ -1021,6 +1230,28 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
           oldestLoadedStart: merged.oldestLoadedStart,
         ),
       );
+    } catch (e) {
+      emit(FrameReportsError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteWritingEfficiency(
+    DeleteFrameWritingEfficiencyRecord event,
+    Emitter<FrameReportsState> emit,
+  ) async {
+    try {
+      await frameRepository.deleteWritingEfficiency(event.id);
+      if (state is FrameWritingEfficiencyLoaded) {
+        final current = state as FrameWritingEfficiencyLoaded;
+        emit(
+          FrameWritingEfficiencyLoaded(
+            current.records.where((r) => r.id != event.id).toList(),
+            hasMore: current.hasMore,
+            isLoadingMore: current.isLoadingMore,
+            oldestLoadedStart: current.oldestLoadedStart,
+          ),
+        );
+      }
     } catch (e) {
       emit(FrameReportsError(e.toString()));
     }

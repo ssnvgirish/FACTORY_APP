@@ -64,12 +64,18 @@ class ScrapCleaningReportListPage extends StatelessWidget {
         emptyMessage: 'No cleaning reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: report.machineNumber,
             subtitle: DateFormat('dd MMM yyyy').format(report.date),
             trailing: '${report.percentage.toStringAsFixed(1)}%',
             statusColor: report.percentage >= 80
                 ? AppTheme.successGreen
                 : AppTheme.errorRed,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<ScrapRegrindBloc>().add(
+                    DeleteScrapCleaningReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

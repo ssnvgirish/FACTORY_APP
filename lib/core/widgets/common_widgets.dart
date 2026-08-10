@@ -1,6 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:async';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../theme/app_theme.dart';
 
 class AutoCalculatedField extends StatelessWidget {
@@ -60,6 +65,11 @@ class ReportCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? statusColor;
 
+  /// When set, enables swipe-to-delete (end-to-start) with a confirm dialog.
+  /// Prefer an async callback so the row only dismisses after delete succeeds.
+  final FutureOr<void> Function()? onDelete;
+  final String deleteConfirmMessage;
+
   const ReportCard({
     super.key,
     required this.title,
@@ -67,11 +77,49 @@ class ReportCard extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.statusColor,
+    this.onDelete,
+    this.deleteConfirmMessage = 'Delete this report? This cannot be undone.',
   });
+
+  Future<bool> _confirmAndDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete report'),
+        content: Text(deleteConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.errorRed,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || onDelete == null) return false;
+    try {
+      await onDelete!();
+      return true;
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not delete: $e')),
+        );
+      }
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    final card = Card(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Text(title, style: Theme.of(context).textTheme.titleMedium),
@@ -100,6 +148,40 @@ class ReportCard extends StatelessWidget {
             : null,
         onTap: onTap,
       ),
+    );
+
+    if (onDelete == null) return card;
+
+    // Swipe-to-delete is admin-only.
+    return BlocBuilder<AuthBloc, AuthState>(
+      buildWhen: (prev, next) =>
+          prev.runtimeType != next.runtimeType ||
+          (prev is AuthAuthenticated) != (next is AuthAuthenticated) ||
+          (prev is AuthAuthenticated &&
+              next is AuthAuthenticated &&
+              prev.user.isAdmin != next.user.isAdmin),
+      builder: (context, authState) {
+        final isAdmin =
+            authState is AuthAuthenticated && authState.user.isAdmin;
+        if (!isAdmin) return card;
+
+        return Dismissible(
+          key: key ?? ValueKey('report-$title-$subtitle-$trailing'),
+          direction: DismissDirection.endToStart,
+          confirmDismiss: (_) => _confirmAndDelete(context),
+          background: Container(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
+              color: AppTheme.errorRed,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            child: const Icon(Icons.delete_outline, color: Colors.white),
+          ),
+          child: card,
+        );
+      },
     );
   }
 }
@@ -216,8 +298,7 @@ class PaginatedListView<T> extends StatefulWidget {
   final int pageSize;
   final EdgeInsetsGeometry padding;
 
-  /// When set, "Load More" fetches the next page from the server instead of
-  /// revealing more already-loaded items.
+  /// When local items are exhausted, "Load More" can fetch the next server page.
   final VoidCallback? onLoadMore;
   final bool hasMore;
   final bool isLoadingMore;
@@ -229,7 +310,7 @@ class PaginatedListView<T> extends StatefulWidget {
     required this.emptyMessage,
     this.onRefresh,
     this.emptyIcon = Icons.inbox_outlined,
-    this.pageSize = 30,
+    this.pageSize = 10,
     this.padding = const EdgeInsets.all(8),
     this.onLoadMore,
     this.hasMore = false,
@@ -243,7 +324,11 @@ class PaginatedListView<T> extends StatefulWidget {
 class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
   late int _visibleCount;
 
-  bool get _serverPaging => widget.onLoadMore != null;
+  bool get _hasLocalMore => _visibleCount < widget.items.length;
+  bool get _hasServerMore =>
+      widget.onLoadMore != null && widget.hasMore && !_hasLocalMore;
+  bool get _showLoadMore =>
+      widget.items.isNotEmpty && (_hasLocalMore || _hasServerMore);
 
   @override
   void initState() {
@@ -251,16 +336,44 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     _visibleCount = math.min(widget.pageSize, widget.items.length);
   }
 
+  bool _isAppend(List<T> oldItems, List<T> newItems) {
+    if (oldItems.isEmpty || newItems.length <= oldItems.length) return false;
+    for (var i = 0; i < oldItems.length; i++) {
+      if (oldItems[i] != newItems[i]) return false;
+    }
+    return true;
+  }
+
   @override
   void didUpdateWidget(covariant PaginatedListView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!identical(oldWidget.items, widget.items)) {
-      _visibleCount = math.min(widget.pageSize, widget.items.length);
+      if (_isAppend(oldWidget.items, widget.items)) {
+        _visibleCount = math.min(
+          _visibleCount + widget.pageSize,
+          widget.items.length,
+        );
+      } else {
+        _visibleCount = math.min(widget.pageSize, widget.items.length);
+      }
       return;
     }
     if (_visibleCount > widget.items.length) {
       _visibleCount = widget.items.length;
     }
+  }
+
+  void _onLoadMorePressed() {
+    if (_hasLocalMore) {
+      setState(() {
+        _visibleCount = math.min(
+          _visibleCount + widget.pageSize,
+          widget.items.length,
+        );
+      });
+      return;
+    }
+    widget.onLoadMore?.call();
   }
 
   Widget _buildLoadMoreFooter() {
@@ -271,23 +384,14 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
       );
     }
 
-    final remaining = _serverPaging
-        ? null
-        : widget.items.length - _visibleCount;
+    final remaining = _hasLocalMore
+        ? widget.items.length - _visibleCount
+        : null;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Center(
         child: OutlinedButton.icon(
-          onPressed: _serverPaging
-              ? widget.onLoadMore
-              : () {
-                  setState(() {
-                    _visibleCount = math.min(
-                      _visibleCount + widget.pageSize,
-                      widget.items.length,
-                    );
-                  });
-                },
+          onPressed: _onLoadMorePressed,
           icon: const Icon(Icons.expand_more),
           label: Text(
             remaining == null ? 'Load More' : 'Load More ($remaining)',
@@ -299,11 +403,6 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final visibleCount = _serverPaging ? widget.items.length : _visibleCount;
-    final showLoadMore = _serverPaging
-        ? widget.hasMore
-        : visibleCount < widget.items.length;
-
     if (widget.items.isEmpty) {
       final listView = ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -312,7 +411,6 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
             message: widget.emptyMessage,
             icon: widget.emptyIcon,
           ),
-          if (showLoadMore) _buildLoadMoreFooter(),
         ],
       );
       if (widget.onRefresh == null) return listView;
@@ -322,9 +420,9 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     final listView = ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: widget.padding,
-      itemCount: visibleCount + (showLoadMore ? 1 : 0),
+      itemCount: _visibleCount + (_showLoadMore ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index >= visibleCount) return _buildLoadMoreFooter();
+        if (index >= _visibleCount) return _buildLoadMoreFooter();
         return widget.itemBuilder(context, widget.items[index], index);
       },
     );

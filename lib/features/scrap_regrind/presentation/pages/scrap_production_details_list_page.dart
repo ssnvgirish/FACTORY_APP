@@ -64,11 +64,17 @@ class ScrapProductionDetailsListPage extends StatelessWidget {
         emptyMessage: 'No production details reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: report.machineNumber,
             subtitle:
                 '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.shift}',
             trailing: '${report.totalProductionWeight.toStringAsFixed(1)} kg',
             statusColor: AppTheme.successGreen,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<ScrapRegrindBloc>().add(
+                    DeleteScrapProductionDetailsReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

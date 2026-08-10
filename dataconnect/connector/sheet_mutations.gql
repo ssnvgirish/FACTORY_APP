@@ -574,3 +574,43 @@ query ListSheetCustomerRejectionReports(
     }
   }
 }
+
+# ═══════════════════════════════════════
+# Sheet Report Deletes
+# ═══════════════════════════════════════
+
+mutation DeleteSheetCleaningReport($id: SheetCleaningReport_Key!) @auth(level: PUBLIC) {
+  sheetCleaningReport_delete(key: $id)
+}
+
+mutation DeleteSheetToolsCountReport($id: SheetToolsCountReport_Key!) @auth(level: PUBLIC) {
+  sheetToolsCountReport_delete(key: $id)
+}
+
+mutation DeleteSheetHealthReport($id: UUID!) @auth(level: PUBLIC) {
+  sheetMaintenanceEntry_deleteMany(where: { report: { id: { eq: $id } } })
+  sheetHealthReport_delete(id: $id)
+}
+
+mutation DeleteSheetProductionDetailsReport($id: UUID!) @auth(level: PUBLIC) {
+  sheetProductionLineItem_deleteMany(where: { report: { id: { eq: $id } } })
+  sheetProductionDetailsReport_delete(id: $id)
+}
+
+mutation DeleteSheetRunningFeetReport($id: SheetRunningFeetReport_Key!) @auth(level: PUBLIC) {
+  sheetRunningFeetReport_delete(key: $id)
+}
+
+mutation DeleteSheetShiftPackingReport($id: UUID!) @auth(level: PUBLIC) {
+  sheetPackingLineItem_deleteMany(where: { report: { id: { eq: $id } } })
+  sheetShiftPackingReport_delete(id: $id)
+}
+
+mutation DeleteSheetWritingEfficiency($id: SheetWritingEfficiency_Key!) @auth(level: PUBLIC) {
+  sheetWritingEfficiency_delete(key: $id)
+}
+
+mutation DeleteSheetCustomerRejectionReport($id: UUID!) @auth(level: PUBLIC) {
+  sheetCustomerRejectionItem_deleteMany(where: { report: { id: { eq: $id } } })
+  sheetCustomerRejectionReport_delete(id: $id)
+}

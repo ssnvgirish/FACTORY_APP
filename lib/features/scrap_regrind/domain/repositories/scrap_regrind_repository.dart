@@ -8,6 +8,7 @@ abstract class ScrapRegrindRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteCleaningReport(String id);
 
   // Tools Count Report
   Future<void> submitToolsCountReport(ScrapToolsCountReport report);
@@ -16,6 +17,7 @@ abstract class ScrapRegrindRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteToolsCountReport(String id);
 
   // Machine Health Report
   Future<void> submitMachineHealthReport(ScrapMachineHealthReport report);
@@ -29,6 +31,7 @@ abstract class ScrapRegrindRepository {
     DateTime date,
     String shift,
   );
+  Future<void> deleteMachineHealthReport(String id);
 
   // Production Details Report
   Future<void> submitProductionDetailsReport(
@@ -44,6 +47,7 @@ abstract class ScrapRegrindRepository {
     DateTime date,
     String shift,
   );
+  Future<void> deleteProductionDetailsReport(String id);
 
   // Production Weight Report
   Future<void> submitProductionWeightReport(ScrapProductionWeightReport report);
@@ -52,6 +56,7 @@ abstract class ScrapRegrindRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteProductionWeightReport(String id);
 
   // Report Writing Efficiency
   Future<List<ScrapReportWritingEfficiency>> getReportWritingEfficiency({
@@ -59,6 +64,7 @@ abstract class ScrapRegrindRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteWritingEfficiency(String id);
 
   // Scrap Quality Report
   Future<void> submitScrapQualityReport(ScrapQualityReport report);
@@ -67,6 +73,7 @@ abstract class ScrapRegrindRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteScrapQualityReport(String id);
 
   // Salary
   Future<ScrapSalaryWeightages> getSalaryWeightages();

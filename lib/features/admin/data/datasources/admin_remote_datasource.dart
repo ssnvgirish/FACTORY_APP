@@ -389,23 +389,9 @@ class AdminRemoteDatasource {
             )
             .execute();
       case MasterTableType.frameSections:
-        await _connector
-            .updateMasterFrameSection(
-              id: UpdateMasterFrameSectionVariablesId(id: item.id),
-              name: item.value,
-              sortOrder: item.sortOrder,
-              isActive: item.isActive,
-            )
-            .execute();
+        await _updateFrameSection(item);
       case MasterTableType.frameDensities:
-        await _connector
-            .updateMasterFrameDensity(
-              id: UpdateMasterFrameDensityVariablesId(id: item.id),
-              value: item.value,
-              sortOrder: item.sortOrder,
-              isActive: item.isActive,
-            )
-            .execute();
+        await _updateFrameDensity(item);
       case MasterTableType.frameColors:
         await _connector
             .updateMasterFrameColor(
@@ -416,23 +402,9 @@ class AdminRemoteDatasource {
             )
             .execute();
       case MasterTableType.sheetThicknesses:
-        await _connector
-            .updateMasterSheetThickness(
-              id: UpdateMasterSheetThicknessVariablesId(id: item.id),
-              value: item.value,
-              sortOrder: item.sortOrder,
-              isActive: item.isActive,
-            )
-            .execute();
+        await _updateSheetThickness(item);
       case MasterTableType.sheetDensities:
-        await _connector
-            .updateMasterSheetDensity(
-              id: UpdateMasterSheetDensityVariablesId(id: item.id),
-              value: item.value,
-              sortOrder: item.sortOrder,
-              isActive: item.isActive,
-            )
-            .execute();
+        await _updateSheetDensity(item);
       case MasterTableType.sheetColors:
         await _connector
             .updateMasterSheetColor(
@@ -845,6 +817,229 @@ class AdminRemoteDatasource {
     await _connector
         .deleteMasterSalaryWeightage(
           id: DeleteMasterSalaryWeightageVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  /// Master natural keys are FK parents of weight/target tables. Renames are
+  /// done as insert → retarget children → delete old row so FK checks pass
+  /// without requiring ON UPDATE CASCADE on the live DB.
+  Future<void> _updateFrameSection(MasterTableItem item) async {
+    final old = (await getMasterTable(
+      MasterTableType.frameSections,
+    )).where((e) => e.id == item.id).firstOrNull;
+    if (old == null) return;
+    if (old.value == item.value) {
+      await _connector
+          .updateMasterFrameSection(
+            id: UpdateMasterFrameSectionVariablesId(id: item.id),
+            name: item.value,
+            sortOrder: item.sortOrder,
+            isActive: item.isActive,
+          )
+          .execute();
+      return;
+    }
+
+    await _connector
+        .insertMasterFrameSection(
+          name: item.value,
+          sortOrder: item.sortOrder,
+          isActive: item.isActive,
+        )
+        .execute();
+    final weights = await getWeightTable(MasterLookupType.frameWeights);
+    for (final w in weights.where((e) => e.key1 == old.value)) {
+      await updateWeightEntry(
+        MasterLookupType.frameWeights,
+        MasterWeightEntry(
+          id: w.id,
+          key1: item.value,
+          key2: w.key2,
+          weight: w.weight,
+        ),
+      );
+    }
+    final targets = await getTargetTable(MasterLookupType.frameTargets);
+    for (final t in targets.where((e) => e.key == old.value)) {
+      await updateTargetEntry(
+        MasterLookupType.frameTargets,
+        MasterTargetEntry(
+          id: t.id,
+          key: item.value,
+          density: t.density,
+          target: t.target,
+        ),
+      );
+    }
+    await _connector
+        .deleteMasterFrameSection(
+          id: DeleteMasterFrameSectionVariablesId(id: item.id),
+        )
+        .execute();
+  }
+
+  Future<void> _updateFrameDensity(MasterTableItem item) async {
+    final old = (await getMasterTable(
+      MasterTableType.frameDensities,
+    )).where((e) => e.id == item.id).firstOrNull;
+    if (old == null) return;
+    if (old.value == item.value) {
+      await _connector
+          .updateMasterFrameDensity(
+            id: UpdateMasterFrameDensityVariablesId(id: item.id),
+            value: item.value,
+            sortOrder: item.sortOrder,
+            isActive: item.isActive,
+          )
+          .execute();
+      return;
+    }
+
+    await _connector
+        .insertMasterFrameDensity(
+          value: item.value,
+          sortOrder: item.sortOrder,
+          isActive: item.isActive,
+        )
+        .execute();
+    final weights = await getWeightTable(MasterLookupType.frameWeights);
+    for (final w in weights.where((e) => e.key2 == old.value)) {
+      await updateWeightEntry(
+        MasterLookupType.frameWeights,
+        MasterWeightEntry(
+          id: w.id,
+          key1: w.key1,
+          key2: item.value,
+          weight: w.weight,
+        ),
+      );
+    }
+    final targets = await getTargetTable(MasterLookupType.frameTargets);
+    for (final t in targets.where((e) => e.density == old.value)) {
+      await updateTargetEntry(
+        MasterLookupType.frameTargets,
+        MasterTargetEntry(
+          id: t.id,
+          key: t.key,
+          density: item.value,
+          target: t.target,
+        ),
+      );
+    }
+    await _connector
+        .deleteMasterFrameDensity(
+          id: DeleteMasterFrameDensityVariablesId(id: item.id),
+        )
+        .execute();
+  }
+
+  Future<void> _updateSheetThickness(MasterTableItem item) async {
+    final old = (await getMasterTable(
+      MasterTableType.sheetThicknesses,
+    )).where((e) => e.id == item.id).firstOrNull;
+    if (old == null) return;
+    if (old.value == item.value) {
+      await _connector
+          .updateMasterSheetThickness(
+            id: UpdateMasterSheetThicknessVariablesId(id: item.id),
+            value: item.value,
+            sortOrder: item.sortOrder,
+            isActive: item.isActive,
+          )
+          .execute();
+      return;
+    }
+
+    await _connector
+        .insertMasterSheetThickness(
+          value: item.value,
+          sortOrder: item.sortOrder,
+          isActive: item.isActive,
+        )
+        .execute();
+    final weights = await getWeightTable(MasterLookupType.sheetWeights);
+    for (final w in weights.where((e) => e.key1 == old.value)) {
+      await updateWeightEntry(
+        MasterLookupType.sheetWeights,
+        MasterWeightEntry(
+          id: w.id,
+          key1: item.value,
+          key2: w.key2,
+          weight: w.weight,
+        ),
+      );
+    }
+    final targets = await getTargetTable(MasterLookupType.sheetTargets);
+    for (final t in targets.where((e) => e.key == old.value)) {
+      await updateTargetEntry(
+        MasterLookupType.sheetTargets,
+        MasterTargetEntry(
+          id: t.id,
+          key: item.value,
+          density: t.density,
+          target: t.target,
+        ),
+      );
+    }
+    await _connector
+        .deleteMasterSheetThickness(
+          id: DeleteMasterSheetThicknessVariablesId(id: item.id),
+        )
+        .execute();
+  }
+
+  Future<void> _updateSheetDensity(MasterTableItem item) async {
+    final old = (await getMasterTable(
+      MasterTableType.sheetDensities,
+    )).where((e) => e.id == item.id).firstOrNull;
+    if (old == null) return;
+    if (old.value == item.value) {
+      await _connector
+          .updateMasterSheetDensity(
+            id: UpdateMasterSheetDensityVariablesId(id: item.id),
+            value: item.value,
+            sortOrder: item.sortOrder,
+            isActive: item.isActive,
+          )
+          .execute();
+      return;
+    }
+
+    await _connector
+        .insertMasterSheetDensity(
+          value: item.value,
+          sortOrder: item.sortOrder,
+          isActive: item.isActive,
+        )
+        .execute();
+    final weights = await getWeightTable(MasterLookupType.sheetWeights);
+    for (final w in weights.where((e) => e.key2 == old.value)) {
+      await updateWeightEntry(
+        MasterLookupType.sheetWeights,
+        MasterWeightEntry(
+          id: w.id,
+          key1: w.key1,
+          key2: item.value,
+          weight: w.weight,
+        ),
+      );
+    }
+    final targets = await getTargetTable(MasterLookupType.sheetTargets);
+    for (final t in targets.where((e) => e.density == old.value)) {
+      await updateTargetEntry(
+        MasterLookupType.sheetTargets,
+        MasterTargetEntry(
+          id: t.id,
+          key: t.key,
+          density: item.value,
+          target: t.target,
+        ),
+      );
+    }
+    await _connector
+        .deleteMasterSheetDensity(
+          id: DeleteMasterSheetDensityVariablesId(id: item.id),
         )
         .execute();
   }

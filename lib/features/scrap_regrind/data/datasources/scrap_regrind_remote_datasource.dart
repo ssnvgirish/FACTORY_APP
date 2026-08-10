@@ -11,6 +11,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteCleaningReport(String id);
 
   // Tools Count Report
   Future<void> submitToolsCountReport(ScrapToolsCountReport report);
@@ -19,6 +20,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteToolsCountReport(String id);
 
   // Machine Health Report
   Future<void> submitMachineHealthReport(ScrapMachineHealthReport report);
@@ -32,6 +34,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime date,
     String shift,
   );
+  Future<void> deleteMachineHealthReport(String id);
 
   // Production Details Report
   Future<void> submitProductionDetailsReport(
@@ -47,6 +50,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime date,
     String shift,
   );
+  Future<void> deleteProductionDetailsReport(String id);
 
   // Production Weight Report
   Future<void> submitProductionWeightReport(ScrapProductionWeightReport report);
@@ -55,6 +59,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteProductionWeightReport(String id);
 
   // Report Writing Efficiency
   Future<List<ScrapReportWritingEfficiency>> getReportWritingEfficiency({
@@ -62,6 +67,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteWritingEfficiency(String id);
 
   // Scrap Quality Report
   Future<void> submitScrapQualityReport(ScrapQualityReport report);
@@ -70,6 +76,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteScrapQualityReport(String id);
 
   // Salary
   Future<ScrapSalaryWeightages> getSalaryWeightages();
@@ -140,6 +147,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
         .toList();
   }
 
+  @override
+  Future<void> deleteCleaningReport(String id) async {
+    await connector
+        .deleteScrapCleaningReport(
+          id: DeleteScrapCleaningReportVariablesId(id: id),
+        )
+        .execute();
+  }
+
   // ═══════════════════════════════════════
   // TOOLS COUNT REPORT
   // ═══════════════════════════════════════
@@ -183,6 +199,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteToolsCountReport(String id) async {
+    await connector
+        .deleteScrapToolsCountReport(
+          id: DeleteScrapToolsCountReportVariablesId(id: id),
+        )
+        .execute();
   }
 
   // ═══════════════════════════════════════
@@ -284,6 +309,11 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     );
   }
 
+  @override
+  Future<void> deleteMachineHealthReport(String id) async {
+    await connector.deleteScrapMachineHealthReport(id: id).execute();
+  }
+
   // ═══════════════════════════════════════
   // PRODUCTION DETAILS REPORT
   // ═══════════════════════════════════════
@@ -376,6 +406,11 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     );
   }
 
+  @override
+  Future<void> deleteProductionDetailsReport(String id) async {
+    await connector.deleteScrapProductionDetailsReport(id: id).execute();
+  }
+
   // ═══════════════════════════════════════
   // PRODUCTION WEIGHT REPORT
   // ═══════════════════════════════════════
@@ -429,6 +464,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
         .toList();
   }
 
+  @override
+  Future<void> deleteProductionWeightReport(String id) async {
+    await connector
+        .deleteScrapProductionWeightReport(
+          id: DeleteScrapProductionWeightReportVariablesId(id: id),
+        )
+        .execute();
+  }
+
   // ═══════════════════════════════════════
   // REPORT WRITING EFFICIENCY
   // ═══════════════════════════════════════
@@ -458,6 +502,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteWritingEfficiency(String id) async {
+    await connector
+        .deleteScrapWritingEfficiency(
+          id: DeleteScrapWritingEfficiencyVariablesId(id: id),
+        )
+        .execute();
   }
 
   // ═══════════════════════════════════════
@@ -506,6 +559,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> deleteScrapQualityReport(String id) async {
+    await connector
+        .deleteScrapQualityReport(
+          id: DeleteScrapQualityReportVariablesId(id: id),
+        )
+        .execute();
   }
 
   // ═══════════════════════════════════════

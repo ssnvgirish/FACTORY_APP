@@ -92,12 +92,18 @@ class FrameCustomerRejectionListPage extends StatelessWidget {
               emptyMessage: 'No customer rejection reports',
               itemBuilder: (context, report, index) {
                 return ReportCard(
+                  key: ValueKey(report.id),
                   title: report.machineNumber,
                   subtitle:
                       'Production: ${DateFormat('dd MMM yyyy').format(report.originalProductionDate)}\nRejected: ${DateFormat('dd MMM yyyy').format(report.rejectionDate)}',
                   trailing:
                       '${report.totalRejectedWeight.toStringAsFixed(1)} kg',
                   statusColor: AppTheme.errorRed,
+                  onDelete: report.id == null
+                      ? null
+                      : () => context.read<FrameReportsBloc>().add(
+                          DeleteCustomerRejectionReport(report.id!),
+                        ),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(

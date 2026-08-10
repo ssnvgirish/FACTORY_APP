@@ -60,12 +60,18 @@ class SheetCleaningReportListPage extends StatelessWidget {
                 emptyMessage: 'No cleaning reports yet',
                 itemBuilder: (context, r, i) {
                   return ReportCard(
+                    key: ValueKey(r.id),
                     title: r.machineNumber,
                     subtitle: DateFormat('dd MMM yyyy').format(r.date),
                     trailing: '${r.percentage.toStringAsFixed(1)}%',
                     statusColor: r.percentage >= 80
                         ? AppTheme.successGreen
                         : AppTheme.errorRed,
+                    onDelete: r.id == null
+                        ? null
+                        : () => context.read<SheetReportsBloc>().add(
+                              DeleteSheetCleaningReport(r.id!),
+                            ),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(

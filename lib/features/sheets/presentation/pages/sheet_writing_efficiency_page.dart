@@ -48,6 +48,7 @@ class SheetWritingEfficiencyPage extends StatelessWidget {
               emptyMessage: 'No writing efficiency records yet',
               itemBuilder: (context, record, index) {
                 return ReportCard(
+                  key: ValueKey(record.id),
                   title: record.machineNumber,
                   subtitle:
                       '${DateFormat('dd MMM yyyy').format(record.date)} — ${record.shift}',
@@ -57,6 +58,11 @@ class SheetWritingEfficiencyPage extends StatelessWidget {
                       : record.score >= 2
                       ? AppTheme.warningYellow
                       : AppTheme.errorRed,
+                  onDelete: record.id == null
+                      ? null
+                      : () => context.read<SheetReportsBloc>().add(
+                            DeleteSheetWritingEfficiency(record.id!),
+                          ),
                 );
               },
             );

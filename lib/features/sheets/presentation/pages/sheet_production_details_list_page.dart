@@ -63,10 +63,16 @@ class SheetProductionDetailsListPage extends StatelessWidget {
         emptyMessage: 'No sheet production reports yet',
         itemBuilder: (context, r, i) {
           return ReportCard(
+            key: ValueKey(r.id),
             title: '${r.machineNumber} — ${r.shift}',
             subtitle:
                 '${DateFormat('dd MMM yyyy').format(r.date)} — ${r.lineItems.length} items',
             trailing: '${r.totalRunningFeet.toStringAsFixed(1)} ft',
+            onDelete: r.id == null
+                ? null
+                : () => context.read<SheetReportsBloc>().add(
+                      DeleteSheetProductionDetailsReport(r.id!),
+                    ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

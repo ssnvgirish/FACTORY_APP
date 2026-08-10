@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.ListMasterMachines().execute();
-DefaultConnector.instance.InsertMasterMachine(insertMasterMachineVariables).execute();
-DefaultConnector.instance.UpdateMasterMachine(updateMasterMachineVariables).execute();
-DefaultConnector.instance.DeleteMasterMachine(deleteMasterMachineVariables).execute();
-DefaultConnector.instance.ListMasterShifts().execute();
-DefaultConnector.instance.InsertMasterShift(insertMasterShiftVariables).execute();
-DefaultConnector.instance.UpdateMasterShift(updateMasterShiftVariables).execute();
-DefaultConnector.instance.DeleteMasterShift(deleteMasterShiftVariables).execute();
-DefaultConnector.instance.ListMasterRoles().execute();
-DefaultConnector.instance.InsertMasterRole(insertMasterRoleVariables).execute();
+DefaultConnector.instance.CreateFrameCleaningReport(createFrameCleaningReportVariables).execute();
+DefaultConnector.instance.ListFrameCleaningReports(listFrameCleaningReportsVariables).execute();
+DefaultConnector.instance.CreateFrameToolsCountReport(createFrameToolsCountReportVariables).execute();
+DefaultConnector.instance.ListFrameToolsCountReports(listFrameToolsCountReportsVariables).execute();
+DefaultConnector.instance.CreateFrameHealthReport(createFrameHealthReportVariables).execute();
+DefaultConnector.instance.CreateFrameMaintenanceEntry(createFrameMaintenanceEntryVariables).execute();
+DefaultConnector.instance.ListFrameHealthReports(listFrameHealthReportsVariables).execute();
+DefaultConnector.instance.CreateFrameProductionDetailsReport(createFrameProductionDetailsReportVariables).execute();
+DefaultConnector.instance.CreateFrameProductionLineItem(createFrameProductionLineItemVariables).execute();
+DefaultConnector.instance.ListFrameProductionDetailsReports(listFrameProductionDetailsReportsVariables).execute();
 
 ```
 
@@ -23,7 +23,7 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.ListFrameCustomerRejectionReports({ ... })
+await DefaultConnector.instance.ListSheetCustomerRejectionReports({ ... })
 .machineNumber(...)
 .execute();
 ```

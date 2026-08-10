@@ -21,6 +21,609 @@ DefaultConnector.instance.dataConnect.useDataConnectEmulator(host, port);
 You can also call queries and mutations by using the connector class.
 ## Queries
 
+### ListFrameCleaningReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameCleaningReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameCleaningReports, we created `ListFrameCleaningReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameCleaningReportsVariablesBuilder {
+  ...
+ 
+  ListFrameCleaningReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameCleaningReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameCleaningReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameCleaningReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameCleaningReportsData, ListFrameCleaningReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameCleaningReports();
+ListFrameCleaningReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameCleaningReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameToolsCountReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameToolsCountReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameToolsCountReports, we created `ListFrameToolsCountReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameToolsCountReportsVariablesBuilder {
+  ...
+ 
+  ListFrameToolsCountReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameToolsCountReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameToolsCountReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameToolsCountReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameToolsCountReportsData, ListFrameToolsCountReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameToolsCountReports();
+ListFrameToolsCountReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameToolsCountReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameHealthReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameHealthReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameHealthReports, we created `ListFrameHealthReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameHealthReportsVariablesBuilder {
+  ...
+ 
+  ListFrameHealthReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameHealthReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameHealthReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameHealthReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameHealthReportsData, ListFrameHealthReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameHealthReports();
+ListFrameHealthReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameHealthReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameProductionDetailsReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameProductionDetailsReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameProductionDetailsReports, we created `ListFrameProductionDetailsReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameProductionDetailsReportsVariablesBuilder {
+  ...
+ 
+  ListFrameProductionDetailsReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameProductionDetailsReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameProductionDetailsReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameProductionDetailsReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameProductionDetailsReportsData, ListFrameProductionDetailsReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameProductionDetailsReports();
+ListFrameProductionDetailsReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameProductionDetailsReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### GetFrameProductionDetailsReport
+#### Required Arguments
+```dart
+String machineNumber = ...;
+DateTime date = ...;
+String shift = ...;
+DefaultConnector.instance.getFrameProductionDetailsReport(
+  machineNumber: machineNumber,
+  date: date,
+  shift: shift,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<GetFrameProductionDetailsReportData, GetFrameProductionDetailsReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.getFrameProductionDetailsReport(
+  machineNumber: machineNumber,
+  date: date,
+  shift: shift,
+);
+GetFrameProductionDetailsReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String machineNumber = ...;
+DateTime date = ...;
+String shift = ...;
+
+final ref = DefaultConnector.instance.getFrameProductionDetailsReport(
+  machineNumber: machineNumber,
+  date: date,
+  shift: shift,
+).ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameProductionWeightReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameProductionWeightReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameProductionWeightReports, we created `ListFrameProductionWeightReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameProductionWeightReportsVariablesBuilder {
+  ...
+ 
+  ListFrameProductionWeightReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameProductionWeightReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameProductionWeightReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameProductionWeightReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameProductionWeightReportsData, ListFrameProductionWeightReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameProductionWeightReports();
+ListFrameProductionWeightReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameProductionWeightReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameShiftPackingReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameShiftPackingReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameShiftPackingReports, we created `ListFrameShiftPackingReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameShiftPackingReportsVariablesBuilder {
+  ...
+ 
+  ListFrameShiftPackingReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameShiftPackingReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameShiftPackingReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameShiftPackingReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameShiftPackingReportsData, ListFrameShiftPackingReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameShiftPackingReports();
+ListFrameShiftPackingReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameShiftPackingReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameWritingEfficiency
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameWritingEfficiency().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameWritingEfficiency, we created `ListFrameWritingEfficiencyBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameWritingEfficiencyVariablesBuilder {
+  ...
+ 
+  ListFrameWritingEfficiencyVariablesBuilder operatorId(String? t) {
+   _operatorId.value = t;
+   return this;
+  }
+  ListFrameWritingEfficiencyVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameWritingEfficiencyVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameWritingEfficiency()
+.operatorId(operatorId)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameWritingEfficiencyData, ListFrameWritingEfficiencyVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameWritingEfficiency();
+ListFrameWritingEfficiencyData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameWritingEfficiency().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListFrameCustomerRejectionReports
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.listFrameCustomerRejectionReports().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListFrameCustomerRejectionReports, we created `ListFrameCustomerRejectionReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListFrameCustomerRejectionReportsVariablesBuilder {
+  ...
+ 
+  ListFrameCustomerRejectionReportsVariablesBuilder machineNumber(String? t) {
+   _machineNumber.value = t;
+   return this;
+  }
+  ListFrameCustomerRejectionReportsVariablesBuilder startDate(DateTime? t) {
+   _startDate.value = t;
+   return this;
+  }
+  ListFrameCustomerRejectionReportsVariablesBuilder endDate(DateTime? t) {
+   _endDate.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.listFrameCustomerRejectionReports()
+.machineNumber(machineNumber)
+.startDate(startDate)
+.endDate(endDate)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListFrameCustomerRejectionReportsData, ListFrameCustomerRejectionReportsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.listFrameCustomerRejectionReports();
+ListFrameCustomerRejectionReportsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.listFrameCustomerRejectionReports().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### ListMasterMachines
 #### Required Arguments
 ```dart
@@ -2334,296 +2937,35 @@ ref.execute();
 ref.subscribe(...);
 ```
 
+## Mutations
 
-### ListFrameCleaningReports
+### CreateFrameCleaningReport
 #### Required Arguments
 ```dart
-// No required arguments
-DefaultConnector.instance.listFrameCleaningReports().execute();
-```
-
-#### Optional Arguments
-We return a builder for each query. For ListFrameCleaningReports, we created `ListFrameCleaningReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListFrameCleaningReportsVariablesBuilder {
-  ...
- 
-  ListFrameCleaningReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameCleaningReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameCleaningReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
-   return this;
-  }
-
-  ...
-}
-DefaultConnector.instance.listFrameCleaningReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
-.execute();
-```
-
-#### Return Type
-`execute()` returns a `QueryResult<ListFrameCleaningReportsData, ListFrameCleaningReportsVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameCleaningReports();
-ListFrameCleaningReportsData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-final ref = DefaultConnector.instance.listFrameCleaningReports().ref();
-ref.execute();
-
-ref.subscribe(...);
-```
-
-
-### ListFrameToolsCountReports
-#### Required Arguments
-```dart
-// No required arguments
-DefaultConnector.instance.listFrameToolsCountReports().execute();
-```
-
-#### Optional Arguments
-We return a builder for each query. For ListFrameToolsCountReports, we created `ListFrameToolsCountReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListFrameToolsCountReportsVariablesBuilder {
-  ...
- 
-  ListFrameToolsCountReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameToolsCountReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameToolsCountReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
-   return this;
-  }
-
-  ...
-}
-DefaultConnector.instance.listFrameToolsCountReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
-.execute();
-```
-
-#### Return Type
-`execute()` returns a `QueryResult<ListFrameToolsCountReportsData, ListFrameToolsCountReportsVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameToolsCountReports();
-ListFrameToolsCountReportsData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-final ref = DefaultConnector.instance.listFrameToolsCountReports().ref();
-ref.execute();
-
-ref.subscribe(...);
-```
-
-
-### ListFrameHealthReports
-#### Required Arguments
-```dart
-// No required arguments
-DefaultConnector.instance.listFrameHealthReports().execute();
-```
-
-#### Optional Arguments
-We return a builder for each query. For ListFrameHealthReports, we created `ListFrameHealthReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListFrameHealthReportsVariablesBuilder {
-  ...
- 
-  ListFrameHealthReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameHealthReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameHealthReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
-   return this;
-  }
-
-  ...
-}
-DefaultConnector.instance.listFrameHealthReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
-.execute();
-```
-
-#### Return Type
-`execute()` returns a `QueryResult<ListFrameHealthReportsData, ListFrameHealthReportsVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameHealthReports();
-ListFrameHealthReportsData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-final ref = DefaultConnector.instance.listFrameHealthReports().ref();
-ref.execute();
-
-ref.subscribe(...);
-```
-
-
-### ListFrameProductionDetailsReports
-#### Required Arguments
-```dart
-// No required arguments
-DefaultConnector.instance.listFrameProductionDetailsReports().execute();
-```
-
-#### Optional Arguments
-We return a builder for each query. For ListFrameProductionDetailsReports, we created `ListFrameProductionDetailsReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListFrameProductionDetailsReportsVariablesBuilder {
-  ...
- 
-  ListFrameProductionDetailsReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameProductionDetailsReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameProductionDetailsReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
-   return this;
-  }
-
-  ...
-}
-DefaultConnector.instance.listFrameProductionDetailsReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
-.execute();
-```
-
-#### Return Type
-`execute()` returns a `QueryResult<ListFrameProductionDetailsReportsData, ListFrameProductionDetailsReportsVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameProductionDetailsReports();
-ListFrameProductionDetailsReportsData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-final ref = DefaultConnector.instance.listFrameProductionDetailsReports().ref();
-ref.execute();
-
-ref.subscribe(...);
-```
-
-
-### GetFrameProductionDetailsReport
-#### Required Arguments
-```dart
-String machineNumber = ...;
 DateTime date = ...;
-String shift = ...;
-DefaultConnector.instance.getFrameProductionDetailsReport(
-  machineNumber: machineNumber,
+String machineNumber = ...;
+int machineCondition = ...;
+int groundCondition = ...;
+int mouldCondition = ...;
+int totalScore = ...;
+double percentage = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameCleaningReport(
   date: date,
-  shift: shift,
+  machineNumber: machineNumber,
+  machineCondition: machineCondition,
+  groundCondition: groundCondition,
+  mouldCondition: mouldCondition,
+  totalScore: totalScore,
+  percentage: percentage,
+  createdBy: createdBy,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `QueryResult<GetFrameProductionDetailsReportData, GetFrameProductionDetailsReportVariables>`
+`execute()` returns a `OperationResult<CreateFrameCleaningReportData, CreateFrameCleaningReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -2633,17 +2975,17 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.getFrameProductionDetailsReport(
-  machineNumber: machineNumber,
+final result = await DefaultConnector.instance.createFrameCleaningReport(
   date: date,
-  shift: shift,
+  machineNumber: machineNumber,
+  machineCondition: machineCondition,
+  groundCondition: groundCondition,
+  mouldCondition: mouldCondition,
+  totalScore: totalScore,
+  percentage: percentage,
+  createdBy: createdBy,
 );
-GetFrameProductionDetailsReportData data = result.data;
+CreateFrameCleaningReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -2651,59 +2993,52 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-String machineNumber = ...;
 DateTime date = ...;
-String shift = ...;
+String machineNumber = ...;
+int machineCondition = ...;
+int groundCondition = ...;
+int mouldCondition = ...;
+int totalScore = ...;
+double percentage = ...;
+String createdBy = ...;
 
-final ref = DefaultConnector.instance.getFrameProductionDetailsReport(
-  machineNumber: machineNumber,
+final ref = DefaultConnector.instance.createFrameCleaningReport(
   date: date,
-  shift: shift,
+  machineNumber: machineNumber,
+  machineCondition: machineCondition,
+  groundCondition: groundCondition,
+  mouldCondition: mouldCondition,
+  totalScore: totalScore,
+  percentage: percentage,
+  createdBy: createdBy,
 ).ref();
 ref.execute();
-
-ref.subscribe(...);
 ```
 
 
-### ListFrameProductionWeightReports
+### CreateFrameToolsCountReport
 #### Required Arguments
 ```dart
-// No required arguments
-DefaultConnector.instance.listFrameProductionWeightReports().execute();
+DateTime date = ...;
+String machineNumber = ...;
+int totalToolsGiven = ...;
+int totalToolsAvailable = ...;
+double percentageAvailable = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameToolsCountReport(
+  date: date,
+  machineNumber: machineNumber,
+  totalToolsGiven: totalToolsGiven,
+  totalToolsAvailable: totalToolsAvailable,
+  percentageAvailable: percentageAvailable,
+  createdBy: createdBy,
+).execute();
 ```
 
-#### Optional Arguments
-We return a builder for each query. For ListFrameProductionWeightReports, we created `ListFrameProductionWeightReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListFrameProductionWeightReportsVariablesBuilder {
-  ...
- 
-  ListFrameProductionWeightReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameProductionWeightReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameProductionWeightReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
-   return this;
-  }
 
-  ...
-}
-DefaultConnector.instance.listFrameProductionWeightReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
-.execute();
-```
 
 #### Return Type
-`execute()` returns a `QueryResult<ListFrameProductionWeightReportsData, ListFrameProductionWeightReportsVariables>`
+`execute()` returns a `OperationResult<CreateFrameToolsCountReportData, CreateFrameToolsCountReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -2713,13 +3048,15 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameProductionWeightReports();
-ListFrameProductionWeightReportsData data = result.data;
+final result = await DefaultConnector.instance.createFrameToolsCountReport(
+  date: date,
+  machineNumber: machineNumber,
+  totalToolsGiven: totalToolsGiven,
+  totalToolsAvailable: totalToolsAvailable,
+  percentageAvailable: percentageAvailable,
+  createdBy: createdBy,
+);
+CreateFrameToolsCountReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -2727,51 +3064,68 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-final ref = DefaultConnector.instance.listFrameProductionWeightReports().ref();
-ref.execute();
+DateTime date = ...;
+String machineNumber = ...;
+int totalToolsGiven = ...;
+int totalToolsAvailable = ...;
+double percentageAvailable = ...;
+String createdBy = ...;
 
-ref.subscribe(...);
+final ref = DefaultConnector.instance.createFrameToolsCountReport(
+  date: date,
+  machineNumber: machineNumber,
+  totalToolsGiven: totalToolsGiven,
+  totalToolsAvailable: totalToolsAvailable,
+  percentageAvailable: percentageAvailable,
+  createdBy: createdBy,
+).ref();
+ref.execute();
 ```
 
 
-### ListFrameShiftPackingReports
+### CreateFrameHealthReport
 #### Required Arguments
 ```dart
-// No required arguments
-DefaultConnector.instance.listFrameShiftPackingReports().execute();
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+double totalMaintenanceDurationHours = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameHealthReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
+  createdBy: createdBy,
+).execute();
 ```
 
 #### Optional Arguments
-We return a builder for each query. For ListFrameShiftPackingReports, we created `ListFrameShiftPackingReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+We return a builder for each query. For CreateFrameHealthReport, we created `CreateFrameHealthReportBuilder`. For queries and mutations with optional parameters, we return a builder class.
 The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
 ```dart
-class ListFrameShiftPackingReportsVariablesBuilder {
+class CreateFrameHealthReportVariablesBuilder {
   ...
- 
-  ListFrameShiftPackingReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameShiftPackingReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameShiftPackingReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
+   CreateFrameHealthReportVariablesBuilder submittedAt(Timestamp? t) {
+   _submittedAt.value = t;
    return this;
   }
 
   ...
 }
-DefaultConnector.instance.listFrameShiftPackingReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
+DefaultConnector.instance.createFrameHealthReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
+  createdBy: createdBy,
+)
+.submittedAt(submittedAt)
 .execute();
 ```
 
 #### Return Type
-`execute()` returns a `QueryResult<ListFrameShiftPackingReportsData, ListFrameShiftPackingReportsVariables>`
+`execute()` returns a `OperationResult<CreateFrameHealthReportData, CreateFrameHealthReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -2781,13 +3135,14 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameShiftPackingReports();
-ListFrameShiftPackingReportsData data = result.data;
+final result = await DefaultConnector.instance.createFrameHealthReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
+  createdBy: createdBy,
+);
+CreateFrameHealthReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -2795,51 +3150,48 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-final ref = DefaultConnector.instance.listFrameShiftPackingReports().ref();
-ref.execute();
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+double totalMaintenanceDurationHours = ...;
+String createdBy = ...;
 
-ref.subscribe(...);
+final ref = DefaultConnector.instance.createFrameHealthReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
+  createdBy: createdBy,
+).ref();
+ref.execute();
 ```
 
 
-### ListFrameWritingEfficiency
+### CreateFrameMaintenanceEntry
 #### Required Arguments
 ```dart
-// No required arguments
-DefaultConnector.instance.listFrameWritingEfficiency().execute();
+CreateFrameMaintenanceEntryVariablesReportId reportId = ...;
+String maintenanceItem = ...;
+Timestamp startTime = ...;
+Timestamp endTime = ...;
+String personDoingMaintenance = ...;
+String description = ...;
+double durationHours = ...;
+DefaultConnector.instance.createFrameMaintenanceEntry(
+  reportId: reportId,
+  maintenanceItem: maintenanceItem,
+  startTime: startTime,
+  endTime: endTime,
+  personDoingMaintenance: personDoingMaintenance,
+  description: description,
+  durationHours: durationHours,
+).execute();
 ```
 
-#### Optional Arguments
-We return a builder for each query. For ListFrameWritingEfficiency, we created `ListFrameWritingEfficiencyBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListFrameWritingEfficiencyVariablesBuilder {
-  ...
- 
-  ListFrameWritingEfficiencyVariablesBuilder operatorId(String? t) {
-   _operatorId.value = t;
-   return this;
-  }
-  ListFrameWritingEfficiencyVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameWritingEfficiencyVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
-   return this;
-  }
 
-  ...
-}
-DefaultConnector.instance.listFrameWritingEfficiency()
-.operatorId(operatorId)
-.startDate(startDate)
-.endDate(endDate)
-.execute();
-```
 
 #### Return Type
-`execute()` returns a `QueryResult<ListFrameWritingEfficiencyData, ListFrameWritingEfficiencyVariables>`
+`execute()` returns a `OperationResult<CreateFrameMaintenanceEntryData, CreateFrameMaintenanceEntryVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -2849,13 +3201,16 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameWritingEfficiency();
-ListFrameWritingEfficiencyData data = result.data;
+final result = await DefaultConnector.instance.createFrameMaintenanceEntry(
+  reportId: reportId,
+  maintenanceItem: maintenanceItem,
+  startTime: startTime,
+  endTime: endTime,
+  personDoingMaintenance: personDoingMaintenance,
+  description: description,
+  durationHours: durationHours,
+);
+CreateFrameMaintenanceEntryData data = result.data;
 final ref = result.ref;
 ```
 
@@ -2863,51 +3218,73 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-final ref = DefaultConnector.instance.listFrameWritingEfficiency().ref();
-ref.execute();
+CreateFrameMaintenanceEntryVariablesReportId reportId = ...;
+String maintenanceItem = ...;
+Timestamp startTime = ...;
+Timestamp endTime = ...;
+String personDoingMaintenance = ...;
+String description = ...;
+double durationHours = ...;
 
-ref.subscribe(...);
+final ref = DefaultConnector.instance.createFrameMaintenanceEntry(
+  reportId: reportId,
+  maintenanceItem: maintenanceItem,
+  startTime: startTime,
+  endTime: endTime,
+  personDoingMaintenance: personDoingMaintenance,
+  description: description,
+  durationHours: durationHours,
+).ref();
+ref.execute();
 ```
 
 
-### ListFrameCustomerRejectionReports
+### CreateFrameProductionDetailsReport
 #### Required Arguments
 ```dart
-// No required arguments
-DefaultConnector.instance.listFrameCustomerRejectionReports().execute();
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+int totalQuantity = ...;
+double totalWeight = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameProductionDetailsReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalQuantity: totalQuantity,
+  totalWeight: totalWeight,
+  createdBy: createdBy,
+).execute();
 ```
 
 #### Optional Arguments
-We return a builder for each query. For ListFrameCustomerRejectionReports, we created `ListFrameCustomerRejectionReportsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+We return a builder for each query. For CreateFrameProductionDetailsReport, we created `CreateFrameProductionDetailsReportBuilder`. For queries and mutations with optional parameters, we return a builder class.
 The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
 ```dart
-class ListFrameCustomerRejectionReportsVariablesBuilder {
+class CreateFrameProductionDetailsReportVariablesBuilder {
   ...
- 
-  ListFrameCustomerRejectionReportsVariablesBuilder machineNumber(String? t) {
-   _machineNumber.value = t;
-   return this;
-  }
-  ListFrameCustomerRejectionReportsVariablesBuilder startDate(DateTime? t) {
-   _startDate.value = t;
-   return this;
-  }
-  ListFrameCustomerRejectionReportsVariablesBuilder endDate(DateTime? t) {
-   _endDate.value = t;
+   CreateFrameProductionDetailsReportVariablesBuilder submittedAt(Timestamp? t) {
+   _submittedAt.value = t;
    return this;
   }
 
   ...
 }
-DefaultConnector.instance.listFrameCustomerRejectionReports()
-.machineNumber(machineNumber)
-.startDate(startDate)
-.endDate(endDate)
+DefaultConnector.instance.createFrameProductionDetailsReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalQuantity: totalQuantity,
+  totalWeight: totalWeight,
+  createdBy: createdBy,
+)
+.submittedAt(submittedAt)
 .execute();
 ```
 
 #### Return Type
-`execute()` returns a `QueryResult<ListFrameCustomerRejectionReportsData, ListFrameCustomerRejectionReportsVariables>`
+`execute()` returns a `OperationResult<CreateFrameProductionDetailsReportData, CreateFrameProductionDetailsReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -2917,13 +3294,15 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-/// Result of a query request. Created to hold extra variables in the future.
-class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
-  QueryResult(super.dataConnect, super.data, super.ref);
-}
-
-final result = await DefaultConnector.instance.listFrameCustomerRejectionReports();
-ListFrameCustomerRejectionReportsData data = result.data;
+final result = await DefaultConnector.instance.createFrameProductionDetailsReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalQuantity: totalQuantity,
+  totalWeight: totalWeight,
+  createdBy: createdBy,
+);
+CreateFrameProductionDetailsReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -2931,13 +3310,932 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-final ref = DefaultConnector.instance.listFrameCustomerRejectionReports().ref();
-ref.execute();
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+int totalQuantity = ...;
+double totalWeight = ...;
+String createdBy = ...;
 
-ref.subscribe(...);
+final ref = DefaultConnector.instance.createFrameProductionDetailsReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalQuantity: totalQuantity,
+  totalWeight: totalWeight,
+  createdBy: createdBy,
+).ref();
+ref.execute();
 ```
 
-## Mutations
+
+### CreateFrameProductionLineItem
+#### Required Arguments
+```dart
+CreateFrameProductionLineItemVariablesReportId reportId = ...;
+String section = ...;
+String density = ...;
+String color = ...;
+double length = ...;
+int quantity = ...;
+double perPieceWeight = ...;
+double totalWeight = ...;
+DefaultConnector.instance.createFrameProductionLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For CreateFrameProductionLineItem, we created `CreateFrameProductionLineItemBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class CreateFrameProductionLineItemVariablesBuilder {
+  ...
+   CreateFrameProductionLineItemVariablesBuilder manualWeightPerFoot(double? t) {
+   _manualWeightPerFoot.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.createFrameProductionLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+)
+.manualWeightPerFoot(manualWeightPerFoot)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFrameProductionLineItemData, CreateFrameProductionLineItemVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFrameProductionLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+);
+CreateFrameProductionLineItemData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+CreateFrameProductionLineItemVariablesReportId reportId = ...;
+String section = ...;
+String density = ...;
+String color = ...;
+double length = ...;
+int quantity = ...;
+double perPieceWeight = ...;
+double totalWeight = ...;
+
+final ref = DefaultConnector.instance.createFrameProductionLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+).ref();
+ref.execute();
+```
+
+
+### CreateFrameProductionWeightReport
+#### Required Arguments
+```dart
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+double productionWeight = ...;
+double maintenanceWeight = ...;
+double totalProductionWeight = ...;
+double targetWeight = ...;
+double efficiencyPercentage = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameProductionWeightReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  productionWeight: productionWeight,
+  maintenanceWeight: maintenanceWeight,
+  totalProductionWeight: totalProductionWeight,
+  targetWeight: targetWeight,
+  efficiencyPercentage: efficiencyPercentage,
+  createdBy: createdBy,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFrameProductionWeightReportData, CreateFrameProductionWeightReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFrameProductionWeightReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  productionWeight: productionWeight,
+  maintenanceWeight: maintenanceWeight,
+  totalProductionWeight: totalProductionWeight,
+  targetWeight: targetWeight,
+  efficiencyPercentage: efficiencyPercentage,
+  createdBy: createdBy,
+);
+CreateFrameProductionWeightReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+double productionWeight = ...;
+double maintenanceWeight = ...;
+double totalProductionWeight = ...;
+double targetWeight = ...;
+double efficiencyPercentage = ...;
+String createdBy = ...;
+
+final ref = DefaultConnector.instance.createFrameProductionWeightReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  productionWeight: productionWeight,
+  maintenanceWeight: maintenanceWeight,
+  totalProductionWeight: totalProductionWeight,
+  targetWeight: targetWeight,
+  efficiencyPercentage: efficiencyPercentage,
+  createdBy: createdBy,
+).ref();
+ref.execute();
+```
+
+
+### CreateFrameShiftPackingReport
+#### Required Arguments
+```dart
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+double totalRejectedWeight = ...;
+double qualityAcceptancePercentage = ...;
+double packingEfficiency = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameShiftPackingReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalRejectedWeight: totalRejectedWeight,
+  qualityAcceptancePercentage: qualityAcceptancePercentage,
+  packingEfficiency: packingEfficiency,
+  createdBy: createdBy,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFrameShiftPackingReportData, CreateFrameShiftPackingReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFrameShiftPackingReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalRejectedWeight: totalRejectedWeight,
+  qualityAcceptancePercentage: qualityAcceptancePercentage,
+  packingEfficiency: packingEfficiency,
+  createdBy: createdBy,
+);
+CreateFrameShiftPackingReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+double totalRejectedWeight = ...;
+double qualityAcceptancePercentage = ...;
+double packingEfficiency = ...;
+String createdBy = ...;
+
+final ref = DefaultConnector.instance.createFrameShiftPackingReport(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalRejectedWeight: totalRejectedWeight,
+  qualityAcceptancePercentage: qualityAcceptancePercentage,
+  packingEfficiency: packingEfficiency,
+  createdBy: createdBy,
+).ref();
+ref.execute();
+```
+
+
+### CreateFramePackingLineItem
+#### Required Arguments
+```dart
+CreateFramePackingLineItemVariablesReportId reportId = ...;
+String section = ...;
+String density = ...;
+String color = ...;
+double length = ...;
+int productionQuantity = ...;
+double perPieceWeight = ...;
+int packed = ...;
+int rejectedQuality = ...;
+DefaultConnector.instance.createFramePackingLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  productionQuantity: productionQuantity,
+  perPieceWeight: perPieceWeight,
+  packed: packed,
+  rejectedQuality: rejectedQuality,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFramePackingLineItemData, CreateFramePackingLineItemVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFramePackingLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  productionQuantity: productionQuantity,
+  perPieceWeight: perPieceWeight,
+  packed: packed,
+  rejectedQuality: rejectedQuality,
+);
+CreateFramePackingLineItemData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+CreateFramePackingLineItemVariablesReportId reportId = ...;
+String section = ...;
+String density = ...;
+String color = ...;
+double length = ...;
+int productionQuantity = ...;
+double perPieceWeight = ...;
+int packed = ...;
+int rejectedQuality = ...;
+
+final ref = DefaultConnector.instance.createFramePackingLineItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  productionQuantity: productionQuantity,
+  perPieceWeight: perPieceWeight,
+  packed: packed,
+  rejectedQuality: rejectedQuality,
+).ref();
+ref.execute();
+```
+
+
+### CreateFrameWritingEfficiency
+#### Required Arguments
+```dart
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+Timestamp shiftEndTime = ...;
+int score = ...;
+String operatorId = ...;
+DefaultConnector.instance.createFrameWritingEfficiency(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  shiftEndTime: shiftEndTime,
+  score: score,
+  operatorId: operatorId,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For CreateFrameWritingEfficiency, we created `CreateFrameWritingEfficiencyBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class CreateFrameWritingEfficiencyVariablesBuilder {
+  ...
+   CreateFrameWritingEfficiencyVariablesBuilder submittedAt(Timestamp? t) {
+   _submittedAt.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.createFrameWritingEfficiency(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  shiftEndTime: shiftEndTime,
+  score: score,
+  operatorId: operatorId,
+)
+.submittedAt(submittedAt)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFrameWritingEfficiencyData, CreateFrameWritingEfficiencyVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFrameWritingEfficiency(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  shiftEndTime: shiftEndTime,
+  score: score,
+  operatorId: operatorId,
+);
+CreateFrameWritingEfficiencyData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DateTime date = ...;
+String machineNumber = ...;
+String shift = ...;
+Timestamp shiftEndTime = ...;
+int score = ...;
+String operatorId = ...;
+
+final ref = DefaultConnector.instance.createFrameWritingEfficiency(
+  date: date,
+  machineNumber: machineNumber,
+  shift: shift,
+  shiftEndTime: shiftEndTime,
+  score: score,
+  operatorId: operatorId,
+).ref();
+ref.execute();
+```
+
+
+### CreateFrameCustomerRejectionReport
+#### Required Arguments
+```dart
+DateTime originalProductionDate = ...;
+DateTime rejectionDate = ...;
+String machineNumber = ...;
+String shift = ...;
+double totalRejectedWeight = ...;
+String createdBy = ...;
+DefaultConnector.instance.createFrameCustomerRejectionReport(
+  originalProductionDate: originalProductionDate,
+  rejectionDate: rejectionDate,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalRejectedWeight: totalRejectedWeight,
+  createdBy: createdBy,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFrameCustomerRejectionReportData, CreateFrameCustomerRejectionReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFrameCustomerRejectionReport(
+  originalProductionDate: originalProductionDate,
+  rejectionDate: rejectionDate,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalRejectedWeight: totalRejectedWeight,
+  createdBy: createdBy,
+);
+CreateFrameCustomerRejectionReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DateTime originalProductionDate = ...;
+DateTime rejectionDate = ...;
+String machineNumber = ...;
+String shift = ...;
+double totalRejectedWeight = ...;
+String createdBy = ...;
+
+final ref = DefaultConnector.instance.createFrameCustomerRejectionReport(
+  originalProductionDate: originalProductionDate,
+  rejectionDate: rejectionDate,
+  machineNumber: machineNumber,
+  shift: shift,
+  totalRejectedWeight: totalRejectedWeight,
+  createdBy: createdBy,
+).ref();
+ref.execute();
+```
+
+
+### CreateFrameCustomerRejectionItem
+#### Required Arguments
+```dart
+CreateFrameCustomerRejectionItemVariablesReportId reportId = ...;
+String section = ...;
+String density = ...;
+String color = ...;
+double length = ...;
+int quantity = ...;
+double perPieceWeight = ...;
+double totalWeight = ...;
+DefaultConnector.instance.createFrameCustomerRejectionItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateFrameCustomerRejectionItemData, CreateFrameCustomerRejectionItemVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.createFrameCustomerRejectionItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+);
+CreateFrameCustomerRejectionItemData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+CreateFrameCustomerRejectionItemVariablesReportId reportId = ...;
+String section = ...;
+String density = ...;
+String color = ...;
+double length = ...;
+int quantity = ...;
+double perPieceWeight = ...;
+double totalWeight = ...;
+
+final ref = DefaultConnector.instance.createFrameCustomerRejectionItem(
+  reportId: reportId,
+  section: section,
+  density: density,
+  color: color,
+  length: length,
+  quantity: quantity,
+  perPieceWeight: perPieceWeight,
+  totalWeight: totalWeight,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameCleaningReport
+#### Required Arguments
+```dart
+DeleteFrameCleaningReportVariablesId id = ...;
+DefaultConnector.instance.deleteFrameCleaningReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameCleaningReportData, DeleteFrameCleaningReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameCleaningReport(
+  id: id,
+);
+DeleteFrameCleaningReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteFrameCleaningReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameCleaningReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameToolsCountReport
+#### Required Arguments
+```dart
+DeleteFrameToolsCountReportVariablesId id = ...;
+DefaultConnector.instance.deleteFrameToolsCountReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameToolsCountReportData, DeleteFrameToolsCountReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameToolsCountReport(
+  id: id,
+);
+DeleteFrameToolsCountReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteFrameToolsCountReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameToolsCountReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameHealthReport
+#### Required Arguments
+```dart
+String id = ...;
+DefaultConnector.instance.deleteFrameHealthReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameHealthReportData, DeleteFrameHealthReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameHealthReport(
+  id: id,
+);
+DeleteFrameHealthReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameHealthReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameProductionDetailsReport
+#### Required Arguments
+```dart
+String id = ...;
+DefaultConnector.instance.deleteFrameProductionDetailsReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameProductionDetailsReportData, DeleteFrameProductionDetailsReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameProductionDetailsReport(
+  id: id,
+);
+DeleteFrameProductionDetailsReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameProductionDetailsReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameProductionWeightReport
+#### Required Arguments
+```dart
+DeleteFrameProductionWeightReportVariablesId id = ...;
+DefaultConnector.instance.deleteFrameProductionWeightReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameProductionWeightReportData, DeleteFrameProductionWeightReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameProductionWeightReport(
+  id: id,
+);
+DeleteFrameProductionWeightReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteFrameProductionWeightReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameProductionWeightReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameShiftPackingReport
+#### Required Arguments
+```dart
+String id = ...;
+DefaultConnector.instance.deleteFrameShiftPackingReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameShiftPackingReportData, DeleteFrameShiftPackingReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameShiftPackingReport(
+  id: id,
+);
+DeleteFrameShiftPackingReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameShiftPackingReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameWritingEfficiency
+#### Required Arguments
+```dart
+DeleteFrameWritingEfficiencyVariablesId id = ...;
+DefaultConnector.instance.deleteFrameWritingEfficiency(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameWritingEfficiencyData, DeleteFrameWritingEfficiencyVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameWritingEfficiency(
+  id: id,
+);
+DeleteFrameWritingEfficiencyData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteFrameWritingEfficiencyVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameWritingEfficiency(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteFrameCustomerRejectionReport
+#### Required Arguments
+```dart
+String id = ...;
+DefaultConnector.instance.deleteFrameCustomerRejectionReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteFrameCustomerRejectionReportData, DeleteFrameCustomerRejectionReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteFrameCustomerRejectionReport(
+  id: id,
+);
+DeleteFrameCustomerRejectionReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = DefaultConnector.instance.deleteFrameCustomerRejectionReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
 
 ### InsertMasterMachine
 #### Required Arguments
@@ -4936,9 +6234,11 @@ ref.execute();
 #### Required Arguments
 ```dart
 String section = ...;
+String density = ...;
 double targetKgPerHour = ...;
 DefaultConnector.instance.insertMasterFrameTarget(
   section: section,
+  density: density,
   targetKgPerHour: targetKgPerHour,
 ).execute();
 ```
@@ -4958,6 +6258,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.insertMasterFrameTarget(
   section: section,
+  density: density,
   targetKgPerHour: targetKgPerHour,
 );
 InsertMasterFrameTargetData data = result.data;
@@ -4969,10 +6270,12 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String section = ...;
+String density = ...;
 double targetKgPerHour = ...;
 
 final ref = DefaultConnector.instance.insertMasterFrameTarget(
   section: section,
+  density: density,
   targetKgPerHour: targetKgPerHour,
 ).ref();
 ref.execute();
@@ -4984,10 +6287,12 @@ ref.execute();
 ```dart
 UpdateMasterFrameTargetVariablesId id = ...;
 String section = ...;
+String density = ...;
 double targetKgPerHour = ...;
 DefaultConnector.instance.updateMasterFrameTarget(
   id: id,
   section: section,
+  density: density,
   targetKgPerHour: targetKgPerHour,
 ).execute();
 ```
@@ -5008,6 +6313,7 @@ class OperationResult<Data, Variables> {
 final result = await DefaultConnector.instance.updateMasterFrameTarget(
   id: id,
   section: section,
+  density: density,
   targetKgPerHour: targetKgPerHour,
 );
 UpdateMasterFrameTargetData data = result.data;
@@ -5020,11 +6326,13 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 UpdateMasterFrameTargetVariablesId id = ...;
 String section = ...;
+String density = ...;
 double targetKgPerHour = ...;
 
 final ref = DefaultConnector.instance.updateMasterFrameTarget(
   id: id,
   section: section,
+  density: density,
   targetKgPerHour: targetKgPerHour,
 ).ref();
 ref.execute();
@@ -5077,9 +6385,11 @@ ref.execute();
 #### Required Arguments
 ```dart
 String thickness = ...;
+String density = ...;
 double targetFeetPerHour = ...;
 DefaultConnector.instance.insertMasterSheetTarget(
   thickness: thickness,
+  density: density,
   targetFeetPerHour: targetFeetPerHour,
 ).execute();
 ```
@@ -5099,6 +6409,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.insertMasterSheetTarget(
   thickness: thickness,
+  density: density,
   targetFeetPerHour: targetFeetPerHour,
 );
 InsertMasterSheetTargetData data = result.data;
@@ -5110,10 +6421,12 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String thickness = ...;
+String density = ...;
 double targetFeetPerHour = ...;
 
 final ref = DefaultConnector.instance.insertMasterSheetTarget(
   thickness: thickness,
+  density: density,
   targetFeetPerHour: targetFeetPerHour,
 ).ref();
 ref.execute();
@@ -5125,10 +6438,12 @@ ref.execute();
 ```dart
 UpdateMasterSheetTargetVariablesId id = ...;
 String thickness = ...;
+String density = ...;
 double targetFeetPerHour = ...;
 DefaultConnector.instance.updateMasterSheetTarget(
   id: id,
   thickness: thickness,
+  density: density,
   targetFeetPerHour: targetFeetPerHour,
 ).execute();
 ```
@@ -5149,6 +6464,7 @@ class OperationResult<Data, Variables> {
 final result = await DefaultConnector.instance.updateMasterSheetTarget(
   id: id,
   thickness: thickness,
+  density: density,
   targetFeetPerHour: targetFeetPerHour,
 );
 UpdateMasterSheetTargetData data = result.data;
@@ -5161,11 +6477,13 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 UpdateMasterSheetTargetVariablesId id = ...;
 String thickness = ...;
+String density = ...;
 double targetFeetPerHour = ...;
 
 final ref = DefaultConnector.instance.updateMasterSheetTarget(
   id: id,
   thickness: thickness,
+  density: density,
   targetFeetPerHour: targetFeetPerHour,
 ).ref();
 ref.execute();
@@ -6806,6 +8124,300 @@ final ref = DefaultConnector.instance.createScrapSalaryCalculation(
   multiplier: multiplier,
   fixedSalary: fixedSalary,
   calculatedSalary: calculatedSalary,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapCleaningReport
+#### Required Arguments
+```dart
+DeleteScrapCleaningReportVariablesId id = ...;
+DefaultConnector.instance.deleteScrapCleaningReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapCleaningReportData, DeleteScrapCleaningReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapCleaningReport(
+  id: id,
+);
+DeleteScrapCleaningReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteScrapCleaningReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapCleaningReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapToolsCountReport
+#### Required Arguments
+```dart
+DeleteScrapToolsCountReportVariablesId id = ...;
+DefaultConnector.instance.deleteScrapToolsCountReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapToolsCountReportData, DeleteScrapToolsCountReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapToolsCountReport(
+  id: id,
+);
+DeleteScrapToolsCountReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteScrapToolsCountReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapToolsCountReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapMachineHealthReport
+#### Required Arguments
+```dart
+String id = ...;
+DefaultConnector.instance.deleteScrapMachineHealthReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapMachineHealthReportData, DeleteScrapMachineHealthReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapMachineHealthReport(
+  id: id,
+);
+DeleteScrapMachineHealthReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapMachineHealthReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapProductionDetailsReport
+#### Required Arguments
+```dart
+String id = ...;
+DefaultConnector.instance.deleteScrapProductionDetailsReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapProductionDetailsReportData, DeleteScrapProductionDetailsReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapProductionDetailsReport(
+  id: id,
+);
+DeleteScrapProductionDetailsReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapProductionDetailsReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapProductionWeightReport
+#### Required Arguments
+```dart
+DeleteScrapProductionWeightReportVariablesId id = ...;
+DefaultConnector.instance.deleteScrapProductionWeightReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapProductionWeightReportData, DeleteScrapProductionWeightReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapProductionWeightReport(
+  id: id,
+);
+DeleteScrapProductionWeightReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteScrapProductionWeightReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapProductionWeightReport(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapWritingEfficiency
+#### Required Arguments
+```dart
+DeleteScrapWritingEfficiencyVariablesId id = ...;
+DefaultConnector.instance.deleteScrapWritingEfficiency(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapWritingEfficiencyData, DeleteScrapWritingEfficiencyVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapWritingEfficiency(
+  id: id,
+);
+DeleteScrapWritingEfficiencyData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteScrapWritingEfficiencyVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapWritingEfficiency(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### DeleteScrapQualityReport
+#### Required Arguments
+```dart
+DeleteScrapQualityReportVariablesId id = ...;
+DefaultConnector.instance.deleteScrapQualityReport(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteScrapQualityReportData, DeleteScrapQualityReportVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.deleteScrapQualityReport(
+  id: id,
+);
+DeleteScrapQualityReportData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+DeleteScrapQualityReportVariablesId id = ...;
+
+final ref = DefaultConnector.instance.deleteScrapQualityReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
@@ -13183,15 +14795,13 @@ ref.execute();
 DateTime date = ...;
 String machineNumber = ...;
 String shift = ...;
-int totalScore = ...;
-double percentage = ...;
+double totalMaintenanceDurationHours = ...;
 String createdBy = ...;
 DefaultConnector.instance.createSheetHealthReport(
   date: date,
   machineNumber: machineNumber,
   shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
   createdBy: createdBy,
 ).execute();
 ```
@@ -13213,8 +14823,7 @@ DefaultConnector.instance.createSheetHealthReport(
   date: date,
   machineNumber: machineNumber,
   shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
   createdBy: createdBy,
 )
 .submittedAt(submittedAt)
@@ -13236,8 +14845,7 @@ final result = await DefaultConnector.instance.createSheetHealthReport(
   date: date,
   machineNumber: machineNumber,
   shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
   createdBy: createdBy,
 );
 CreateSheetHealthReportData data = result.data;
@@ -13251,39 +14859,45 @@ An example of how to use the `Ref` object is shown below:
 DateTime date = ...;
 String machineNumber = ...;
 String shift = ...;
-int totalScore = ...;
-double percentage = ...;
+double totalMaintenanceDurationHours = ...;
 String createdBy = ...;
 
 final ref = DefaultConnector.instance.createSheetHealthReport(
   date: date,
   machineNumber: machineNumber,
   shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
+  totalMaintenanceDurationHours: totalMaintenanceDurationHours,
   createdBy: createdBy,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateSheetHealthRatingItem
+### CreateSheetMaintenanceEntry
 #### Required Arguments
 ```dart
-CreateSheetHealthRatingItemVariablesReportId reportId = ...;
-String item = ...;
-int rating = ...;
-DefaultConnector.instance.createSheetHealthRatingItem(
+CreateSheetMaintenanceEntryVariablesReportId reportId = ...;
+String maintenanceItem = ...;
+Timestamp startTime = ...;
+Timestamp endTime = ...;
+String personDoingMaintenance = ...;
+String description = ...;
+double durationHours = ...;
+DefaultConnector.instance.createSheetMaintenanceEntry(
   reportId: reportId,
-  item: item,
-  rating: rating,
+  maintenanceItem: maintenanceItem,
+  startTime: startTime,
+  endTime: endTime,
+  personDoingMaintenance: personDoingMaintenance,
+  description: description,
+  durationHours: durationHours,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateSheetHealthRatingItemData, CreateSheetHealthRatingItemVariables>`
+`execute()` returns a `OperationResult<CreateSheetMaintenanceEntryData, CreateSheetMaintenanceEntryVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -13293,12 +14907,16 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createSheetHealthRatingItem(
+final result = await DefaultConnector.instance.createSheetMaintenanceEntry(
   reportId: reportId,
-  item: item,
-  rating: rating,
+  maintenanceItem: maintenanceItem,
+  startTime: startTime,
+  endTime: endTime,
+  personDoingMaintenance: personDoingMaintenance,
+  description: description,
+  durationHours: durationHours,
 );
-CreateSheetHealthRatingItemData data = result.data;
+CreateSheetMaintenanceEntryData data = result.data;
 final ref = result.ref;
 ```
 
@@ -13306,14 +14924,22 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-CreateSheetHealthRatingItemVariablesReportId reportId = ...;
-String item = ...;
-int rating = ...;
+CreateSheetMaintenanceEntryVariablesReportId reportId = ...;
+String maintenanceItem = ...;
+Timestamp startTime = ...;
+Timestamp endTime = ...;
+String personDoingMaintenance = ...;
+String description = ...;
+double durationHours = ...;
 
-final ref = DefaultConnector.instance.createSheetHealthRatingItem(
+final ref = DefaultConnector.instance.createSheetMaintenanceEntry(
   reportId: reportId,
-  item: item,
-  rating: rating,
+  maintenanceItem: maintenanceItem,
+  startTime: startTime,
+  endTime: endTime,
+  personDoingMaintenance: personDoingMaintenance,
+  description: description,
+  durationHours: durationHours,
 ).ref();
 ref.execute();
 ```
@@ -14040,33 +15666,19 @@ ref.execute();
 ```
 
 
-### CreateFrameCleaningReport
+### DeleteSheetCleaningReport
 #### Required Arguments
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-int machineCondition = ...;
-int groundCondition = ...;
-int mouldCondition = ...;
-int totalScore = ...;
-double percentage = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameCleaningReport(
-  date: date,
-  machineNumber: machineNumber,
-  machineCondition: machineCondition,
-  groundCondition: groundCondition,
-  mouldCondition: mouldCondition,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
+DeleteSheetCleaningReportVariablesId id = ...;
+DefaultConnector.instance.deleteSheetCleaningReport(
+  id: id,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameCleaningReportData, CreateFrameCleaningReportVariables>`
+`execute()` returns a `OperationResult<DeleteSheetCleaningReportData, DeleteSheetCleaningReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14076,17 +15688,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameCleaningReport(
-  date: date,
-  machineNumber: machineNumber,
-  machineCondition: machineCondition,
-  groundCondition: groundCondition,
-  mouldCondition: mouldCondition,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
+final result = await DefaultConnector.instance.deleteSheetCleaningReport(
+  id: id,
 );
-CreateFrameCleaningReportData data = result.data;
+DeleteSheetCleaningReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14094,52 +15699,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-int machineCondition = ...;
-int groundCondition = ...;
-int mouldCondition = ...;
-int totalScore = ...;
-double percentage = ...;
-String createdBy = ...;
+DeleteSheetCleaningReportVariablesId id = ...;
 
-final ref = DefaultConnector.instance.createFrameCleaningReport(
-  date: date,
-  machineNumber: machineNumber,
-  machineCondition: machineCondition,
-  groundCondition: groundCondition,
-  mouldCondition: mouldCondition,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
+final ref = DefaultConnector.instance.deleteSheetCleaningReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameToolsCountReport
+### DeleteSheetToolsCountReport
 #### Required Arguments
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-int totalToolsGiven = ...;
-int totalToolsAvailable = ...;
-double percentageAvailable = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameToolsCountReport(
-  date: date,
-  machineNumber: machineNumber,
-  totalToolsGiven: totalToolsGiven,
-  totalToolsAvailable: totalToolsAvailable,
-  percentageAvailable: percentageAvailable,
-  createdBy: createdBy,
+DeleteSheetToolsCountReportVariablesId id = ...;
+DefaultConnector.instance.deleteSheetToolsCountReport(
+  id: id,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameToolsCountReportData, CreateFrameToolsCountReportVariables>`
+`execute()` returns a `OperationResult<DeleteSheetToolsCountReportData, DeleteSheetToolsCountReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14149,15 +15730,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameToolsCountReport(
-  date: date,
-  machineNumber: machineNumber,
-  totalToolsGiven: totalToolsGiven,
-  totalToolsAvailable: totalToolsAvailable,
-  percentageAvailable: percentageAvailable,
-  createdBy: createdBy,
+final result = await DefaultConnector.instance.deleteSheetToolsCountReport(
+  id: id,
 );
-CreateFrameToolsCountReportData data = result.data;
+DeleteSheetToolsCountReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14165,71 +15741,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-int totalToolsGiven = ...;
-int totalToolsAvailable = ...;
-double percentageAvailable = ...;
-String createdBy = ...;
+DeleteSheetToolsCountReportVariablesId id = ...;
 
-final ref = DefaultConnector.instance.createFrameToolsCountReport(
-  date: date,
-  machineNumber: machineNumber,
-  totalToolsGiven: totalToolsGiven,
-  totalToolsAvailable: totalToolsAvailable,
-  percentageAvailable: percentageAvailable,
-  createdBy: createdBy,
+final ref = DefaultConnector.instance.deleteSheetToolsCountReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameHealthReport
+### DeleteSheetHealthReport
 #### Required Arguments
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-int totalScore = ...;
-double percentage = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameHealthReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
+String id = ...;
+DefaultConnector.instance.deleteSheetHealthReport(
+  id: id,
 ).execute();
 ```
 
-#### Optional Arguments
-We return a builder for each query. For CreateFrameHealthReport, we created `CreateFrameHealthReportBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class CreateFrameHealthReportVariablesBuilder {
-  ...
-   CreateFrameHealthReportVariablesBuilder submittedAt(Timestamp? t) {
-   _submittedAt.value = t;
-   return this;
-  }
 
-  ...
-}
-DefaultConnector.instance.createFrameHealthReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
-)
-.submittedAt(submittedAt)
-.execute();
-```
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameHealthReportData, CreateFrameHealthReportVariables>`
+`execute()` returns a `OperationResult<DeleteSheetHealthReportData, DeleteSheetHealthReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14239,15 +15772,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameHealthReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
+final result = await DefaultConnector.instance.deleteSheetHealthReport(
+  id: id,
 );
-CreateFrameHealthReportData data = result.data;
+DeleteSheetHealthReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14255,42 +15783,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-int totalScore = ...;
-double percentage = ...;
-String createdBy = ...;
+String id = ...;
 
-final ref = DefaultConnector.instance.createFrameHealthReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalScore: totalScore,
-  percentage: percentage,
-  createdBy: createdBy,
+final ref = DefaultConnector.instance.deleteSheetHealthReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameHealthRatingItem
+### DeleteSheetProductionDetailsReport
 #### Required Arguments
 ```dart
-CreateFrameHealthRatingItemVariablesReportId reportId = ...;
-String item = ...;
-int rating = ...;
-DefaultConnector.instance.createFrameHealthRatingItem(
-  reportId: reportId,
-  item: item,
-  rating: rating,
+String id = ...;
+DefaultConnector.instance.deleteSheetProductionDetailsReport(
+  id: id,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameHealthRatingItemData, CreateFrameHealthRatingItemVariables>`
+`execute()` returns a `OperationResult<DeleteSheetProductionDetailsReportData, DeleteSheetProductionDetailsReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14300,12 +15814,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameHealthRatingItem(
-  reportId: reportId,
-  item: item,
-  rating: rating,
+final result = await DefaultConnector.instance.deleteSheetProductionDetailsReport(
+  id: id,
 );
-CreateFrameHealthRatingItemData data = result.data;
+DeleteSheetProductionDetailsReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14313,65 +15825,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-CreateFrameHealthRatingItemVariablesReportId reportId = ...;
-String item = ...;
-int rating = ...;
+String id = ...;
 
-final ref = DefaultConnector.instance.createFrameHealthRatingItem(
-  reportId: reportId,
-  item: item,
-  rating: rating,
+final ref = DefaultConnector.instance.deleteSheetProductionDetailsReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameProductionDetailsReport
+### DeleteSheetRunningFeetReport
 #### Required Arguments
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-int totalQuantity = ...;
-double totalWeight = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameProductionDetailsReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalQuantity: totalQuantity,
-  totalWeight: totalWeight,
-  createdBy: createdBy,
+DeleteSheetRunningFeetReportVariablesId id = ...;
+DefaultConnector.instance.deleteSheetRunningFeetReport(
+  id: id,
 ).execute();
 ```
 
-#### Optional Arguments
-We return a builder for each query. For CreateFrameProductionDetailsReport, we created `CreateFrameProductionDetailsReportBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class CreateFrameProductionDetailsReportVariablesBuilder {
-  ...
-   CreateFrameProductionDetailsReportVariablesBuilder submittedAt(Timestamp? t) {
-   _submittedAt.value = t;
-   return this;
-  }
 
-  ...
-}
-DefaultConnector.instance.createFrameProductionDetailsReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalQuantity: totalQuantity,
-  totalWeight: totalWeight,
-  createdBy: createdBy,
-)
-.submittedAt(submittedAt)
-.execute();
-```
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameProductionDetailsReportData, CreateFrameProductionDetailsReportVariables>`
+`execute()` returns a `OperationResult<DeleteSheetRunningFeetReportData, DeleteSheetRunningFeetReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14381,15 +15856,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameProductionDetailsReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalQuantity: totalQuantity,
-  totalWeight: totalWeight,
-  createdBy: createdBy,
+final result = await DefaultConnector.instance.deleteSheetRunningFeetReport(
+  id: id,
 );
-CreateFrameProductionDetailsReportData data = result.data;
+DeleteSheetRunningFeetReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14397,77 +15867,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-int totalQuantity = ...;
-double totalWeight = ...;
-String createdBy = ...;
+DeleteSheetRunningFeetReportVariablesId id = ...;
 
-final ref = DefaultConnector.instance.createFrameProductionDetailsReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalQuantity: totalQuantity,
-  totalWeight: totalWeight,
-  createdBy: createdBy,
+final ref = DefaultConnector.instance.deleteSheetRunningFeetReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameProductionLineItem
+### DeleteSheetShiftPackingReport
 #### Required Arguments
 ```dart
-CreateFrameProductionLineItemVariablesReportId reportId = ...;
-String section = ...;
-String density = ...;
-String color = ...;
-double length = ...;
-int quantity = ...;
-double perPieceWeight = ...;
-double totalWeight = ...;
-DefaultConnector.instance.createFrameProductionLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
+String id = ...;
+DefaultConnector.instance.deleteSheetShiftPackingReport(
+  id: id,
 ).execute();
 ```
 
-#### Optional Arguments
-We return a builder for each query. For CreateFrameProductionLineItem, we created `CreateFrameProductionLineItemBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class CreateFrameProductionLineItemVariablesBuilder {
-  ...
-   CreateFrameProductionLineItemVariablesBuilder manualWeightPerFoot(double? t) {
-   _manualWeightPerFoot.value = t;
-   return this;
-  }
 
-  ...
-}
-DefaultConnector.instance.createFrameProductionLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
-)
-.manualWeightPerFoot(manualWeightPerFoot)
-.execute();
-```
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameProductionLineItemData, CreateFrameProductionLineItemVariables>`
+`execute()` returns a `OperationResult<DeleteSheetShiftPackingReportData, DeleteSheetShiftPackingReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14477,17 +15898,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameProductionLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
+final result = await DefaultConnector.instance.deleteSheetShiftPackingReport(
+  id: id,
 );
-CreateFrameProductionLineItemData data = result.data;
+DeleteSheetShiftPackingReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14495,58 +15909,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-CreateFrameProductionLineItemVariablesReportId reportId = ...;
-String section = ...;
-String density = ...;
-String color = ...;
-double length = ...;
-int quantity = ...;
-double perPieceWeight = ...;
-double totalWeight = ...;
+String id = ...;
 
-final ref = DefaultConnector.instance.createFrameProductionLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
+final ref = DefaultConnector.instance.deleteSheetShiftPackingReport(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameProductionWeightReport
+### DeleteSheetWritingEfficiency
 #### Required Arguments
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-double productionWeight = ...;
-double maintenanceWeight = ...;
-double totalProductionWeight = ...;
-double targetWeight = ...;
-double efficiencyPercentage = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameProductionWeightReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  productionWeight: productionWeight,
-  maintenanceWeight: maintenanceWeight,
-  totalProductionWeight: totalProductionWeight,
-  targetWeight: targetWeight,
-  efficiencyPercentage: efficiencyPercentage,
-  createdBy: createdBy,
+DeleteSheetWritingEfficiencyVariablesId id = ...;
+DefaultConnector.instance.deleteSheetWritingEfficiency(
+  id: id,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameProductionWeightReportData, CreateFrameProductionWeightReportVariables>`
+`execute()` returns a `OperationResult<DeleteSheetWritingEfficiencyData, DeleteSheetWritingEfficiencyVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14556,18 +15940,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameProductionWeightReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  productionWeight: productionWeight,
-  maintenanceWeight: maintenanceWeight,
-  totalProductionWeight: totalProductionWeight,
-  targetWeight: targetWeight,
-  efficiencyPercentage: efficiencyPercentage,
-  createdBy: createdBy,
+final result = await DefaultConnector.instance.deleteSheetWritingEfficiency(
+  id: id,
 );
-CreateFrameProductionWeightReportData data = result.data;
+DeleteSheetWritingEfficiencyData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14575,56 +15951,28 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-double productionWeight = ...;
-double maintenanceWeight = ...;
-double totalProductionWeight = ...;
-double targetWeight = ...;
-double efficiencyPercentage = ...;
-String createdBy = ...;
+DeleteSheetWritingEfficiencyVariablesId id = ...;
 
-final ref = DefaultConnector.instance.createFrameProductionWeightReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  productionWeight: productionWeight,
-  maintenanceWeight: maintenanceWeight,
-  totalProductionWeight: totalProductionWeight,
-  targetWeight: targetWeight,
-  efficiencyPercentage: efficiencyPercentage,
-  createdBy: createdBy,
+final ref = DefaultConnector.instance.deleteSheetWritingEfficiency(
+  id: id,
 ).ref();
 ref.execute();
 ```
 
 
-### CreateFrameShiftPackingReport
+### DeleteSheetCustomerRejectionReport
 #### Required Arguments
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-double totalRejectedWeight = ...;
-double qualityAcceptancePercentage = ...;
-double packingEfficiency = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameShiftPackingReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalRejectedWeight: totalRejectedWeight,
-  qualityAcceptancePercentage: qualityAcceptancePercentage,
-  packingEfficiency: packingEfficiency,
-  createdBy: createdBy,
+String id = ...;
+DefaultConnector.instance.deleteSheetCustomerRejectionReport(
+  id: id,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `OperationResult<CreateFrameShiftPackingReportData, CreateFrameShiftPackingReportVariables>`
+`execute()` returns a `OperationResult<DeleteSheetCustomerRejectionReportData, DeleteSheetCustomerRejectionReportVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -14634,16 +15982,10 @@ class OperationResult<Data, Variables> {
   FirebaseDataConnect dataConnect;
 }
 
-final result = await DefaultConnector.instance.createFrameShiftPackingReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalRejectedWeight: totalRejectedWeight,
-  qualityAcceptancePercentage: qualityAcceptancePercentage,
-  packingEfficiency: packingEfficiency,
-  createdBy: createdBy,
+final result = await DefaultConnector.instance.deleteSheetCustomerRejectionReport(
+  id: id,
 );
-CreateFrameShiftPackingReportData data = result.data;
+DeleteSheetCustomerRejectionReportData data = result.data;
 final ref = result.ref;
 ```
 
@@ -14651,338 +15993,10 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-double totalRejectedWeight = ...;
-double qualityAcceptancePercentage = ...;
-double packingEfficiency = ...;
-String createdBy = ...;
+String id = ...;
 
-final ref = DefaultConnector.instance.createFrameShiftPackingReport(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalRejectedWeight: totalRejectedWeight,
-  qualityAcceptancePercentage: qualityAcceptancePercentage,
-  packingEfficiency: packingEfficiency,
-  createdBy: createdBy,
-).ref();
-ref.execute();
-```
-
-
-### CreateFramePackingLineItem
-#### Required Arguments
-```dart
-CreateFramePackingLineItemVariablesReportId reportId = ...;
-String section = ...;
-String density = ...;
-String color = ...;
-double length = ...;
-int productionQuantity = ...;
-double perPieceWeight = ...;
-int packed = ...;
-int rejectedQuality = ...;
-DefaultConnector.instance.createFramePackingLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  productionQuantity: productionQuantity,
-  perPieceWeight: perPieceWeight,
-  packed: packed,
-  rejectedQuality: rejectedQuality,
-).execute();
-```
-
-
-
-#### Return Type
-`execute()` returns a `OperationResult<CreateFramePackingLineItemData, CreateFramePackingLineItemVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-final result = await DefaultConnector.instance.createFramePackingLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  productionQuantity: productionQuantity,
-  perPieceWeight: perPieceWeight,
-  packed: packed,
-  rejectedQuality: rejectedQuality,
-);
-CreateFramePackingLineItemData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-CreateFramePackingLineItemVariablesReportId reportId = ...;
-String section = ...;
-String density = ...;
-String color = ...;
-double length = ...;
-int productionQuantity = ...;
-double perPieceWeight = ...;
-int packed = ...;
-int rejectedQuality = ...;
-
-final ref = DefaultConnector.instance.createFramePackingLineItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  productionQuantity: productionQuantity,
-  perPieceWeight: perPieceWeight,
-  packed: packed,
-  rejectedQuality: rejectedQuality,
-).ref();
-ref.execute();
-```
-
-
-### CreateFrameWritingEfficiency
-#### Required Arguments
-```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-Timestamp shiftEndTime = ...;
-int score = ...;
-String operatorId = ...;
-DefaultConnector.instance.createFrameWritingEfficiency(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  shiftEndTime: shiftEndTime,
-  score: score,
-  operatorId: operatorId,
-).execute();
-```
-
-#### Optional Arguments
-We return a builder for each query. For CreateFrameWritingEfficiency, we created `CreateFrameWritingEfficiencyBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class CreateFrameWritingEfficiencyVariablesBuilder {
-  ...
-   CreateFrameWritingEfficiencyVariablesBuilder submittedAt(Timestamp? t) {
-   _submittedAt.value = t;
-   return this;
-  }
-
-  ...
-}
-DefaultConnector.instance.createFrameWritingEfficiency(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  shiftEndTime: shiftEndTime,
-  score: score,
-  operatorId: operatorId,
-)
-.submittedAt(submittedAt)
-.execute();
-```
-
-#### Return Type
-`execute()` returns a `OperationResult<CreateFrameWritingEfficiencyData, CreateFrameWritingEfficiencyVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-final result = await DefaultConnector.instance.createFrameWritingEfficiency(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  shiftEndTime: shiftEndTime,
-  score: score,
-  operatorId: operatorId,
-);
-CreateFrameWritingEfficiencyData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-DateTime date = ...;
-String machineNumber = ...;
-String shift = ...;
-Timestamp shiftEndTime = ...;
-int score = ...;
-String operatorId = ...;
-
-final ref = DefaultConnector.instance.createFrameWritingEfficiency(
-  date: date,
-  machineNumber: machineNumber,
-  shift: shift,
-  shiftEndTime: shiftEndTime,
-  score: score,
-  operatorId: operatorId,
-).ref();
-ref.execute();
-```
-
-
-### CreateFrameCustomerRejectionReport
-#### Required Arguments
-```dart
-DateTime originalProductionDate = ...;
-DateTime rejectionDate = ...;
-String machineNumber = ...;
-String shift = ...;
-double totalRejectedWeight = ...;
-String createdBy = ...;
-DefaultConnector.instance.createFrameCustomerRejectionReport(
-  originalProductionDate: originalProductionDate,
-  rejectionDate: rejectionDate,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalRejectedWeight: totalRejectedWeight,
-  createdBy: createdBy,
-).execute();
-```
-
-
-
-#### Return Type
-`execute()` returns a `OperationResult<CreateFrameCustomerRejectionReportData, CreateFrameCustomerRejectionReportVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-final result = await DefaultConnector.instance.createFrameCustomerRejectionReport(
-  originalProductionDate: originalProductionDate,
-  rejectionDate: rejectionDate,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalRejectedWeight: totalRejectedWeight,
-  createdBy: createdBy,
-);
-CreateFrameCustomerRejectionReportData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-DateTime originalProductionDate = ...;
-DateTime rejectionDate = ...;
-String machineNumber = ...;
-String shift = ...;
-double totalRejectedWeight = ...;
-String createdBy = ...;
-
-final ref = DefaultConnector.instance.createFrameCustomerRejectionReport(
-  originalProductionDate: originalProductionDate,
-  rejectionDate: rejectionDate,
-  machineNumber: machineNumber,
-  shift: shift,
-  totalRejectedWeight: totalRejectedWeight,
-  createdBy: createdBy,
-).ref();
-ref.execute();
-```
-
-
-### CreateFrameCustomerRejectionItem
-#### Required Arguments
-```dart
-CreateFrameCustomerRejectionItemVariablesReportId reportId = ...;
-String section = ...;
-String density = ...;
-String color = ...;
-double length = ...;
-int quantity = ...;
-double perPieceWeight = ...;
-double totalWeight = ...;
-DefaultConnector.instance.createFrameCustomerRejectionItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
-).execute();
-```
-
-
-
-#### Return Type
-`execute()` returns a `OperationResult<CreateFrameCustomerRejectionItemData, CreateFrameCustomerRejectionItemVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-final result = await DefaultConnector.instance.createFrameCustomerRejectionItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
-);
-CreateFrameCustomerRejectionItemData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-CreateFrameCustomerRejectionItemVariablesReportId reportId = ...;
-String section = ...;
-String density = ...;
-String color = ...;
-double length = ...;
-int quantity = ...;
-double perPieceWeight = ...;
-double totalWeight = ...;
-
-final ref = DefaultConnector.instance.createFrameCustomerRejectionItem(
-  reportId: reportId,
-  section: section,
-  density: density,
-  color: color,
-  length: length,
-  quantity: quantity,
-  perPieceWeight: perPieceWeight,
-  totalWeight: totalWeight,
+final ref = DefaultConnector.instance.deleteSheetCustomerRejectionReport(
+  id: id,
 ).ref();
 ref.execute();
 ```

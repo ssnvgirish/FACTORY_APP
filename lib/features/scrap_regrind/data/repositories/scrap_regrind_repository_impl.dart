@@ -24,6 +24,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
   );
 
   @override
+  Future<void> deleteCleaningReport(String id) =>
+      remoteDataSource.deleteCleaningReport(id);
+
+  @override
   Future<void> submitToolsCountReport(ScrapToolsCountReport report) =>
       remoteDataSource.submitToolsCountReport(report);
 
@@ -37,6 +41,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteToolsCountReport(String id) =>
+      remoteDataSource.deleteToolsCountReport(id);
 
   @override
   Future<void> submitMachineHealthReport(ScrapMachineHealthReport report) =>
@@ -59,6 +67,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
     DateTime date,
     String shift,
   ) => remoteDataSource.getMachineHealthReport(machineNumber, date, shift);
+
+  @override
+  Future<void> deleteMachineHealthReport(String id) =>
+      remoteDataSource.deleteMachineHealthReport(id);
 
   @override
   Future<void> submitProductionDetailsReport(
@@ -84,6 +96,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
   ) => remoteDataSource.getProductionDetailsReport(machineNumber, date, shift);
 
   @override
+  Future<void> deleteProductionDetailsReport(String id) =>
+      remoteDataSource.deleteProductionDetailsReport(id);
+
+  @override
   Future<void> submitProductionWeightReport(
     ScrapProductionWeightReport report,
   ) => remoteDataSource.submitProductionWeightReport(report);
@@ -100,6 +116,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
   );
 
   @override
+  Future<void> deleteProductionWeightReport(String id) =>
+      remoteDataSource.deleteProductionWeightReport(id);
+
+  @override
   Future<List<ScrapReportWritingEfficiency>> getReportWritingEfficiency({
     String? operatorId,
     DateTime? startDate,
@@ -109,6 +129,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteWritingEfficiency(String id) =>
+      remoteDataSource.deleteWritingEfficiency(id);
 
   @override
   Future<void> submitScrapQualityReport(ScrapQualityReport report) =>
@@ -124,6 +148,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteScrapQualityReport(String id) =>
+      remoteDataSource.deleteScrapQualityReport(id);
 
   @override
   Future<ScrapSalaryWeightages> getSalaryWeightages() =>

@@ -93,12 +93,18 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
               emptyMessage: 'No sheet customer rejection reports yet',
               itemBuilder: (context, report, index) {
                 return ReportCard(
+                  key: ValueKey(report.id),
                   title: report.machineNumber,
                   subtitle:
                       'Production date: ${DateFormat('dd MMM yyyy').format(report.originalProductionDate)}',
                   trailing:
                       '${report.totalRejectedRunningFeet.toStringAsFixed(1)} ft',
                   statusColor: AppTheme.errorRed,
+                  onDelete: report.id == null
+                      ? null
+                      : () => context.read<SheetReportsBloc>().add(
+                            DeleteSheetCustomerRejectionReport(report.id!),
+                          ),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(

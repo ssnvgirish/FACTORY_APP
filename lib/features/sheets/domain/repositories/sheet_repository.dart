@@ -9,6 +9,7 @@ abstract class SheetRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteMachineCleaningReport(String id);
 
   // Tools Count
   Future<void> submitToolsCountReport(ToolsCountReport report);
@@ -17,6 +18,7 @@ abstract class SheetRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteToolsCountReport(String id);
 
   // Machine Health
   Future<void> submitMachineHealthReport(MachineHealthReport report);
@@ -26,6 +28,7 @@ abstract class SheetRepository {
     DateTime? endDate,
   });
   Future<List<MachineHealthReport>> getPendingApprovals();
+  Future<void> deleteMachineHealthReport(String id);
 
   // Production Details (sheet-specific)
   Future<void> submitProductionDetailsReport(
@@ -41,6 +44,7 @@ abstract class SheetRepository {
     DateTime date,
     String shift,
   );
+  Future<void> deleteProductionDetailsReport(String id);
 
   // Production Running Feet
   Future<void> submitProductionRunningFeetReport(
@@ -52,6 +56,7 @@ abstract class SheetRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteProductionRunningFeetReport(String id);
 
   // Shift Packing
   Future<void> submitShiftPackingReport(SheetShiftPackingReport report);
@@ -60,6 +65,7 @@ abstract class SheetRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteShiftPackingReport(String id);
 
   // Report Writing Efficiency
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
@@ -67,6 +73,7 @@ abstract class SheetRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteWritingEfficiency(String id);
 
   // Customer Rejection
   Future<void> submitCustomerRejectionReport(
@@ -77,6 +84,7 @@ abstract class SheetRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteCustomerRejectionReport(String id);
 
   // Monthly aggregates
   Future<Map<String, double>> getMonthlyAggregates(

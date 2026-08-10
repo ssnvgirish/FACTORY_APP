@@ -93,7 +93,12 @@ Future<void> initDependencies() async {
       frameTargets: sl<DropdownConfigProvider>().frameTargets,
     ),
   );
-  sl.registerFactory(() => SheetReportsBloc(sheetRepository: sl()));
+  sl.registerFactory(
+    () => SheetReportsBloc(
+      sheetRepository: sl(),
+      sheetTargets: sl<DropdownConfigProvider>().sheetTargets,
+    ),
+  );
   sl.registerFactory(() => SalaryBloc(salaryRepository: sl()));
   sl.registerFactory(
     () => AdminBloc(sl(), configProvider: sl<DropdownConfigProvider>()),

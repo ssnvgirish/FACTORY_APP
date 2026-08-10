@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/utils/calculations.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -181,6 +182,9 @@ class _SheetPackingReportPageState extends State<SheetPackingReportPage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate() &&
                         _lines.isNotEmpty) {
+                      final authState = context.read<AuthBloc>().state;
+                      if (authState is! AuthAuthenticated) return;
+
                       final report = SheetShiftPackingReport(
                         date: _selectedDate,
                         machineNumber: _selectedMachine,
@@ -189,7 +193,7 @@ class _SheetPackingReportPageState extends State<SheetPackingReportPage> {
                         totalRejectedRunningFeet: _totalRejected.toDouble(),
                         qualityAcceptancePercentage: _qualityAcceptance,
                         packingEfficiency: _packingEfficiency,
-                        createdBy: '',
+                        createdBy: authState.user.uid,
                       );
                       context.read<SheetReportsBloc>().add(
                         SubmitSheetPackingReport(report),

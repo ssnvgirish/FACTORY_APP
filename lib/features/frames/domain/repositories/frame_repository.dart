@@ -8,6 +8,7 @@ abstract class FrameRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteMachineCleaningReport(String id);
 
   // Tools Count Report
   Future<void> submitToolsCountReport(ToolsCountReport report);
@@ -16,6 +17,7 @@ abstract class FrameRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteToolsCountReport(String id);
 
   // Machine Health Report
   Future<void> submitMachineHealthReport(MachineHealthReport report);
@@ -25,6 +27,7 @@ abstract class FrameRepository {
     DateTime? endDate,
   });
   Future<List<MachineHealthReport>> getPendingApprovals();
+  Future<void> deleteMachineHealthReport(String id);
 
   // Production Details Report
   Future<void> submitProductionDetailsReport(
@@ -40,6 +43,7 @@ abstract class FrameRepository {
     DateTime date,
     String shift,
   );
+  Future<void> deleteProductionDetailsReport(String id);
 
   // Production Weight Report
   Future<void> submitProductionWeightReport(FrameProductionWeightReport report);
@@ -48,6 +52,7 @@ abstract class FrameRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteProductionWeightReport(String id);
 
   // Shift Packing Report
   Future<void> submitShiftPackingReport(FrameShiftPackingReport report);
@@ -56,6 +61,7 @@ abstract class FrameRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteShiftPackingReport(String id);
 
   // Report Writing Efficiency
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
@@ -63,6 +69,7 @@ abstract class FrameRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteWritingEfficiency(String id);
 
   // Customer Rejection Report
   Future<void> submitCustomerRejectionReport(
@@ -73,6 +80,7 @@ abstract class FrameRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
+  Future<void> deleteCustomerRejectionReport(String id);
 
   // Monthly aggregates
   Future<Map<String, double>> getMonthlyAggregates(

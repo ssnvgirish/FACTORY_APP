@@ -64,12 +64,18 @@ class FrameHealthReportListPage extends StatelessWidget {
         emptyMessage: 'No machine health reports yet',
         itemBuilder: (context, report, index) {
           return ReportCard(
+            key: ValueKey(report.id),
             title: '${report.machineNumber} — ${report.shift}',
             subtitle:
                 '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.entries.length} item(s)',
             trailing:
                 '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
             statusColor: AppTheme.pendingBlue,
+            onDelete: report.id == null
+                ? null
+                : () => context.read<FrameReportsBloc>().add(
+                    DeleteMachineHealthReport(report.id!),
+                  ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

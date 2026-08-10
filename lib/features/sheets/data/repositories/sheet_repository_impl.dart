@@ -22,6 +22,9 @@ class SheetRepositoryImpl implements SheetRepository {
     endDate: endDate,
   );
   @override
+  Future<void> deleteMachineCleaningReport(String id) =>
+      remoteDataSource.deleteMachineCleaningReport(id);
+  @override
   Future<void> submitToolsCountReport(ToolsCountReport report) =>
       remoteDataSource.submitToolsCountReport(report);
   @override
@@ -34,6 +37,9 @@ class SheetRepositoryImpl implements SheetRepository {
     startDate: startDate,
     endDate: endDate,
   );
+  @override
+  Future<void> deleteToolsCountReport(String id) =>
+      remoteDataSource.deleteToolsCountReport(id);
   @override
   Future<void> submitMachineHealthReport(MachineHealthReport report) =>
       remoteDataSource.submitMachineHealthReport(report);
@@ -50,6 +56,9 @@ class SheetRepositoryImpl implements SheetRepository {
   @override
   Future<List<MachineHealthReport>> getPendingApprovals() =>
       remoteDataSource.getPendingApprovals();
+  @override
+  Future<void> deleteMachineHealthReport(String id) =>
+      remoteDataSource.deleteMachineHealthReport(id);
   @override
   Future<void> submitProductionDetailsReport(
     SheetProductionDetailsReport report,
@@ -71,6 +80,9 @@ class SheetRepositoryImpl implements SheetRepository {
     String shift,
   ) => remoteDataSource.getProductionDetailsReport(machineNumber, date, shift);
   @override
+  Future<void> deleteProductionDetailsReport(String id) =>
+      remoteDataSource.deleteProductionDetailsReport(id);
+  @override
   Future<void> submitProductionRunningFeetReport(
     SheetProductionRunningFeetReport report,
   ) => remoteDataSource.submitProductionRunningFeetReport(report);
@@ -86,6 +98,9 @@ class SheetRepositoryImpl implements SheetRepository {
     endDate: endDate,
   );
   @override
+  Future<void> deleteProductionRunningFeetReport(String id) =>
+      remoteDataSource.deleteProductionRunningFeetReport(id);
+  @override
   Future<void> submitShiftPackingReport(SheetShiftPackingReport report) =>
       remoteDataSource.submitShiftPackingReport(report);
   @override
@@ -99,6 +114,9 @@ class SheetRepositoryImpl implements SheetRepository {
     endDate: endDate,
   );
   @override
+  Future<void> deleteShiftPackingReport(String id) =>
+      remoteDataSource.deleteShiftPackingReport(id);
+  @override
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
     String? operatorId,
     DateTime? startDate,
@@ -108,6 +126,9 @@ class SheetRepositoryImpl implements SheetRepository {
     startDate: startDate,
     endDate: endDate,
   );
+  @override
+  Future<void> deleteWritingEfficiency(String id) =>
+      remoteDataSource.deleteWritingEfficiency(id);
   @override
   Future<void> submitCustomerRejectionReport(
     SheetCustomerRejectionReport report,
@@ -122,6 +143,9 @@ class SheetRepositoryImpl implements SheetRepository {
     startDate: startDate,
     endDate: endDate,
   );
+  @override
+  Future<void> deleteCustomerRejectionReport(String id) =>
+      remoteDataSource.deleteCustomerRejectionReport(id);
 
   @override
   Future<Map<String, double>> getMonthlyAggregates(

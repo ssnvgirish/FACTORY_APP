@@ -23,6 +23,10 @@ class FrameRepositoryImpl implements FrameRepository {
   );
 
   @override
+  Future<void> deleteMachineCleaningReport(String id) =>
+      remoteDataSource.deleteMachineCleaningReport(id);
+
+  @override
   Future<void> submitToolsCountReport(ToolsCountReport report) =>
       remoteDataSource.submitToolsCountReport(report);
 
@@ -36,6 +40,10 @@ class FrameRepositoryImpl implements FrameRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteToolsCountReport(String id) =>
+      remoteDataSource.deleteToolsCountReport(id);
 
   @override
   Future<void> submitMachineHealthReport(MachineHealthReport report) =>
@@ -55,6 +63,10 @@ class FrameRepositoryImpl implements FrameRepository {
   @override
   Future<List<MachineHealthReport>> getPendingApprovals() =>
       remoteDataSource.getPendingApprovals();
+
+  @override
+  Future<void> deleteMachineHealthReport(String id) =>
+      remoteDataSource.deleteMachineHealthReport(id);
 
   @override
   Future<void> submitProductionDetailsReport(
@@ -80,6 +92,10 @@ class FrameRepositoryImpl implements FrameRepository {
   ) => remoteDataSource.getProductionDetailsReport(machineNumber, date, shift);
 
   @override
+  Future<void> deleteProductionDetailsReport(String id) =>
+      remoteDataSource.deleteProductionDetailsReport(id);
+
+  @override
   Future<void> submitProductionWeightReport(
     FrameProductionWeightReport report,
   ) => remoteDataSource.submitProductionWeightReport(report);
@@ -94,6 +110,10 @@ class FrameRepositoryImpl implements FrameRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteProductionWeightReport(String id) =>
+      remoteDataSource.deleteProductionWeightReport(id);
 
   @override
   Future<void> submitShiftPackingReport(FrameShiftPackingReport report) =>
@@ -111,6 +131,10 @@ class FrameRepositoryImpl implements FrameRepository {
   );
 
   @override
+  Future<void> deleteShiftPackingReport(String id) =>
+      remoteDataSource.deleteShiftPackingReport(id);
+
+  @override
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
     String? operatorId,
     DateTime? startDate,
@@ -120,6 +144,10 @@ class FrameRepositoryImpl implements FrameRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteWritingEfficiency(String id) =>
+      remoteDataSource.deleteWritingEfficiency(id);
 
   @override
   Future<void> submitCustomerRejectionReport(
@@ -136,6 +164,10 @@ class FrameRepositoryImpl implements FrameRepository {
     startDate: startDate,
     endDate: endDate,
   );
+
+  @override
+  Future<void> deleteCustomerRejectionReport(String id) =>
+      remoteDataSource.deleteCustomerRejectionReport(id);
 
   @override
   Future<Map<String, double>> getMonthlyAggregates(

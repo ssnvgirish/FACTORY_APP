@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../frames/domain/entities/frame_entities.dart';
 import '../../domain/entities/sheet_entities.dart';
 import '../../domain/repositories/sheet_repository.dart';
+import '../../../../core/utils/calculations.dart';
 import '../../../../core/utils/report_list_pagination.dart';
 
 // ═══════════════════════════════════════
@@ -32,6 +33,11 @@ class SubmitSheetCleaningReport extends SheetReportsEvent {
   SubmitSheetCleaningReport(this.report);
 }
 
+class DeleteSheetCleaningReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetCleaningReport(this.id);
+}
+
 class LoadSheetToolsCountReports extends SheetReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
@@ -48,6 +54,11 @@ class LoadSheetToolsCountReports extends SheetReportsEvent {
 class SubmitSheetToolsCountReport extends SheetReportsEvent {
   final ToolsCountReport report;
   SubmitSheetToolsCountReport(this.report);
+}
+
+class DeleteSheetToolsCountReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetToolsCountReport(this.id);
 }
 
 class LoadSheetHealthReports extends SheetReportsEvent {
@@ -68,6 +79,11 @@ class SubmitSheetHealthReport extends SheetReportsEvent {
   SubmitSheetHealthReport(this.report);
 }
 
+class DeleteSheetHealthReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetHealthReport(this.id);
+}
+
 class LoadSheetPendingApprovals extends SheetReportsEvent {}
 
 class LoadSheetProductionDetailsReports extends SheetReportsEvent {
@@ -86,6 +102,11 @@ class LoadSheetProductionDetailsReports extends SheetReportsEvent {
 class SubmitSheetProductionDetailsReport extends SheetReportsEvent {
   final SheetProductionDetailsReport report;
   SubmitSheetProductionDetailsReport(this.report);
+}
+
+class DeleteSheetProductionDetailsReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetProductionDetailsReport(this.id);
 }
 
 class LoadSheetProductionDetailsForShift extends SheetReportsEvent {
@@ -117,6 +138,11 @@ class SubmitSheetRunningFeetReport extends SheetReportsEvent {
   SubmitSheetRunningFeetReport(this.report);
 }
 
+class DeleteSheetRunningFeetReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetRunningFeetReport(this.id);
+}
+
 class LoadSheetPackingReports extends SheetReportsEvent {
   final String? machineNumber;
   final DateTime? startDate;
@@ -133,6 +159,11 @@ class LoadSheetPackingReports extends SheetReportsEvent {
 class SubmitSheetPackingReport extends SheetReportsEvent {
   final SheetShiftPackingReport report;
   SubmitSheetPackingReport(this.report);
+}
+
+class DeleteSheetPackingReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetPackingReport(this.id);
 }
 
 class LoadSheetCustomerRejectionReports extends SheetReportsEvent {
@@ -153,6 +184,11 @@ class SubmitSheetCustomerRejectionReport extends SheetReportsEvent {
   SubmitSheetCustomerRejectionReport(this.report);
 }
 
+class DeleteSheetCustomerRejectionReport extends SheetReportsEvent {
+  final String id;
+  DeleteSheetCustomerRejectionReport(this.id);
+}
+
 class LoadSheetWritingEfficiency extends SheetReportsEvent {
   final String? operatorId;
   final DateTime? startDate;
@@ -164,6 +200,11 @@ class LoadSheetWritingEfficiency extends SheetReportsEvent {
     this.endDate,
     this.append = false,
   });
+}
+
+class DeleteSheetWritingEfficiency extends SheetReportsEvent {
+  final String id;
+  DeleteSheetWritingEfficiency(this.id);
 }
 
 // ═══════════════════════════════════════
@@ -371,9 +412,12 @@ class SheetWritingEfficiencyLoaded extends SheetReportsState {
 
 class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
   final SheetRepository sheetRepository;
+  final Map<String, double> sheetTargets;
 
-  SheetReportsBloc({required this.sheetRepository})
-    : super(SheetReportsInitial()) {
+  SheetReportsBloc({
+    required this.sheetRepository,
+    required this.sheetTargets,
+  }) : super(SheetReportsInitial()) {
     on<LoadSheetCleaningReports>((e, emit) async {
       final previous = state is SheetCleaningReportsLoaded
           ? state as SheetCleaningReportsLoaded
@@ -626,6 +670,7 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
           return;
         }
         await sheetRepository.submitProductionDetailsReport(e.report);
+        await _generateRunningFeetReport(e.report);
         emit(SheetReportsSubmitted('Production Details Report submitted'));
       } catch (err) {
         emit(SheetReportsError(err.toString()));
@@ -870,5 +915,214 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
         emit(SheetReportsError(err.toString()));
       }
     });
+    on<DeleteSheetCleaningReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteMachineCleaningReport(e.id);
+        if (previous is SheetCleaningReportsLoaded) {
+          emit(
+            SheetCleaningReportsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetToolsCountReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteToolsCountReport(e.id);
+        if (previous is SheetToolsCountReportsLoaded) {
+          emit(
+            SheetToolsCountReportsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetHealthReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteMachineHealthReport(e.id);
+        if (previous is SheetHealthReportsLoaded) {
+          emit(
+            SheetHealthReportsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        } else if (previous is SheetPendingApprovalsLoaded) {
+          emit(
+            SheetPendingApprovalsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetProductionDetailsReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteProductionDetailsReport(e.id);
+        if (previous is SheetProductionDetailsLoaded) {
+          emit(
+            SheetProductionDetailsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetRunningFeetReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteProductionRunningFeetReport(e.id);
+        if (previous is SheetRunningFeetReportsLoaded) {
+          emit(
+            SheetRunningFeetReportsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetPackingReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteShiftPackingReport(e.id);
+        if (previous is SheetPackingReportsLoaded) {
+          emit(
+            SheetPackingReportsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetCustomerRejectionReport>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteCustomerRejectionReport(e.id);
+        if (previous is SheetCustomerRejectionReportsLoaded) {
+          emit(
+            SheetCustomerRejectionReportsLoaded(
+              previous.reports.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+    on<DeleteSheetWritingEfficiency>((e, emit) async {
+      final previous = state;
+      try {
+        await sheetRepository.deleteWritingEfficiency(e.id);
+        if (previous is SheetWritingEfficiencyLoaded) {
+          emit(
+            SheetWritingEfficiencyLoaded(
+              previous.records.where((r) => r.id != e.id).toList(),
+              hasMore: previous.hasMore,
+              isLoadingMore: previous.isLoadingMore,
+              oldestLoadedStart: previous.oldestLoadedStart,
+            ),
+          );
+        }
+      } catch (err) {
+        emit(SheetReportsError(err.toString()));
+      }
+    });
+  }
+
+  /// Computes and persists a running-feet efficiency report from production details.
+  Future<void> _generateRunningFeetReport(
+    SheetProductionDetailsReport report,
+  ) async {
+    final productionRunningFeet = report.totalRunningFeet;
+    if (productionRunningFeet == 0) return;
+
+    const shiftHours = 12.0;
+    final thicknessDensityFeet = <String, double>{};
+    for (final li in report.lineItems) {
+      final key = '${li.thickness}|${li.density}';
+      thicknessDensityFeet[key] =
+          (thicknessDensityFeet[key] ?? 0) + li.totalRunningFeet;
+    }
+
+    final lineItemsTotal = report.lineItems.fold<double>(
+      0,
+      (s, li) => s + li.totalRunningFeet,
+    );
+    if (lineItemsTotal == 0) return;
+
+    final segments = thicknessDensityFeet.entries.map((e) {
+      final parts = e.key.split('|');
+      return <String, dynamic>{
+        'section': parts[0],
+        'density': parts.length > 1 ? parts[1] : '',
+        'durationHours': (e.value / lineItemsTotal) * shiftHours,
+      };
+    }).toList();
+
+    final targetRunningFeet = Calculations.calculateTargetWeight(
+      segments: segments,
+      targetPerHour: sheetTargets,
+    );
+    if (targetRunningFeet == 0) return;
+
+    const maintenanceRunningFeet = 0.0;
+    final totalProductionRunningFeet =
+        productionRunningFeet + maintenanceRunningFeet;
+    final efficiency = Calculations.productionEfficiency(
+      totalProductionRunningFeet,
+      targetRunningFeet,
+    );
+
+    await sheetRepository.submitProductionRunningFeetReport(
+      SheetProductionRunningFeetReport(
+        date: report.date,
+        machineNumber: report.machineNumber,
+        shift: report.shift,
+        productionRunningFeet: productionRunningFeet,
+        maintenanceRunningFeet: maintenanceRunningFeet,
+        totalProductionRunningFeet: totalProductionRunningFeet,
+        targetRunningFeet: targetRunningFeet,
+        efficiencyPercentage: efficiency,
+        createdBy: report.createdBy,
+      ),
+    );
   }
 }

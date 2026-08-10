@@ -278,6 +278,10 @@ class _ScaffoldWithNav extends StatelessWidget {
   }
 
   List<_NavItem> _buildDestinations(AppUser? user) {
+    final isAdmin = user != null && user.roles.contains('admin');
+
+    // Admin: Home (reports) + Admin only.
+    // Other roles: Home + Report dashboard.
     final items = <_NavItem>[
       const _NavItem(
         path: '/home',
@@ -286,22 +290,25 @@ class _ScaffoldWithNav extends StatelessWidget {
           label: 'Home',
         ),
       ),
-      const _NavItem(
-        path: '/report',
-        destination: NavigationDestination(
-          icon: Icon(Icons.dashboard),
-          label: 'Report',
-        ),
-      ),
     ];
 
-    if (user != null && user.roles.contains('admin')) {
+    if (isAdmin) {
       items.add(
         const _NavItem(
           path: '/admin',
           destination: NavigationDestination(
             icon: Icon(Icons.admin_panel_settings),
             label: 'Admin',
+          ),
+        ),
+      );
+    } else {
+      items.add(
+        const _NavItem(
+          path: '/report',
+          destination: NavigationDestination(
+            icon: Icon(Icons.dashboard),
+            label: 'Report',
           ),
         ),
       );
