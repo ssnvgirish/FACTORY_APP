@@ -70,6 +70,7 @@ abstract class FrameRepository {
     DateTime? endDate,
   });
   Future<void> deleteWritingEfficiency(String id);
+  Future<void> submitWritingEfficiency(ReportWritingEfficiencyRecord record);
 
   // Customer Rejection Report
   Future<void> submitCustomerRejectionReport(

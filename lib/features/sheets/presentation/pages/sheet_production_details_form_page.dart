@@ -11,7 +11,8 @@ import '../../domain/entities/sheet_entities.dart';
 import '../bloc/sheet_reports_bloc.dart';
 
 class SheetProductionDetailsFormPage extends StatefulWidget {
-  const SheetProductionDetailsFormPage({super.key});
+  final SheetProductionDetailsReport? existing;
+  const SheetProductionDetailsFormPage({super.key, this.existing});
 
   @override
   State<SheetProductionDetailsFormPage> createState() =>
@@ -24,7 +25,12 @@ class _SheetProductionDetailsFormPageState
   DateTime _date = DateTime.now();
   String? _machineNumber;
   String? _shift;
-  final List<_SheetLineItemData> _items = [];
+  final List<_ItemGroup> _groups = [];
+
+  List<_SheetLineItemData> get _items => [
+    for (final g in _groups)
+      for (final line in g.lines) line._withGroup(g),
+  ];
 
   int get _totalQty =>
       _items.fold(0, (s, i) => s + (int.tryParse(i.quantityCtrl.text) ?? 0));
@@ -37,6 +43,45 @@ class _SheetProductionDetailsFormPageState
     final qty = int.tryParse(i.quantityCtrl.text) ?? 0;
     return s + Calculations.totalRunningFeet(l, qty);
   });
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.existing;
+    if (existing != null) {
+      _date = existing.date;
+      _machineNumber = existing.machineNumber;
+      _shift = existing.shift;
+      _loadExisting(existing);
+    } else {
+      _groups.add(_ItemGroup()..lines.add(_SheetLineItemData()));
+    }
+  }
+
+  void _loadExisting(SheetProductionDetailsReport report) {
+    _ItemGroup? current;
+    for (final li in report.lineItems) {
+      final needsNewGroup =
+          current == null ||
+          current.thickness != li.thickness ||
+          current.density != li.density ||
+          current.color != li.color;
+      if (needsNewGroup) {
+        current = _ItemGroup()
+          ..thickness = li.thickness
+          ..density = li.density
+          ..color = li.color
+          ..timeOfChange = li.timeOfChange
+          ..manualWeightCtrl.text = li.manualWeightPerSqft?.toString() ?? '';
+        _groups.add(current);
+      }
+      final line = _SheetLineItemData();
+      line.lengthCtrl.text = li.length.toString();
+      line.widthCtrl.text = li.width.toString();
+      line.quantityCtrl.text = li.quantity.toString();
+      current.lines.add(line);
+    }
+  }
 
   double _sqft(_SheetLineItemData item) {
     final l = double.tryParse(item.lengthCtrl.text) ?? 0;
@@ -60,37 +105,53 @@ class _SheetProductionDetailsFormPageState
     return Calculations.sheetPerPieceWeight(sqft, wpsqft);
   }
 
-  /// True when the chosen thickness/density pair has no row in the weight
-  /// table, which would otherwise silently submit a zero-weight line item.
-  bool _missingWeightRow(_SheetLineItemData item) {
-    if (item.thickness == null || item.density == null) return false;
-    if (item.density == 'Others') return false;
+  bool _missingWeightRow(_ItemGroup group) {
+    if (group.thickness == null || group.density == null) return false;
+    if (group.density == 'Others') return false;
     return Calculations.sheetWeightPerSqft(
-          thickness: item.thickness!,
-          density: item.density!,
+          thickness: group.thickness!,
+          density: group.density!,
           weightTable: ddp.sheetWeights,
         ) ==
         null;
   }
 
-  void _addItem() => setState(() => _items.add(_SheetLineItemData()));
-  void _removeItem(int i) => setState(() {
-    _items[i].dispose();
-    _items.removeAt(i);
+  void _addGroup() => setState(() {
+    _groups.add(_ItemGroup()..lines.add(_SheetLineItemData()));
   });
 
-  bool _needsTimeOfChange(int i) {
-    if (i == 0) return false;
-    final prev = _items[i - 1];
-    final curr = _items[i];
-    return curr.thickness != prev.thickness ||
-        curr.density != prev.density ||
-        curr.color != prev.color;
-  }
+  void _removeGroup(int i) => setState(() {
+    _groups[i].dispose();
+    _groups.removeAt(i);
+  });
+
+  void _addLine(_ItemGroup group) =>
+      setState(() => group.lines.add(_SheetLineItemData()));
+
+  void _removeLine(_ItemGroup group, int i) => setState(() {
+    group.lines[i].dispose();
+    group.lines.removeAt(i);
+    if (group.lines.isEmpty) {
+      _groups.remove(group);
+      group.manualWeightCtrl.dispose();
+    }
+  });
 
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_machineNumber == null || _shift == null || _items.isEmpty) return;
+
+    for (var g = 1; g < _groups.length; g++) {
+      if (_groups[g].timeOfChange == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Set time of change for Item Group ${g + 1}'),
+            backgroundColor: AppTheme.errorRed,
+          ),
+        );
+        return;
+      }
+    }
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -101,29 +162,36 @@ class _SheetProductionDetailsFormPageState
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthAuthenticated) return;
 
-    final lineItems = _items.map((item) {
-      final l = double.parse(item.lengthCtrl.text);
-      final w = double.parse(item.widthCtrl.text);
-      final qty = int.parse(item.quantityCtrl.text);
-      final sqft = Calculations.sheetSqft(l, w);
-      final ppw = _ppw(item);
-      return SheetProductionLineItem(
-        thickness: item.thickness!,
-        density: item.density!,
-        color: item.color!,
-        length: l,
-        width: w,
-        quantity: qty,
-        sqft: sqft,
-        perPieceWeight: ppw,
-        totalWeight: Calculations.totalWeight(qty, ppw),
-        totalRunningFeet: Calculations.totalRunningFeet(l, qty),
-        timeOfChange: item.timeOfChange,
-        manualWeightPerSqft: item.density == 'Others'
-            ? double.tryParse(item.manualWeightCtrl.text)
-            : null,
-      );
-    }).toList();
+    final lineItems = <SheetProductionLineItem>[];
+    for (var gi = 0; gi < _groups.length; gi++) {
+      final group = _groups[gi];
+      for (var li = 0; li < group.lines.length; li++) {
+        final item = group.lines[li]._withGroup(group);
+        final l = double.parse(item.lengthCtrl.text);
+        final w = double.parse(item.widthCtrl.text);
+        final qty = int.parse(item.quantityCtrl.text);
+        final sqft = Calculations.sheetSqft(l, w);
+        final ppw = _ppw(item);
+        lineItems.add(
+          SheetProductionLineItem(
+            thickness: group.thickness!,
+            density: group.density!,
+            color: group.color!,
+            length: l,
+            width: w,
+            quantity: qty,
+            sqft: sqft,
+            perPieceWeight: ppw,
+            totalWeight: Calculations.totalWeight(qty, ppw),
+            totalRunningFeet: Calculations.totalRunningFeet(l, qty),
+            timeOfChange: gi > 0 && li == 0 ? group.timeOfChange : null,
+            manualWeightPerSqft: group.density == 'Others'
+                ? double.tryParse(group.manualWeightCtrl.text)
+                : null,
+          ),
+        );
+      }
+    }
 
     context.read<SheetReportsBloc>().add(
       SubmitSheetProductionDetailsReport(
@@ -138,8 +206,17 @@ class _SheetProductionDetailsFormPageState
           createdBy: authState.user.uid,
           submittedAt: DateTime.now(),
         ),
+        replaceId: widget.existing?.id,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    for (final g in _groups) {
+      g.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -154,6 +231,7 @@ class _SheetProductionDetailsFormPageState
             ),
           );
           Navigator.pop(context);
+          if (widget.existing != null) Navigator.pop(context);
         }
         if (state is SheetReportsError) {
           debugPrint('SheetReportsError: ${state.message}');
@@ -166,7 +244,13 @@ class _SheetProductionDetailsFormPageState
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('New Sheet Production')),
+        appBar: AppBar(
+          title: Text(
+            widget.existing == null
+                ? 'New Sheet Production'
+                : 'Edit Sheet Production',
+          ),
+        ),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -209,7 +293,7 @@ class _SheetProductionDetailsFormPageState
                 validator: (v) => v == null ? 'Required' : null,
               ),
               const SizedBox(height: 24),
-              const SectionHeader(title: 'Production Line Items'),
+              const SectionHeader(title: 'Production Item Groups'),
               if (!ddp.isLoaded) ...[
                 const SizedBox(height: 8),
                 ListTile(
@@ -223,214 +307,13 @@ class _SheetProductionDetailsFormPageState
                     'Master data could not be loaded',
                     style: TextStyle(fontSize: 13),
                   ),
-                  subtitle: const Text(
-                    'Weights shown come from built-in defaults and may be out '
-                    'of date. Reconnect and restart before submitting.',
-                    style: TextStyle(fontSize: 12),
-                  ),
                 ),
               ],
-              ...List.generate(_items.length, (index) {
-                final item = _items[index];
-                final showChange = _needsTimeOfChange(index);
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Item ${index + 1}',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => _removeItem(index),
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: AppTheme.errorRed,
-                              ),
-                            ),
-                          ],
-                        ),
-                        DropdownButtonFormField<String>(
-                          initialValue: item.thickness,
-                          decoration: const InputDecoration(
-                            labelText: 'Thickness',
-                          ),
-                          items: ddp.sheetThicknesses
-                              .map(
-                                (t) =>
-                                    DropdownMenuItem(value: t, child: Text(t)),
-                              )
-                              .toList(),
-                          onChanged: (v) => setState(() => item.thickness = v),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          initialValue: item.density,
-                          decoration: const InputDecoration(
-                            labelText: 'Density',
-                          ),
-                          items: ddp.sheetDensities
-                              .map(
-                                (d) =>
-                                    DropdownMenuItem(value: d, child: Text(d)),
-                              )
-                              .toList(),
-                          onChanged: (v) => setState(() => item.density = v),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
-                        if (item.density == 'Others') ...[
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            controller: item.manualWeightCtrl,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Weight per SQFT (kg)',
-                            ),
-                            validator: (v) =>
-                                Validators.positiveNumber(v, 'Weight'),
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ],
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          initialValue: item.color,
-                          decoration: const InputDecoration(labelText: 'Color'),
-                          items: ddp.sheetColors
-                              .map(
-                                (c) =>
-                                    DropdownMenuItem(value: c, child: Text(c)),
-                              )
-                              .toList(),
-                          onChanged: (v) => setState(() => item.color = v),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: item.lengthCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Length (inches)',
-                          ),
-                          validator: (v) =>
-                              Validators.positiveNumber(v, 'Length'),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: item.widthCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Width (inches)',
-                          ),
-                          validator: (v) =>
-                              Validators.positiveNumber(v, 'Width'),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: item.quantityCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Quantity',
-                          ),
-                          validator: (v) =>
-                              Validators.positiveInteger(v, 'Quantity'),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        const SizedBox(height: 12),
-                        AutoCalculatedField(
-                          label: 'SQFT',
-                          value: _sqft(item).toStringAsFixed(3),
-                        ),
-                        const SizedBox(height: 8),
-                        if (_missingWeightRow(item)) ...[
-                          ListTile(
-                            dense: true,
-                            tileColor: AppTheme.errorRed.withValues(alpha: 0.1),
-                            leading: const Icon(
-                              Icons.error_outline,
-                              color: AppTheme.errorRed,
-                            ),
-                            title: Text(
-                              'No weight configured for ${item.thickness} × ${item.density}',
-                              style: const TextStyle(
-                                color: AppTheme.errorRed,
-                                fontSize: 13,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Add it in Admin → Reference Tables → Sheet Weight Table, '
-                              'or choose density "Others" to enter it manually.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                        AutoCalculatedField(
-                          label: 'Per Piece Weight',
-                          value: '${_ppw(item).toStringAsFixed(3)} kg',
-                        ),
-                        const SizedBox(height: 8),
-                        AutoCalculatedField(
-                          label: 'Total Running Feet',
-                          value:
-                              '${Calculations.totalRunningFeet(double.tryParse(item.lengthCtrl.text) ?? 0, int.tryParse(item.quantityCtrl.text) ?? 0).toStringAsFixed(3)} ft',
-                        ),
-                        if (showChange) ...[
-                          const SizedBox(height: 12),
-                          ListTile(
-                            dense: true,
-                            tileColor: AppTheme.warningYellow.withValues(
-                              alpha: 0.1,
-                            ),
-                            leading: const Icon(
-                              Icons.schedule,
-                              color: AppTheme.warningYellow,
-                            ),
-                            title: const Text('Time of Change'),
-                            subtitle: Text(
-                              item.timeOfChange != null
-                                  ? DateFormat(
-                                      'hh:mm a',
-                                    ).format(item.timeOfChange!)
-                                  : 'Tap to set',
-                            ),
-                            onTap: () async {
-                              final t = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (t != null) {
-                                setState(
-                                  () => item.timeOfChange = DateTime(
-                                    _date.year,
-                                    _date.month,
-                                    _date.day,
-                                    t.hour,
-                                    t.minute,
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                );
-              }),
+              ...List.generate(_groups.length, (gi) => _buildGroupCard(gi)),
               OutlinedButton.icon(
-                onPressed: _addItem,
+                onPressed: _addGroup,
                 icon: const Icon(Icons.add),
-                label: const Text('Add Line Item'),
+                label: const Text('Add Item Group'),
               ),
               const SizedBox(height: 24),
               AutoCalculatedField(
@@ -460,7 +343,11 @@ class _SheetProductionDetailsFormPageState
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Submit Report'),
+                      : Text(
+                          widget.existing == null
+                              ? 'Submit Report'
+                              : 'Save Changes',
+                        ),
                 ),
               ),
             ],
@@ -469,17 +356,243 @@ class _SheetProductionDetailsFormPageState
       ),
     );
   }
+
+  Widget _buildGroupCard(int gi) {
+    final group = _groups[gi];
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Item Group ${gi + 1}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _removeGroup(gi),
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: AppTheme.errorRed,
+                  ),
+                ),
+              ],
+            ),
+            DropdownButtonFormField<String>(
+              key: ValueKey('g${gi}_th_${group.thickness}'),
+              initialValue: group.thickness,
+              decoration: const InputDecoration(labelText: 'Thickness'),
+              items: ddp.sheetThicknesses
+                  .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                  .toList(),
+              onChanged: (v) => setState(() => group.thickness = v),
+              validator: (v) => v == null ? 'Required' : null,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              key: ValueKey('g${gi}_d_${group.density}'),
+              initialValue: group.density,
+              decoration: const InputDecoration(labelText: 'Density'),
+              items: ddp.sheetDensities
+                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                  .toList(),
+              onChanged: (v) => setState(() => group.density = v),
+              validator: (v) => v == null ? 'Required' : null,
+            ),
+            if (group.density == 'Others') ...[
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: group.manualWeightCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Weight per SQFT (kg)',
+                ),
+                validator: (v) => Validators.positiveNumber(v, 'Weight'),
+                onChanged: (_) => setState(() {}),
+              ),
+            ],
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              key: ValueKey('g${gi}_c_${group.color}'),
+              initialValue: group.color,
+              decoration: const InputDecoration(labelText: 'Colour'),
+              items: ddp.sheetColors
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  .toList(),
+              onChanged: (v) => setState(() => group.color = v),
+              validator: (v) => v == null ? 'Required' : null,
+            ),
+            if (_missingWeightRow(group)) ...[
+              const SizedBox(height: 12),
+              ListTile(
+                dense: true,
+                tileColor: AppTheme.errorRed.withValues(alpha: 0.1),
+                leading: const Icon(
+                  Icons.error_outline,
+                  color: AppTheme.errorRed,
+                ),
+                title: Text(
+                  'No weight configured for ${group.thickness} × ${group.density}',
+                  style: const TextStyle(
+                    color: AppTheme.errorRed,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
+            if (gi > 0) ...[
+              const SizedBox(height: 12),
+              ListTile(
+                dense: true,
+                tileColor: AppTheme.warningYellow.withValues(alpha: 0.1),
+                leading: const Icon(
+                  Icons.schedule,
+                  color: AppTheme.warningYellow,
+                ),
+                title: const Text('Time of Change'),
+                subtitle: Text(
+                  group.timeOfChange != null
+                      ? DateFormat('hh:mm a').format(group.timeOfChange!)
+                      : 'Required when adding a new item group',
+                ),
+                onTap: () async {
+                  final t = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (t != null) {
+                    setState(
+                      () => group.timeOfChange = DateTime(
+                        _date.year,
+                        _date.month,
+                        _date.day,
+                        t.hour,
+                        t.minute,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+            const SizedBox(height: 16),
+            Text('Item list', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            ...List.generate(group.lines.length, (li) {
+              final line = group.lines[li];
+              final bound = line._withGroup(group);
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text('Line ${li + 1}'),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () => _removeLine(group, li),
+                          icon: const Icon(Icons.remove_circle_outline),
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: line.lengthCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Length (inches)',
+                      ),
+                      validator: (v) => Validators.positiveNumber(v, 'Length'),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: line.widthCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Width (inches)',
+                      ),
+                      validator: (v) => Validators.positiveNumber(v, 'Width'),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: line.quantityCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Quantity'),
+                      validator: (v) =>
+                          Validators.positiveInteger(v, 'Quantity'),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    AutoCalculatedField(
+                      label: 'SQFT',
+                      value: _sqft(bound).toStringAsFixed(3),
+                    ),
+                    const SizedBox(height: 8),
+                    AutoCalculatedField(
+                      label: 'Per Piece Weight',
+                      value: '${_ppw(bound).toStringAsFixed(3)} kg',
+                    ),
+                    const SizedBox(height: 8),
+                    AutoCalculatedField(
+                      label: 'Total Running Feet',
+                      value:
+                          '${Calculations.totalRunningFeet(double.tryParse(line.lengthCtrl.text) ?? 0, int.tryParse(line.quantityCtrl.text) ?? 0).toStringAsFixed(3)} ft',
+                    ),
+                  ],
+                ),
+              );
+            }),
+            OutlinedButton.icon(
+              onPressed: () => _addLine(group),
+              icon: const Icon(Icons.add),
+              label: const Text('Add line'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ItemGroup {
+  String? thickness;
+  String? density;
+  String? color;
+  DateTime? timeOfChange;
+  final manualWeightCtrl = TextEditingController();
+  final List<_SheetLineItemData> lines = [];
+
+  void dispose() {
+    manualWeightCtrl.dispose();
+    for (final l in lines) {
+      l.dispose();
+    }
+  }
 }
 
 class _SheetLineItemData {
   String? thickness;
   String? density;
   String? color;
-  DateTime? timeOfChange;
   final lengthCtrl = TextEditingController();
   final widthCtrl = TextEditingController();
   final quantityCtrl = TextEditingController();
   final manualWeightCtrl = TextEditingController();
+
+  _SheetLineItemData _withGroup(_ItemGroup group) {
+    thickness = group.thickness;
+    density = group.density;
+    color = group.color;
+    if (group.density == 'Others') {
+      manualWeightCtrl.text = group.manualWeightCtrl.text;
+    }
+    return this;
+  }
 
   void dispose() {
     lengthCtrl.dispose();

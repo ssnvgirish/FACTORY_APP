@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/frame_reports_bloc.dart';
 import 'frame_cleaning_report_form_page.dart';
 
@@ -13,26 +15,38 @@ class FrameCleaningReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FrameReportsBloc, FrameReportsState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Machine Cleaning Reports')),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const FrameCleaningReportFormPage(),
-              ),
-            ),
-            child: const Icon(Icons.add),
+    return ReportListPageShell(
+      title: 'Machine Cleaning Reports',
+      machines: ddp.frameMachines,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const FrameCleaningReportFormPage(),
           ),
-          body: _buildBody(context, state),
+        ),
+        child: const Icon(Icons.add),
+      ),
+      onQueryChanged: (q) => context.read<FrameReportsBloc>().add(
+        LoadMachineCleaningReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<FrameReportsBloc, FrameReportsState>(
+          builder: (context, state) => _buildBody(context, state, query),
         );
       },
     );
   }
 
-  Widget _buildBody(BuildContext context, FrameReportsState state) {
+  Widget _buildBody(
+    BuildContext context,
+    FrameReportsState state,
+    ReportListQuery query,
+  ) {
     if (state is FrameReportsLoading) return const LoadingWidget();
     if (state is MachineCleaningReportsLoaded) {
       return PaginatedListView(
@@ -46,6 +60,7 @@ class FrameCleaningReportListPage extends StatelessWidget {
           final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
           context.read<FrameReportsBloc>().add(
             LoadMachineCleaningReports(
+              machineNumber: query.machineNumber,
               startDate: range.start,
               endDate: range.end,
               append: true,
@@ -53,11 +68,11 @@ class FrameCleaningReportListPage extends StatelessWidget {
           );
         },
         onRefresh: () async {
-          final range = ReportWeekRange.initial();
           context.read<FrameReportsBloc>().add(
             LoadMachineCleaningReports(
-              startDate: range.start,
-              endDate: range.end,
+              machineNumber: query.machineNumber,
+              startDate: query.startDate,
+              endDate: query.endDate,
             ),
           );
         },
@@ -112,13 +127,6 @@ class FrameCleaningReportListPage extends StatelessWidget {
         },
       );
     }
-    // Initial load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final range = ReportWeekRange.initial();
-      context.read<FrameReportsBloc>().add(
-        LoadMachineCleaningReports(startDate: range.start, endDate: range.end),
-      );
-    });
     return const LoadingWidget();
   }
 }

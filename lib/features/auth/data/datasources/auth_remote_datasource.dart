@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/config/dev_flags.dart';
 import '../../../../generated/dataconnect/default.dart';
 import '../models/user_model.dart';
 
@@ -41,7 +42,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     GetUserByPhoneUsers user,
     String password,
   ) async {
-    if (user.password != password) {
+    if (!DevFlags.bypassPasswordCheck && user.password != password) {
       throw Exception('Incorrect password');
     }
     if (!user.isActive) {

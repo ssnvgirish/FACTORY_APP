@@ -150,6 +150,10 @@ class FrameRepositoryImpl implements FrameRepository {
       remoteDataSource.deleteWritingEfficiency(id);
 
   @override
+  Future<void> submitWritingEfficiency(ReportWritingEfficiencyRecord record) =>
+      remoteDataSource.submitWritingEfficiency(record);
+
+  @override
   Future<void> submitCustomerRejectionReport(
     FrameCustomerRejectionReport report,
   ) => remoteDataSource.submitCustomerRejectionReport(report);

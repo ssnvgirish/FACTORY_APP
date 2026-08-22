@@ -3,8 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../domain/entities/admin_entities.dart';
 import '../bloc/admin_bloc.dart';
+
+int _dimensionCompare(String a, String b) {
+  final na = double.tryParse(RegExp(r'^\d+(\.\d+)?').stringMatch(a) ?? '');
+  final nb = double.tryParse(RegExp(r'^\d+(\.\d+)?').stringMatch(b) ?? '');
+  if (na != null && nb != null && na != nb) return na.compareTo(nb);
+  return a.compareTo(b);
+}
 
 class ReferenceTablesPage extends StatelessWidget {
   const ReferenceTablesPage({super.key});
@@ -42,7 +50,7 @@ class ReferenceTablesPage extends StatelessWidget {
           ),
           _LookupTile(
             title: 'Scrap Production Targets',
-            subtitle: 'Product → Target kg / hr',
+            subtitle: 'Machine → Target kg / hr',
             icon: Icons.track_changes,
             lookupType: MasterLookupType.scrapTargets,
           ),
@@ -206,22 +214,27 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
     }
     final entries = _entries;
     if (entries == null) return const LoadingWidget();
-    if (entries.isEmpty) {
+    if (entries.isEmpty && _sections.isEmpty && _densities.isEmpty) {
       return const EmptyStateWidget(message: 'No entries yet. Tap + to add.');
     }
     return _buildMatrix(context, entries);
   }
 
   Widget _buildMatrix(BuildContext context, List<MasterWeightEntry> entries) {
-    // Build row/column sets from the data.
-    final rowKeys = <String>{};
-    final colKeys = <String>{};
+    // Include master thicknesses/sections and densities so newly added
+    // master rows appear even before a weight cell is filled.
+    final rowKeys = <String>{
+      ..._sections.where((s) => s.isActive).map((s) => s.value),
+    };
+    final colKeys = <String>{
+      ..._densities.where((d) => d.isActive).map((d) => d.value),
+    };
     for (final e in entries) {
       rowKeys.add(e.key1);
       colKeys.add(e.key2);
     }
-    final rows = rowKeys.toList()..sort();
-    final cols = colKeys.toList()..sort();
+    final rows = rowKeys.toList()..sort(_dimensionCompare);
+    final cols = colKeys.toList()..sort(_dimensionCompare);
 
     // Build a lookup map for fast access.
     final lookup = <String, MasterWeightEntry>{};
@@ -336,7 +349,17 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
     required double height,
   }) {
     return GestureDetector(
-      onTap: entry == null ? null : () => _showEditDialog(context, entry),
+      onTap: () {
+        if (entry != null) {
+          _showEditDialog(context, entry);
+        } else {
+          _showAddDialog(
+            context,
+            prefillSection: rowKey,
+            prefillDensity: colKey,
+          );
+        }
+      },
       onLongPress: entry == null ? null : () => _confirmDelete(context, entry),
       child: Container(
         width: width,
@@ -358,9 +381,13 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
     );
   }
 
-  void _showAddDialog(BuildContext context) {
-    String? selectedSection;
-    String? selectedDensity;
+  void _showAddDialog(
+    BuildContext context, {
+    String? prefillSection,
+    String? prefillDensity,
+  }) {
+    String? selectedSection = prefillSection;
+    String? selectedDensity = prefillDensity;
     final wCtrl = TextEditingController();
 
     showDialog(
@@ -661,21 +688,25 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
     }
     final entries = _entries;
     if (entries == null) return const LoadingWidget();
-    if (entries.isEmpty) {
+    if (entries.isEmpty && _sections.isEmpty && _densities.isEmpty) {
       return const EmptyStateWidget(message: 'No entries yet. Tap + to add.');
     }
     return _buildMatrix(context, entries);
   }
 
   Widget _buildMatrix(BuildContext context, List<MasterTargetEntry> entries) {
-    final rowKeys = <String>{};
-    final colKeys = <String>{};
+    final rowKeys = <String>{
+      ..._sections.where((s) => s.isActive).map((s) => s.value),
+    };
+    final colKeys = <String>{
+      ..._densities.where((d) => d.isActive).map((d) => d.value),
+    };
     for (final e in entries) {
       rowKeys.add(e.key);
       if (e.density != null) colKeys.add(e.density!);
     }
-    final rows = rowKeys.toList()..sort();
-    final cols = colKeys.toList()..sort();
+    final rows = rowKeys.toList()..sort(_dimensionCompare);
+    final cols = colKeys.toList()..sort(_dimensionCompare);
     final hasDensity = cols.isNotEmpty;
 
     final lookup = <String, MasterTargetEntry>{};
@@ -833,7 +864,17 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
     required double height,
   }) {
     return GestureDetector(
-      onTap: entry == null ? null : () => _showEditDialog(context, entry),
+      onTap: () {
+        if (entry != null) {
+          _showEditDialog(context, entry);
+        } else {
+          _showAddDialog(
+            context,
+            prefillSection: rowKey,
+            prefillDensity: colKey,
+          );
+        }
+      },
       onLongPress: entry == null ? null : () => _confirmDelete(context, entry),
       child: Container(
         width: width,
@@ -855,9 +896,13 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
     );
   }
 
-  void _showAddDialog(BuildContext context) {
-    String? selectedSection;
-    String? selectedDensity;
+  void _showAddDialog(
+    BuildContext context, {
+    String? prefillSection,
+    String? prefillDensity,
+  }) {
+    String? selectedSection = prefillSection;
+    String? selectedDensity = prefillDensity;
     final vCtrl = TextEditingController();
 
     showDialog(
@@ -1140,7 +1185,7 @@ class _ScrapTargetPageState extends State<_ScrapTargetPage> {
         children: [
           Expanded(
             child: Text(
-              'Product',
+              'Machine',
               style: GoogleFonts.sourceCodePro(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -1203,50 +1248,57 @@ class _ScrapTargetPageState extends State<_ScrapTargetPage> {
   }
 
   void _showAddDialog(BuildContext context) {
-    final kCtrl = TextEditingController();
+    String? selectedMachine;
     final vCtrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add Scrap Target'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: kCtrl,
-              decoration: const InputDecoration(labelText: 'Product'),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Add Scrap Target'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedMachine,
+                decoration: const InputDecoration(labelText: 'Machine'),
+                items: ddp.scrapMachines
+                    .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+                    .toList(),
+                onChanged: (v) => setState(() => selectedMachine = v),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: vCtrl,
+                decoration: const InputDecoration(labelText: 'Target (kg/hr)'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: vCtrl,
-              decoration: const InputDecoration(labelText: 'Target (kg/hr)'),
-              keyboardType: TextInputType.number,
+            ElevatedButton(
+              onPressed: () {
+                if (selectedMachine == null) return;
+                context.read<AdminBloc>().add(
+                  SaveMasterTargetEntry(
+                    MasterLookupType.scrapTargets,
+                    MasterTargetEntry(
+                      id: '',
+                      key: selectedMachine!,
+                      target: double.tryParse(vCtrl.text) ?? 0,
+                    ),
+                    isNew: true,
+                  ),
+                );
+                Navigator.pop(ctx);
+              },
+              child: const Text('Add'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<AdminBloc>().add(
-                SaveMasterTargetEntry(
-                  MasterLookupType.scrapTargets,
-                  MasterTargetEntry(
-                    id: '',
-                    key: kCtrl.text.trim(),
-                    target: double.tryParse(vCtrl.text) ?? 0,
-                  ),
-                  isNew: true,
-                ),
-              );
-              Navigator.pop(ctx);
-            },
-            child: const Text('Add'),
-          ),
-        ],
       ),
     );
   }

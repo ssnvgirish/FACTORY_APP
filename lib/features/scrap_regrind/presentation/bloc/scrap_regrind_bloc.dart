@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
 import '../../domain/repositories/scrap_regrind_repository.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
+import '../../../../core/utils/calculations.dart';
 import '../../../../core/utils/report_list_pagination.dart';
 
 // ═══════════════════════════════════════
@@ -836,10 +838,66 @@ class ScrapRegrindBloc extends Bloc<ScrapRegrindEvent, ScrapRegrindState> {
         return;
       }
       await scrapRegrindRepository.submitProductionDetailsReport(event.report);
+      await _generateScrapWeightReport(event.report);
+      await _generateWritingEfficiency(event.report);
       emit(ScrapRegrindSubmitted('Production details report submitted'));
     } catch (e) {
       emit(ScrapRegrindError(e.toString()));
     }
+  }
+
+  Future<void> _generateScrapWeightReport(
+    ScrapProductionDetailsReport report,
+  ) async {
+    final targetPerHour = ddp.scrapTargets[report.machineNumber] ?? 0;
+    if (targetPerHour <= 0) return;
+    const shiftHours = 12.0;
+    const maintenanceHours = 0.0;
+    final targetWeight = Calculations.scrapTargetWeight(
+      shiftDurationHours: shiftHours,
+      maintenanceDurationHours: maintenanceHours,
+      targetWeightPerHour: targetPerHour,
+    );
+    final maintenanceWeight = Calculations.scrapMaintenanceWeight(
+      maintenanceHours,
+      targetPerHour,
+    );
+    final totalWeight = report.totalProductionWeight + maintenanceWeight;
+    final efficiency = Calculations.productionEfficiency(
+      totalWeight,
+      targetWeight,
+    );
+    await scrapRegrindRepository.submitProductionWeightReport(
+      ScrapProductionWeightReport(
+        date: report.date,
+        machineNumber: report.machineNumber,
+        shift: report.shift,
+        totalProductionWeight: report.totalProductionWeight,
+        maintenanceWeight: maintenanceWeight,
+        totalWeight: totalWeight,
+        targetWeight: targetWeight,
+        efficiencyPercentage: efficiency,
+        createdBy: report.createdBy,
+      ),
+    );
+  }
+
+  Future<void> _generateWritingEfficiency(
+    ScrapProductionDetailsReport report,
+  ) async {
+    final submittedAt = report.submittedAt ?? DateTime.now();
+    final shiftEnd = Calculations.shiftEndTime(report.date, report.shift);
+    await scrapRegrindRepository.submitWritingEfficiency(
+      ScrapReportWritingEfficiency(
+        date: report.date,
+        machineNumber: report.machineNumber,
+        shift: report.shift,
+        submittedAt: submittedAt,
+        shiftEndTime: shiftEnd,
+        score: Calculations.reportWritingScore(submittedAt, shiftEnd),
+        operatorId: report.createdBy,
+      ),
+    );
   }
 
   Future<void> _onLoadProductionDetailsForShift(

@@ -11,7 +11,8 @@ import '../../domain/entities/frame_entities.dart';
 import '../bloc/frame_reports_bloc.dart';
 
 class FrameProductionDetailsFormPage extends StatefulWidget {
-  const FrameProductionDetailsFormPage({super.key});
+  final FrameProductionDetailsReport? existing;
+  const FrameProductionDetailsFormPage({super.key, this.existing});
 
   @override
   State<FrameProductionDetailsFormPage> createState() =>
@@ -25,6 +26,30 @@ class _FrameProductionDetailsFormPageState
   String? _machineNumber;
   String? _shift;
   final List<_LineItemData> _lineItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.existing;
+    if (existing != null) {
+      _date = existing.date;
+      _machineNumber = existing.machineNumber;
+      _shift = existing.shift;
+      for (final li in existing.lineItems) {
+        final item = _LineItemData()
+          ..section = li.section
+          ..density = li.density
+          ..color = li.color
+          ..timeOfChange = li.timeOfChange;
+        item.lengthCtrl.text = li.length.toString();
+        item.quantityCtrl.text = li.quantity.toString();
+        if (li.manualWeightPerFoot != null) {
+          item.manualWeightCtrl.text = li.manualWeightPerFoot.toString();
+        }
+        _lineItems.add(item);
+      }
+    }
+  }
 
   Map<String, Map<String, double>> get _weightTable => ddp.frameWeights;
 
@@ -76,7 +101,17 @@ class _FrameProductionDetailsFormPageState
 
   void _addLineItem() {
     setState(() {
-      _lineItems.add(_LineItemData());
+      final next = _LineItemData();
+      if (_lineItems.isNotEmpty) {
+        final first = _lineItems.first;
+        next.section = first.section;
+        next.density = first.density;
+        next.color = first.color;
+        if (first.density == 'Others') {
+          next.manualWeightCtrl.text = first.manualWeightCtrl.text;
+        }
+      }
+      _lineItems.add(next);
     });
   }
 
@@ -146,6 +181,7 @@ class _FrameProductionDetailsFormPageState
           createdBy: authState.user.uid,
           submittedAt: DateTime.now(),
         ),
+        replaceId: widget.existing?.id,
       ),
     );
   }
@@ -170,6 +206,7 @@ class _FrameProductionDetailsFormPageState
             ),
           );
           Navigator.pop(context);
+          if (widget.existing != null) Navigator.pop(context);
         }
         if (state is FrameReportsError) {
           debugPrint('FrameReportsError: ${state.message}');
@@ -182,7 +219,13 @@ class _FrameProductionDetailsFormPageState
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('New Production Details')),
+        appBar: AppBar(
+          title: Text(
+            widget.existing == null
+                ? 'New Production Details'
+                : 'Edit Production Details',
+          ),
+        ),
         body: Form(
           key: _formKey,
           child: ListView(

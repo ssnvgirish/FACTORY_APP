@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/frame_reports_bloc.dart';
 import 'frame_packing_report_form_page.dart';
 
@@ -13,8 +15,9 @@ class FramePackingReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Shift Packing Reports')),
+    return ReportListPageShell(
+      title: 'Shift Packing Reports',
+      machines: ddp.frameMachines,
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
@@ -22,10 +25,18 @@ class FramePackingReportListPage extends StatelessWidget {
         ),
         child: const Icon(Icons.add),
       ),
-      body: BlocBuilder<FrameReportsBloc, FrameReportsState>(
-        builder: (context, state) {
-          if (state is FrameReportsLoading) return const LoadingWidget();
-          if (state is ShiftPackingReportsLoaded) {
+      onQueryChanged: (q) => context.read<FrameReportsBloc>().add(
+        LoadShiftPackingReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<FrameReportsBloc, FrameReportsState>(
+          builder: (context, state) {
+            if (state is FrameReportsLoading) return const LoadingWidget();
+            if (state is ShiftPackingReportsLoaded) {
             return PaginatedListView(
               items: state.reports,
               hasMore: state.hasMore,
@@ -39,6 +50,7 @@ class FramePackingReportListPage extends StatelessWidget {
                 );
                 context.read<FrameReportsBloc>().add(
                   LoadShiftPackingReports(
+                    machineNumber: query.machineNumber,
                     startDate: range.start,
                     endDate: range.end,
                     append: true,
@@ -46,11 +58,11 @@ class FramePackingReportListPage extends StatelessWidget {
                 );
               },
               onRefresh: () async {
-                final range = ReportWeekRange.initial();
                 context.read<FrameReportsBloc>().add(
                   LoadShiftPackingReports(
-                    startDate: range.start,
-                    endDate: range.end,
+                    machineNumber: query.machineNumber,
+                    startDate: query.startDate,
+                    endDate: query.endDate,
                   ),
                 );
               },
@@ -131,19 +143,11 @@ class FramePackingReportListPage extends StatelessWidget {
                 );
               },
             );
-          }
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final range = ReportWeekRange.initial();
-            context.read<FrameReportsBloc>().add(
-              LoadShiftPackingReports(
-                startDate: range.start,
-                endDate: range.end,
-              ),
-            );
-          });
-          return const LoadingWidget();
-        },
-      ),
+            }
+            return const LoadingWidget();
+          },
+        );
+      },
     );
   }
 }

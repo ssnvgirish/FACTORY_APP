@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/sheet_reports_bloc.dart';
 import 'sheet_packing_report_page.dart';
 
@@ -14,8 +16,9 @@ class SheetPackingReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sheet Shift Packing Reports')),
+    return ReportListPageShell(
+      title: 'Sheet Shift Packing Reports',
+      machines: ddp.sheetMachines,
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
@@ -25,10 +28,18 @@ class SheetPackingReportListPage extends StatelessWidget {
         ),
         child: const Icon(Icons.add),
       ),
-      body: BlocBuilder<SheetReportsBloc, SheetReportsState>(
-        builder: (context, state) {
-          if (state is SheetReportsLoading) return const LoadingWidget();
-          if (state is SheetPackingReportsLoaded) {
+      onQueryChanged: (q) => context.read<SheetReportsBloc>().add(
+        LoadSheetPackingReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<SheetReportsBloc, SheetReportsState>(
+          builder: (context, state) {
+            if (state is SheetReportsLoading) return const LoadingWidget();
+            if (state is SheetPackingReportsLoaded) {
             return PaginatedListView(
               items: state.reports,
               hasMore: state.hasMore,
@@ -42,6 +53,7 @@ class SheetPackingReportListPage extends StatelessWidget {
                 );
                 context.read<SheetReportsBloc>().add(
                   LoadSheetPackingReports(
+                    machineNumber: query.machineNumber,
                     startDate: range.start,
                     endDate: range.end,
                     append: true,
@@ -49,11 +61,11 @@ class SheetPackingReportListPage extends StatelessWidget {
                 );
               },
               onRefresh: () async {
-                final range = ReportWeekRange.initial();
                 context.read<SheetReportsBloc>().add(
                   LoadSheetPackingReports(
-                    startDate: range.start,
-                    endDate: range.end,
+                    machineNumber: query.machineNumber,
+                    startDate: query.startDate,
+                    endDate: query.endDate,
                   ),
                 );
               },
@@ -139,20 +151,11 @@ class SheetPackingReportListPage extends StatelessWidget {
                 );
               },
             );
-          }
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final range = ReportWeekRange.initial();
-            context.read<SheetReportsBloc>().add(
-              LoadSheetPackingReports(
-                startDate: range.start,
-                endDate: range.end,
-              ),
-            );
-          });
-          return const LoadingWidget();
-        },
-      ),
+            }
+            return const LoadingWidget();
+          },
+        );
+      },
     );
   }
 }

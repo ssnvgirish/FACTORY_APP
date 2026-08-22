@@ -65,6 +65,7 @@ abstract class ScrapRegrindRepository {
     DateTime? endDate,
   });
   Future<void> deleteWritingEfficiency(String id);
+  Future<void> submitWritingEfficiency(ScrapReportWritingEfficiency record);
 
   // Scrap Quality Report
   Future<void> submitScrapQualityReport(ScrapQualityReport report);

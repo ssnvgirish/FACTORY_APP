@@ -68,6 +68,7 @@ abstract class ScrapRegrindRemoteDataSource {
     DateTime? endDate,
   });
   Future<void> deleteWritingEfficiency(String id);
+  Future<void> submitWritingEfficiency(ScrapReportWritingEfficiency record);
 
   // Scrap Quality Report
   Future<void> submitScrapQualityReport(ScrapQualityReport report);
@@ -509,6 +510,29 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     await connector
         .deleteScrapWritingEfficiency(
           id: DeleteScrapWritingEfficiencyVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
+  Future<void> submitWritingEfficiency(
+    ScrapReportWritingEfficiency record,
+  ) async {
+    final submittedAt = record.submittedAt ?? DateTime.now();
+    await connector
+        .createScrapWritingEfficiency(
+          date: record.date,
+          machineNumber: record.machineNumber,
+          shift: record.shift,
+          shiftEndTime: Timestamp(
+            0,
+            record.shiftEndTime.millisecondsSinceEpoch ~/ 1000,
+          ),
+          score: record.score,
+          operatorId: record.operatorId,
+        )
+        .submittedAt(
+          Timestamp(0, submittedAt.millisecondsSinceEpoch ~/ 1000),
         )
         .execute();
   }

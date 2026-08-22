@@ -229,7 +229,7 @@ mutation DeleteMasterScrapProduct($id: MasterScrapProduct_Key!) @auth(level: PUB
 # ── MasterFrameWeight ──
 
 query ListMasterFrameWeights @auth(level: PUBLIC) {
-  masterFrameWeights {
+  masterFrameWeights(limit: 1000) {
     id section density weightPerFoot
   }
 }
@@ -249,7 +249,7 @@ mutation DeleteMasterFrameWeight($id: MasterFrameWeight_Key!) @auth(level: PUBLI
 # ── MasterSheetWeight ──
 
 query ListMasterSheetWeights @auth(level: PUBLIC) {
-  masterSheetWeights {
+  masterSheetWeights(limit: 1000) {
     id thickness density weightPerSqft
   }
 }
@@ -269,7 +269,7 @@ mutation DeleteMasterSheetWeight($id: MasterSheetWeight_Key!) @auth(level: PUBLI
 # ── MasterFrameTarget ──
 
 query ListMasterFrameTargets @auth(level: PUBLIC) {
-  masterFrameTargets {
+  masterFrameTargets(limit: 1000) {
     id section density targetKgPerHour
   }
 }
@@ -289,7 +289,7 @@ mutation DeleteMasterFrameTarget($id: MasterFrameTarget_Key!) @auth(level: PUBLI
 # ── MasterSheetTarget ──
 
 query ListMasterSheetTargets @auth(level: PUBLIC) {
-  masterSheetTargets {
+  masterSheetTargets(limit: 1000) {
     id thickness density targetFeetPerHour
   }
 }

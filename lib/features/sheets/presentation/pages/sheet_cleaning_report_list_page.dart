@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/sheet_reports_bloc.dart';
 import 'sheet_cleaning_report_form_page.dart';
 
@@ -13,20 +15,28 @@ class SheetCleaningReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SheetReportsBloc, SheetReportsState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Sheet Cleaning Reports')),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const SheetCleaningReportFormPage(),
-              ),
-            ),
-            child: const Icon(Icons.add),
+    return ReportListPageShell(
+      title: 'Sheet Cleaning Reports',
+      machines: ddp.sheetMachines,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const SheetCleaningReportFormPage(),
           ),
-          body: () {
+        ),
+        child: const Icon(Icons.add),
+      ),
+      onQueryChanged: (q) => context.read<SheetReportsBloc>().add(
+        LoadSheetCleaningReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<SheetReportsBloc, SheetReportsState>(
+          builder: (context, state) {
             if (state is SheetReportsLoading) return const LoadingWidget();
             if (state is SheetCleaningReportsLoaded) {
               return PaginatedListView(
@@ -42,6 +52,7 @@ class SheetCleaningReportListPage extends StatelessWidget {
                   );
                   context.read<SheetReportsBloc>().add(
                     LoadSheetCleaningReports(
+                      machineNumber: query.machineNumber,
                       startDate: range.start,
                       endDate: range.end,
                       append: true,
@@ -49,11 +60,11 @@ class SheetCleaningReportListPage extends StatelessWidget {
                   );
                 },
                 onRefresh: () async {
-                  final range = ReportWeekRange.initial();
                   context.read<SheetReportsBloc>().add(
                     LoadSheetCleaningReports(
-                      startDate: range.start,
-                      endDate: range.end,
+                      machineNumber: query.machineNumber,
+                      startDate: query.startDate,
+                      endDate: query.endDate,
                     ),
                   );
                 },
@@ -70,8 +81,8 @@ class SheetCleaningReportListPage extends StatelessWidget {
                     onDelete: r.id == null
                         ? null
                         : () => context.read<SheetReportsBloc>().add(
-                              DeleteSheetCleaningReport(r.id!),
-                            ),
+                            DeleteSheetCleaningReport(r.id!),
+                          ),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -108,17 +119,8 @@ class SheetCleaningReportListPage extends StatelessWidget {
                 },
               );
             }
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              final range = ReportWeekRange.initial();
-              context.read<SheetReportsBloc>().add(
-                LoadSheetCleaningReports(
-                  startDate: range.start,
-                  endDate: range.end,
-                ),
-              );
-            });
             return const LoadingWidget();
-          }(),
+          },
         );
       },
     );

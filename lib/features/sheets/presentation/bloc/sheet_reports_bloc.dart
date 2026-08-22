@@ -101,7 +101,8 @@ class LoadSheetProductionDetailsReports extends SheetReportsEvent {
 
 class SubmitSheetProductionDetailsReport extends SheetReportsEvent {
   final SheetProductionDetailsReport report;
-  SubmitSheetProductionDetailsReport(this.report);
+  final String? replaceId;
+  SubmitSheetProductionDetailsReport(this.report, {this.replaceId});
 }
 
 class DeleteSheetProductionDetailsReport extends SheetReportsEvent {
@@ -661,7 +662,7 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
           e.report.date,
           e.report.shift,
         );
-        if (existing != null) {
+        if (existing != null && existing.id != e.replaceId) {
           emit(
             SheetReportsError(
               'Production details already exist for ${e.report.machineNumber} — ${e.report.shift} on this date',
@@ -669,8 +670,12 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
           );
           return;
         }
+        if (e.replaceId != null) {
+          await sheetRepository.deleteProductionDetailsReport(e.replaceId!);
+        }
         await sheetRepository.submitProductionDetailsReport(e.report);
         await _generateRunningFeetReport(e.report);
+        await _generateWritingEfficiency(e.report);
         emit(SheetReportsSubmitted('Production Details Report submitted'));
       } catch (err) {
         emit(SheetReportsError(err.toString()));
@@ -1101,7 +1106,6 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
       segments: segments,
       targetPerHour: sheetTargets,
     );
-    if (targetRunningFeet == 0) return;
 
     const maintenanceRunningFeet = 0.0;
     final totalProductionRunningFeet =
@@ -1122,6 +1126,24 @@ class SheetReportsBloc extends Bloc<SheetReportsEvent, SheetReportsState> {
         targetRunningFeet: targetRunningFeet,
         efficiencyPercentage: efficiency,
         createdBy: report.createdBy,
+      ),
+    );
+  }
+
+  Future<void> _generateWritingEfficiency(
+    SheetProductionDetailsReport report,
+  ) async {
+    final submittedAt = report.submittedAt ?? DateTime.now();
+    final shiftEnd = Calculations.shiftEndTime(report.date, report.shift);
+    await sheetRepository.submitWritingEfficiency(
+      ReportWritingEfficiencyRecord(
+        date: report.date,
+        machineNumber: report.machineNumber,
+        shift: report.shift,
+        submittedAt: submittedAt,
+        shiftEndTime: shiftEnd,
+        score: Calculations.reportWritingScore(submittedAt, shiftEnd),
+        operatorId: report.createdBy,
       ),
     );
   }

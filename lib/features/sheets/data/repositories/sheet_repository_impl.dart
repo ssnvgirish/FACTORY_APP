@@ -129,6 +129,10 @@ class SheetRepositoryImpl implements SheetRepository {
   @override
   Future<void> deleteWritingEfficiency(String id) =>
       remoteDataSource.deleteWritingEfficiency(id);
+
+  @override
+  Future<void> submitWritingEfficiency(ReportWritingEfficiencyRecord record) =>
+      remoteDataSource.submitWritingEfficiency(record);
   @override
   Future<void> submitCustomerRejectionReport(
     SheetCustomerRejectionReport report,

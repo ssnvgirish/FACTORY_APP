@@ -10,19 +10,31 @@ class ReportDetailPage extends StatelessWidget {
   final String title;
   final List<ReportField> fields;
   final List<ReportSection>? sections;
+  final VoidCallback? onEdit;
 
   const ReportDetailPage({
     super.key,
     required this.title,
     required this.fields,
     this.sections,
+    this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+        actions: [
+          if (onEdit != null)
+            TextButton.icon(
+              onPressed: onEdit,
+              icon: const Icon(Icons.edit_outlined),
+              label: const Text('Edit'),
+            ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

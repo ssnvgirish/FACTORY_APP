@@ -104,7 +104,8 @@ class LoadProductionDetailsReports extends FrameReportsEvent {
 
 class SubmitProductionDetailsReport extends FrameReportsEvent {
   final FrameProductionDetailsReport report;
-  SubmitProductionDetailsReport(this.report);
+  final String? replaceId;
+  SubmitProductionDetailsReport(this.report, {this.replaceId});
 }
 
 class LoadProductionDetailsForShift extends FrameReportsEvent {
@@ -806,7 +807,7 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
         event.report.date,
         event.report.shift,
       );
-      if (existing != null) {
+      if (existing != null && existing.id != event.replaceId) {
         emit(
           FrameReportsError(
             'Production details already exist for ${event.report.machineNumber} — ${event.report.shift} on this date',
@@ -814,10 +815,14 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
         );
         return;
       }
+      if (event.replaceId != null) {
+        await frameRepository.deleteProductionDetailsReport(event.replaceId!);
+      }
       await frameRepository.submitProductionDetailsReport(event.report);
 
       // Auto-generate production weight report from the submitted details
       await _generateWeightReport(event.report);
+      await _generateWritingEfficiency(event.report);
 
       emit(FrameReportsSubmitted('Production Details Report submitted'));
     } catch (e) {
@@ -907,6 +912,24 @@ class FrameReportsBloc extends Bloc<FrameReportsEvent, FrameReportsState> {
         targetWeight: targetWeight,
         efficiencyPercentage: efficiency,
         createdBy: report.createdBy,
+      ),
+    );
+  }
+
+  Future<void> _generateWritingEfficiency(
+    FrameProductionDetailsReport report,
+  ) async {
+    final submittedAt = report.submittedAt ?? DateTime.now();
+    final shiftEnd = Calculations.shiftEndTime(report.date, report.shift);
+    await frameRepository.submitWritingEfficiency(
+      ReportWritingEfficiencyRecord(
+        date: report.date,
+        machineNumber: report.machineNumber,
+        shift: report.shift,
+        submittedAt: submittedAt,
+        shiftEndTime: shiftEnd,
+        score: Calculations.reportWritingScore(submittedAt, shiftEnd),
+        operatorId: report.createdBy,
       ),
     );
   }

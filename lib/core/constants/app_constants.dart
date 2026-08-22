@@ -1,6 +1,8 @@
 class AppConstants {
   AppConstants._();
 
+  static const Duration reportEditWindow = Duration(hours: 1);
+
   // Machine names
   static const String frameMachine1 = 'Frame Machine 1';
   static const String frameMachine2 = 'Frame Machine 2';
@@ -466,15 +468,12 @@ class AppConstants {
     'Others',
   ];
 
-  // Scrap target production weight per hour (kg) - per product/section
+  // Scrap target production weight per hour (kg) - per machine
   // (Admin-configurable; defaults below)
   static const Map<String, double> scrapTargetWeightPerHour = {
-    framesBrownScrap: 100.0,
-    sheetsBrownScrap: 100.0,
-    sheetsIvoryScrap: 100.0,
-    sheetsNfcScrap: 100.0,
-    sheetsOrangeScrap: 100.0,
-    mixScrap: 100.0,
+    pulverizerMachine1: 400.0,
+    pulverizerMachine2: 400.0,
+    pulverizerMachine3: 500.0,
   };
 
   // Scrap salary variable names

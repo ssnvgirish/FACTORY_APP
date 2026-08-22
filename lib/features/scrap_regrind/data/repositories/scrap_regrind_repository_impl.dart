@@ -135,6 +135,10 @@ class ScrapRegrindRepositoryImpl implements ScrapRegrindRepository {
       remoteDataSource.deleteWritingEfficiency(id);
 
   @override
+  Future<void> submitWritingEfficiency(ScrapReportWritingEfficiency record) =>
+      remoteDataSource.submitWritingEfficiency(record);
+
+  @override
   Future<void> submitScrapQualityReport(ScrapQualityReport report) =>
       remoteDataSource.submitScrapQualityReport(report);
 

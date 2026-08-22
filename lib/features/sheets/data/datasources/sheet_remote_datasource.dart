@@ -63,6 +63,7 @@ abstract class SheetRemoteDataSource {
     DateTime? endDate,
   });
   Future<void> deleteWritingEfficiency(String id);
+  Future<void> submitWritingEfficiency(ReportWritingEfficiencyRecord record);
   Future<void> submitCustomerRejectionReport(
     SheetCustomerRejectionReport report,
   );
@@ -598,6 +599,29 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     await connector
         .deleteSheetWritingEfficiency(
           id: DeleteSheetWritingEfficiencyVariablesId(id: id),
+        )
+        .execute();
+  }
+
+  @override
+  Future<void> submitWritingEfficiency(
+    ReportWritingEfficiencyRecord record,
+  ) async {
+    final submittedAt = record.submittedAt ?? DateTime.now();
+    await connector
+        .createSheetWritingEfficiency(
+          date: record.date,
+          machineNumber: record.machineNumber,
+          shift: record.shift,
+          shiftEndTime: Timestamp(
+            0,
+            record.shiftEndTime.millisecondsSinceEpoch ~/ 1000,
+          ),
+          score: record.score,
+          operatorId: record.operatorId,
+        )
+        .submittedAt(
+          Timestamp(0, submittedAt.millisecondsSinceEpoch ~/ 1000),
         )
         .execute();
   }

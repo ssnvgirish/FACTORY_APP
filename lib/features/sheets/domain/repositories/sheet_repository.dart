@@ -74,6 +74,7 @@ abstract class SheetRepository {
     DateTime? endDate,
   });
   Future<void> deleteWritingEfficiency(String id);
+  Future<void> submitWritingEfficiency(ReportWritingEfficiencyRecord record);
 
   // Customer Rejection
   Future<void> submitCustomerRejectionReport(

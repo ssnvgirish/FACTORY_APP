@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/config/dev_flags.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../bloc/auth_bloc.dart';
 
@@ -99,6 +100,33 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 40),
 
+                    if (DevFlags.bypassPasswordCheck) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.warningYellow.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.warningYellow),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.lock_open_outlined,
+                              color: AppTheme.warningYellow,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Testing build — any password is accepted',
+                                style: TextStyle(fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+
                     // Phone Number
                     TextFormField(
                       controller: _phoneController,
@@ -130,6 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: _obscurePassword,
                       textInputAction: TextInputAction.done,
                       validator: (v) {
+                        if (DevFlags.bypassPasswordCheck) return null;
                         if (v == null || v.isEmpty) {
                           return 'Password is required';
                         }
