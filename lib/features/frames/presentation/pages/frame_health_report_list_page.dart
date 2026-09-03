@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/frame_reports_bloc.dart';
 import 'frame_health_report_form_page.dart';
 
@@ -13,51 +14,46 @@ class FrameHealthReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FrameReportsBloc, FrameReportsState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Machine Health Reports')),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const FrameHealthReportFormPage(),
-              ),
-            ),
-            child: const Icon(Icons.add),
-          ),
-          body: _buildBody(context, state),
+    return ReportListPageShell(
+      title: 'Machine Health Reports',
+      machines: ddp.frameMachines,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const FrameHealthReportFormPage()),
+        ),
+        child: const Icon(Icons.add),
+      ),
+      onQueryChanged: (query) => context.read<FrameReportsBloc>().add(
+        LoadMachineHealthReports(
+          machineNumber: query.machineNumber,
+          startDate: query.startDate,
+          endDate: query.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<FrameReportsBloc, FrameReportsState>(
+          builder: (context, state) => _buildBody(context, state, query),
         );
       },
     );
   }
 
-  Widget _buildBody(BuildContext context, FrameReportsState state) {
+  Widget _buildBody(
+    BuildContext context,
+    FrameReportsState state,
+    ReportListQuery query,
+  ) {
     if (state is FrameReportsLoading) return const LoadingWidget();
     if (state is MachineHealthReportsLoaded) {
       return PaginatedListView(
         items: state.reports,
-        hasMore: state.hasMore,
-        isLoadingMore: state.isLoadingMore,
-        onLoadMore: () {
-          if (state.oldestLoadedStart == null || state.isLoadingMore) {
-            return;
-          }
-          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
-          context.read<FrameReportsBloc>().add(
-            LoadMachineHealthReports(
-              startDate: range.start,
-              endDate: range.end,
-              append: true,
-            ),
-          );
-        },
         onRefresh: () async {
-          final range = ReportWeekRange.initial();
           context.read<FrameReportsBloc>().add(
             LoadMachineHealthReports(
-              startDate: range.start,
-              endDate: range.end,
+              machineNumber: query.machineNumber,
+              startDate: query.startDate,
+              endDate: query.endDate,
             ),
           );
         },
@@ -129,12 +125,6 @@ class FrameHealthReportListPage extends StatelessWidget {
         },
       );
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final range = ReportWeekRange.initial();
-      context.read<FrameReportsBloc>().add(
-        LoadMachineHealthReports(startDate: range.start, endDate: range.end),
-      );
-    });
     return const LoadingWidget();
   }
 }
