@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/sheet_reports_bloc.dart';
 import 'sheet_health_report_page.dart';
 
@@ -14,49 +15,49 @@ class SheetHealthReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SheetReportsBloc, SheetReportsState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Sheet Machine Health Reports')),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const SheetHealthReportPage(machineId: ''),
-              ),
-            ),
-            child: const Icon(Icons.add),
+    return ReportListPageShell(
+      title: 'Sheet Machine Health Reports',
+      machines: ddp.sheetMachines,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const SheetHealthReportPage(machineId: ''),
           ),
-          body: _buildBody(context, state),
+        ),
+        child: const Icon(Icons.add),
+      ),
+      onQueryChanged: (q) => context.read<SheetReportsBloc>().add(
+        LoadSheetHealthReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<SheetReportsBloc, SheetReportsState>(
+          builder: (context, state) => _buildBody(context, state, query),
         );
       },
     );
   }
 
-  Widget _buildBody(BuildContext context, SheetReportsState state) {
+  Widget _buildBody(
+    BuildContext context,
+    SheetReportsState state,
+    ReportListQuery query,
+  ) {
     if (state is SheetReportsLoading) return const LoadingWidget();
     if (state is SheetHealthReportsLoaded) {
       return PaginatedListView(
         items: state.reports,
-        hasMore: state.hasMore,
-        isLoadingMore: state.isLoadingMore,
-        onLoadMore: () {
-          if (state.oldestLoadedStart == null || state.isLoadingMore) {
-            return;
-          }
-          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
+        onRefresh: () async {
           context.read<SheetReportsBloc>().add(
             LoadSheetHealthReports(
-              startDate: range.start,
-              endDate: range.end,
-              append: true,
+              machineNumber: query.machineNumber,
+              startDate: query.startDate,
+              endDate: query.endDate,
             ),
-          );
-        },
-        onRefresh: () async {
-          final range = ReportWeekRange.initial();
-          context.read<SheetReportsBloc>().add(
-            LoadSheetHealthReports(startDate: range.start, endDate: range.end),
           );
         },
         emptyMessage: 'No sheet machine health reports yet',
@@ -127,13 +128,6 @@ class SheetHealthReportListPage extends StatelessWidget {
         },
       );
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final range = ReportWeekRange.initial();
-      context.read<SheetReportsBloc>().add(
-        LoadSheetHealthReports(startDate: range.start, endDate: range.end),
-      );
-    });
     return const LoadingWidget();
   }
 }

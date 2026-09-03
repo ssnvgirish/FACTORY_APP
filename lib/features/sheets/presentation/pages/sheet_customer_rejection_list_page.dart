@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/sheet_reports_bloc.dart';
 import 'sheet_customer_rejection_page.dart';
 
@@ -14,8 +15,9 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sheet Customer Rejection Reports')),
+    return ReportListPageShell(
+      title: 'Sheet Customer Rejection Reports',
+      machines: ddp.sheetMachines,
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
@@ -25,7 +27,14 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
         ),
         child: const Icon(Icons.add),
       ),
-      body: BlocBuilder<SheetReportsBloc, SheetReportsState>(
+      onQueryChanged: (query) => context.read<SheetReportsBloc>().add(
+        LoadSheetCustomerRejectionReports(
+          machineNumber: query.machineNumber,
+          startDate: query.startDate,
+          endDate: query.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) => BlocBuilder<SheetReportsBloc, SheetReportsState>(
         builder: (context, state) {
           if (state is SheetReportsLoading) return const LoadingWidget();
           if (state is SheetReportsError) {
@@ -45,15 +54,13 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      final range = ReportWeekRange.initial();
-                      context.read<SheetReportsBloc>().add(
-                        LoadSheetCustomerRejectionReports(
-                          startDate: range.start,
-                          endDate: range.end,
-                        ),
-                      );
-                    },
+                    onPressed: () => context.read<SheetReportsBloc>().add(
+                      LoadSheetCustomerRejectionReports(
+                        machineNumber: query.machineNumber,
+                        startDate: query.startDate,
+                        endDate: query.endDate,
+                      ),
+                    ),
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
                   ),
@@ -64,29 +71,12 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
           if (state is SheetCustomerRejectionReportsLoaded) {
             return PaginatedListView(
               items: state.reports,
-              hasMore: state.hasMore,
-              isLoadingMore: state.isLoadingMore,
-              onLoadMore: () {
-                if (state.oldestLoadedStart == null || state.isLoadingMore) {
-                  return;
-                }
-                final range = ReportWeekRange.previousWeek(
-                  state.oldestLoadedStart!,
-                );
-                context.read<SheetReportsBloc>().add(
-                  LoadSheetCustomerRejectionReports(
-                    startDate: range.start,
-                    endDate: range.end,
-                    append: true,
-                  ),
-                );
-              },
               onRefresh: () async {
-                final range = ReportWeekRange.initial();
                 context.read<SheetReportsBloc>().add(
                   LoadSheetCustomerRejectionReports(
-                    startDate: range.start,
-                    endDate: range.end,
+                    machineNumber: query.machineNumber,
+                    startDate: query.startDate,
+                    endDate: query.endDate,
                   ),
                 );
               },
@@ -166,16 +156,6 @@ class SheetCustomerRejectionListPage extends StatelessWidget {
               },
             );
           }
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final range = ReportWeekRange.initial();
-            context.read<SheetReportsBloc>().add(
-              LoadSheetCustomerRejectionReports(
-                startDate: range.start,
-                endDate: range.end,
-              ),
-            );
-          });
           return const LoadingWidget();
         },
       ),
