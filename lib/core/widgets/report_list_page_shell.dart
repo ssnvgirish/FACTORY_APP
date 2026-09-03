@@ -47,7 +47,7 @@ class _ReportListPageShellState extends State<ReportListPageShell> {
     super.initState();
     final now = DateTime.now();
     _month = ReportWeekRange.monthStart(now);
-    _week = ReportWeekRange.weeksInMonth(_month);
+    _week = ReportWeekRange.weekOfMonthIndex(now);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) widget.onQueryChanged(_query);
     });

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../bloc/frame_reports_bloc.dart';
 
@@ -12,111 +14,113 @@ class FrameWeightReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Production Weight Reports')),
-      body: BlocBuilder<FrameReportsBloc, FrameReportsState>(
-        builder: (context, state) {
-          if (state is FrameReportsLoading) return const LoadingWidget();
-          if (state is ProductionWeightReportsLoaded) {
-            return PaginatedListView(
-              items: state.reports,
-              hasMore: state.hasMore,
-              isLoadingMore: state.isLoadingMore,
-              onLoadMore: () {
-                if (state.oldestLoadedStart == null || state.isLoadingMore) {
-                  return;
-                }
-                final range = ReportWeekRange.previousDay(
-                  state.oldestLoadedStart!,
-                );
-                context.read<FrameReportsBloc>().add(
-                  LoadProductionWeightReports(
-                    startDate: range.start,
-                    endDate: range.end,
-                    append: true,
-                  ),
-                );
-              },
-              onRefresh: () async {
-                final range = ReportWeekRange.initialDay();
-                context.read<FrameReportsBloc>().add(
-                  LoadProductionWeightReports(
-                    startDate: range.start,
-                    endDate: range.end,
-                  ),
-                );
-              },
-              emptyMessage: 'No production weight reports yet',
-              itemBuilder: (context, report, index) {
-                return ReportCard(
-                  key: ValueKey(report.id),
-                  title: '${report.machineNumber} — ${report.shift}',
-                  subtitle:
-                      '${DateFormat('dd MMM yyyy').format(report.date)} — Target: ${report.targetWeight.toStringAsFixed(1)} kg',
-                  trailing:
-                      '${report.efficiencyPercentage.toStringAsFixed(1)}%',
-                  statusColor: report.efficiencyPercentage >= 80
-                      ? AppTheme.successGreen
-                      : report.efficiencyPercentage >= 60
-                      ? AppTheme.warningYellow
-                      : AppTheme.errorRed,
-                  onDelete: report.id == null
-                      ? null
-                      : () => context.read<FrameReportsBloc>().add(
-                          DeleteProductionWeightReport(report.id!),
+    return ReportListPageShell(
+      title: 'Production Weight Reports',
+      machines: ddp.frameMachines,
+      onQueryChanged: (q) => context.read<FrameReportsBloc>().add(
+        LoadProductionWeightReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<FrameReportsBloc, FrameReportsState>(
+          builder: (context, state) {
+            if (state is FrameReportsLoading) return const LoadingWidget();
+            if (state is ProductionWeightReportsLoaded) {
+              return PaginatedListView(
+                items: state.reports,
+                hasMore: state.hasMore,
+                isLoadingMore: state.isLoadingMore,
+                onLoadMore: () {
+                  if (state.oldestLoadedStart == null || state.isLoadingMore) {
+                    return;
+                  }
+                  final range = ReportWeekRange.previousWeek(
+                    state.oldestLoadedStart!,
+                  );
+                  context.read<FrameReportsBloc>().add(
+                    LoadProductionWeightReports(
+                      machineNumber: query.machineNumber,
+                      startDate: range.start,
+                      endDate: range.end,
+                      append: true,
+                    ),
+                  );
+                },
+                onRefresh: () async {
+                  context.read<FrameReportsBloc>().add(
+                    LoadProductionWeightReports(
+                      machineNumber: query.machineNumber,
+                      startDate: query.startDate,
+                      endDate: query.endDate,
+                    ),
+                  );
+                },
+                emptyMessage: 'No production weight reports yet',
+                itemBuilder: (context, report, index) {
+                  return ReportCard(
+                    key: ValueKey(report.id),
+                    title: '${report.machineNumber} — ${report.shift}',
+                    subtitle:
+                        '${DateFormat('dd MMM yyyy').format(report.date)} — Target: ${report.targetWeight.toStringAsFixed(1)} kg',
+                    trailing:
+                        '${report.efficiencyPercentage.toStringAsFixed(1)}%',
+                    statusColor: report.efficiencyPercentage >= 80
+                        ? AppTheme.successGreen
+                        : report.efficiencyPercentage >= 60
+                        ? AppTheme.warningYellow
+                        : AppTheme.errorRed,
+                    onDelete: report.id == null
+                        ? null
+                        : () => context.read<FrameReportsBloc>().add(
+                            DeleteProductionWeightReport(report.id!),
+                          ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ReportDetailPage(
+                          title: 'Production Weight Report',
+                          fields: [
+                            ReportField(
+                              'Date',
+                              DateFormat('dd MMM yyyy').format(report.date),
+                            ),
+                            ReportField('Machine', report.machineNumber),
+                            ReportField('Shift', report.shift),
+                            ReportField(
+                              'Production Weight',
+                              '${report.productionWeight.toStringAsFixed(3)} kg',
+                            ),
+                            ReportField(
+                              'Maintenance Weight',
+                              '${report.maintenanceWeight.toStringAsFixed(3)} kg',
+                            ),
+                            ReportField(
+                              'Total Production Weight',
+                              '${report.totalProductionWeight.toStringAsFixed(3)} kg',
+                            ),
+                            ReportField(
+                              'Target Weight',
+                              '${report.targetWeight.toStringAsFixed(3)} kg',
+                            ),
+                            ReportField(
+                              'Efficiency',
+                              '${report.efficiencyPercentage.toStringAsFixed(1)}%',
+                            ),
+                          ],
                         ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ReportDetailPage(
-                        title: 'Production Weight Report',
-                        fields: [
-                          ReportField(
-                            'Date',
-                            DateFormat('dd MMM yyyy').format(report.date),
-                          ),
-                          ReportField('Machine', report.machineNumber),
-                          ReportField('Shift', report.shift),
-                          ReportField(
-                            'Production Weight',
-                            '${report.productionWeight.toStringAsFixed(3)} kg',
-                          ),
-                          ReportField(
-                            'Maintenance Weight',
-                            '${report.maintenanceWeight.toStringAsFixed(3)} kg',
-                          ),
-                          ReportField(
-                            'Total Production Weight',
-                            '${report.totalProductionWeight.toStringAsFixed(3)} kg',
-                          ),
-                          ReportField(
-                            'Target Weight',
-                            '${report.targetWeight.toStringAsFixed(3)} kg',
-                          ),
-                          ReportField(
-                            'Efficiency',
-                            '${report.efficiencyPercentage.toStringAsFixed(1)}%',
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final range = ReportWeekRange.initialDay();
-            context.read<FrameReportsBloc>().add(
-              LoadProductionWeightReports(
-                startDate: range.start,
-                endDate: range.end,
-              ),
-            );
-          });
-          return const LoadingWidget();
-        },
-      ),
+                  );
+                },
+              );
+            }
+            return const LoadingWidget();
+          },
+        );
+      },
     );
   }
 }

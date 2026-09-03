@@ -53,6 +53,10 @@ class ReportWeekRange {
     return ((last.day - 1) ~/ daysPerPage) + 1;
   }
 
+  /// 1-based index of the 7-day bucket that contains [value].
+  static int weekOfMonthIndex(DateTime value) =>
+      ((value.day - 1) ~/ daysPerPage) + 1;
+
   /// Today only (daily report lists).
   static ({DateTime start, DateTime end}) initialDay({DateTime? now}) =>
       initial(now: now, days: dayPerPage);

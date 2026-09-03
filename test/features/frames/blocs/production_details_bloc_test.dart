@@ -34,6 +34,7 @@ void main() {
     registerFallbackValue(TestFactories.fakeFrameWeightReport());
     registerFallbackValue(TestFactories.fakeFramePackingReport());
     registerFallbackValue(TestFactories.fakeCustomerRejection());
+    registerFallbackValue(TestFactories.fakeReportWritingRecord());
   });
 
   group('FrameReportsBloc — Production Details', () {
@@ -93,6 +94,9 @@ void main() {
         ).thenAnswer((_) async {});
         when(
           () => mockRepo.submitProductionWeightReport(any()),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockRepo.submitWritingEfficiency(any()),
         ).thenAnswer((_) async {});
         return FrameReportsBloc(
           frameRepository: mockRepo,
