@@ -7,17 +7,39 @@ import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/sheet_reports_bloc.dart';
 
-class SheetWritingEfficiencyPage extends StatelessWidget {
+class SheetWritingEfficiencyPage extends StatefulWidget {
   const SheetWritingEfficiencyPage({super.key});
+
+  @override
+  State<SheetWritingEfficiencyPage> createState() =>
+      _SheetWritingEfficiencyPageState();
+}
+
+class _SheetWritingEfficiencyPageState
+    extends State<SheetWritingEfficiencyPage> {
+  DateTime? _lastLoadedStartDate;
+  DateTime? _lastLoadedEndDate;
+
+  void _loadForDateRange(ReportListQuery query) {
+    final isSameStart = _lastLoadedStartDate == query.startDate;
+    final isSameEnd = _lastLoadedEndDate == query.endDate;
+    if (isSameStart && isSameEnd) return;
+    _lastLoadedStartDate = query.startDate;
+    _lastLoadedEndDate = query.endDate;
+    context.read<SheetReportsBloc>().add(
+      LoadSheetWritingEfficiency(
+        startDate: query.startDate,
+        endDate: query.endDate,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
       title: 'Sheet Report Writing Efficiency',
       machines: ddp.sheetMachines,
-      onQueryChanged: (q) => context.read<SheetReportsBloc>().add(
-        LoadSheetWritingEfficiency(startDate: q.startDate, endDate: q.endDate),
-      ),
+      onQueryChanged: _loadForDateRange,
       bodyBuilder: (context, query) {
         return BlocBuilder<SheetReportsBloc, SheetReportsState>(
           builder: (context, state) {

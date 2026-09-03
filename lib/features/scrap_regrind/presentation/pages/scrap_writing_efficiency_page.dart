@@ -7,20 +7,39 @@ import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/scrap_regrind_bloc.dart';
 
-class ScrapWritingEfficiencyPage extends StatelessWidget {
+class ScrapWritingEfficiencyPage extends StatefulWidget {
   const ScrapWritingEfficiencyPage({super.key});
+
+  @override
+  State<ScrapWritingEfficiencyPage> createState() =>
+      _ScrapWritingEfficiencyPageState();
+}
+
+class _ScrapWritingEfficiencyPageState
+    extends State<ScrapWritingEfficiencyPage> {
+  DateTime? _lastLoadedStartDate;
+  DateTime? _lastLoadedEndDate;
+
+  void _loadForDateRange(ReportListQuery query) {
+    final isSameStart = _lastLoadedStartDate == query.startDate;
+    final isSameEnd = _lastLoadedEndDate == query.endDate;
+    if (isSameStart && isSameEnd) return;
+    _lastLoadedStartDate = query.startDate;
+    _lastLoadedEndDate = query.endDate;
+    context.read<ScrapRegrindBloc>().add(
+      LoadScrapWritingEfficiency(
+        startDate: query.startDate,
+        endDate: query.endDate,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
       title: 'Report Writing Efficiency',
       machines: ddp.scrapMachines,
-      onQueryChanged: (q) => context.read<ScrapRegrindBloc>().add(
-        LoadScrapWritingEfficiency(
-          startDate: q.startDate,
-          endDate: q.endDate,
-        ),
-      ),
+      onQueryChanged: _loadForDateRange,
       bodyBuilder: (context, query) {
         return BlocBuilder<ScrapRegrindBloc, ScrapRegrindState>(
           builder: (context, state) {
@@ -29,7 +48,10 @@ class ScrapWritingEfficiencyPage extends StatelessWidget {
               final records = query.machineNumber == null
                   ? state.records
                   : state.records
-                        .where((record) => record.machineNumber == query.machineNumber)
+                        .where(
+                          (record) =>
+                              record.machineNumber == query.machineNumber,
+                        )
                         .toList();
               return PaginatedListView(
                 items: records,

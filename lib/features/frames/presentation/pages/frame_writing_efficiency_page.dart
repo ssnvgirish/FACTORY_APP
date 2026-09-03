@@ -7,17 +7,39 @@ import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/frame_reports_bloc.dart';
 
-class FrameWritingEfficiencyPage extends StatelessWidget {
+class FrameWritingEfficiencyPage extends StatefulWidget {
   const FrameWritingEfficiencyPage({super.key});
+
+  @override
+  State<FrameWritingEfficiencyPage> createState() =>
+      _FrameWritingEfficiencyPageState();
+}
+
+class _FrameWritingEfficiencyPageState
+    extends State<FrameWritingEfficiencyPage> {
+  DateTime? _lastLoadedStartDate;
+  DateTime? _lastLoadedEndDate;
+
+  void _loadForDateRange(ReportListQuery query) {
+    final isSameStart = _lastLoadedStartDate == query.startDate;
+    final isSameEnd = _lastLoadedEndDate == query.endDate;
+    if (isSameStart && isSameEnd) return;
+    _lastLoadedStartDate = query.startDate;
+    _lastLoadedEndDate = query.endDate;
+    context.read<FrameReportsBloc>().add(
+      LoadFrameWritingEfficiency(
+        startDate: query.startDate,
+        endDate: query.endDate,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
       title: 'Report Writing Efficiency',
       machines: ddp.frameMachines,
-      onQueryChanged: (q) => context.read<FrameReportsBloc>().add(
-        LoadFrameWritingEfficiency(startDate: q.startDate, endDate: q.endDate),
-      ),
+      onQueryChanged: _loadForDateRange,
       bodyBuilder: (context, query) {
         return BlocBuilder<FrameReportsBloc, FrameReportsState>(
           builder: (context, state) {

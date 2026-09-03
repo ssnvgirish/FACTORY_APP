@@ -86,6 +86,51 @@ void main() {
       expect(lastBuiltQuery, same(queries.last));
     },
   );
+
+  testWidgets(
+    'retains the last valid query until an invalid start date is corrected',
+    (tester) async {
+      final queries = <ReportListQuery>[];
+      ReportListQuery? lastBuiltQuery;
+      final today = ReportWeekRange.dateOnly(DateTime.now());
+      final validEnd = today.subtract(const Duration(days: 5));
+      final invalidStart = today.subtract(const Duration(days: 4));
+      final validStart = today.subtract(const Duration(days: 6));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ReportListPageShell(
+            title: 'Reports',
+            onQueryChanged: queries.add,
+            bodyBuilder: (_, query) {
+              lastBuiltQuery = query;
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await _selectDate(tester, 'To Date', validEnd);
+      expect(queries, hasLength(2));
+      expect(queries.last.endDate, validEnd);
+      expect(lastBuiltQuery, same(queries.last));
+
+      await _selectDate(tester, 'From Date', invalidStart);
+
+      expect(find.text('To Date cannot be before From Date'), findsOneWidget);
+      expect(queries, hasLength(2));
+      expect(lastBuiltQuery, same(queries.last));
+
+      await _selectDate(tester, 'From Date', validStart);
+
+      expect(find.text('To Date cannot be before From Date'), findsNothing);
+      expect(queries, hasLength(3));
+      expect(queries.last.startDate, validStart);
+      expect(queries.last.endDate, validEnd);
+      expect(lastBuiltQuery, same(queries.last));
+    },
+  );
 }
 
 Future<void> _selectDate(

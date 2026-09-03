@@ -20,7 +20,8 @@ import 'package:mocktail/mocktail.dart';
 
 class MockAdminRepository extends Mock implements AdminRepository {}
 
-class MockScrapRegrindRepository extends Mock implements ScrapRegrindRepository {}
+class MockScrapRegrindRepository extends Mock
+    implements ScrapRegrindRepository {}
 
 void main() {
   const machineNumber = AppConstants.crusherMachine1;
@@ -101,11 +102,7 @@ void main() {
       ),
     ).thenAnswer((_) async => []);
 
-    await _pumpPage(
-      tester,
-      scrapRepository,
-      const ScrapHealthReportListPage(),
-    );
+    await _pumpPage(tester, scrapRepository, const ScrapHealthReportListPage());
     await _selectQuery(tester, machineNumber, startDate, endDate);
 
     verify(
@@ -155,11 +152,7 @@ void main() {
       ),
     ).thenAnswer((_) async => []);
 
-    await _pumpPage(
-      tester,
-      scrapRepository,
-      const ScrapWeightReportListPage(),
-    );
+    await _pumpPage(tester, scrapRepository, const ScrapWeightReportListPage());
     await _selectQuery(tester, machineNumber, startDate, endDate);
 
     verify(
@@ -235,14 +228,6 @@ void main() {
       await _selectDate(tester, 'From Date', startDate);
       await _selectDate(tester, 'To Date', endDate);
 
-      verify(
-        () => scrapRepository.getReportWritingEfficiency(
-          operatorId: any(named: 'operatorId'),
-          startDate: startDate,
-          endDate: endDate,
-        ),
-      ).called(1);
-
       expect(find.text(AppConstants.crusherMachine1), findsWidgets);
       expect(find.text(AppConstants.crusherMachine2), findsWidgets);
 
@@ -251,6 +236,13 @@ void main() {
       await tester.tap(find.text(machineNumber).last);
       await tester.pumpAndSettle();
 
+      verify(
+        () => scrapRepository.getReportWritingEfficiency(
+          operatorId: any(named: 'operatorId'),
+          startDate: startDate,
+          endDate: endDate,
+        ),
+      ).called(1);
       expect(find.byType(ReportCard), findsOneWidget);
       expect(find.textContaining('10 Aug 2026'), findsOneWidget);
       expect(find.textContaining('11 Aug 2026'), findsNothing);

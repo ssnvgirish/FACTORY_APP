@@ -77,13 +77,15 @@ class _ReportListPageShellState extends State<ReportListPageShell> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    if (picked == null) return;
+    if (!mounted || picked == null) return;
+
+    final normalizedPicked = ReportWeekRange.dateOnly(picked);
 
     setState(() {
       if (isFromDate) {
-        _fromDate = picked;
+        _fromDate = normalizedPicked;
       } else {
-        _toDate = picked;
+        _toDate = normalizedPicked;
       }
     });
     _updateQueryIfValid();
