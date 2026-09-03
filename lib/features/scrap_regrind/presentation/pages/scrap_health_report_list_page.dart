@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
+import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/scrap_regrind_bloc.dart';
 import 'scrap_health_report_form_page.dart';
 
@@ -13,125 +14,113 @@ class ScrapHealthReportListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ScrapRegrindBloc, ScrapRegrindState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Machine Health Reports')),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ScrapHealthReportFormPage(),
-              ),
-            ),
-            child: const Icon(Icons.add),
+    return ReportListPageShell(
+      title: 'Machine Health Reports',
+      machines: ddp.scrapMachines,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ScrapHealthReportFormPage(),
           ),
-          body: _buildBody(context, state),
+        ),
+        child: const Icon(Icons.add),
+      ),
+      onQueryChanged: (q) => context.read<ScrapRegrindBloc>().add(
+        LoadScrapHealthReports(
+          machineNumber: q.machineNumber,
+          startDate: q.startDate,
+          endDate: q.endDate,
+        ),
+      ),
+      bodyBuilder: (context, query) {
+        return BlocBuilder<ScrapRegrindBloc, ScrapRegrindState>(
+          builder: (context, state) {
+            if (state is ScrapRegrindLoading) return const LoadingWidget();
+            if (state is ScrapHealthReportsLoaded) {
+              return PaginatedListView(
+                items: state.reports,
+                onRefresh: () async {
+                  context.read<ScrapRegrindBloc>().add(
+                    LoadScrapHealthReports(
+                      machineNumber: query.machineNumber,
+                      startDate: query.startDate,
+                      endDate: query.endDate,
+                    ),
+                  );
+                },
+                emptyMessage: 'No health reports yet',
+                itemBuilder: (context, report, index) {
+                  return ReportCard(
+                    key: ValueKey(report.id),
+                    title: report.machineNumber,
+                    subtitle:
+                        '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.shift}',
+                    trailing:
+                        '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
+                    statusColor: AppTheme.pendingBlue,
+                    onDelete: report.id == null
+                        ? null
+                        : () => context.read<ScrapRegrindBloc>().add(
+                            DeleteScrapHealthReport(report.id!),
+                          ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ReportDetailPage(
+                          title: 'Machine Health Report',
+                          fields: [
+                            ReportField(
+                              'Date',
+                              DateFormat('dd MMM yyyy').format(report.date),
+                            ),
+                            ReportField('Machine', report.machineNumber),
+                            ReportField('Shift', report.shift),
+                            ReportField(
+                              'Total Maintenance Hours',
+                              '${report.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
+                            ),
+                          ],
+                          sections: [
+                            ReportSection(
+                              title: 'Maintenance Entries',
+                              itemLabel: 'Entry',
+                              items: report.entries
+                                  .map(
+                                    (e) => ReportSectionItem(
+                                      heading: e.maintenanceItem,
+                                      fields: [
+                                        ReportField(
+                                          'Start',
+                                          DateFormat('hh:mm a').format(e.startTime),
+                                        ),
+                                        ReportField(
+                                          'End',
+                                          DateFormat('hh:mm a').format(e.endTime),
+                                        ),
+                                        ReportField(
+                                          'Duration',
+                                          '${e.durationHours.toStringAsFixed(2)}h',
+                                        ),
+                                        ReportField('Person', e.personDoingMaintenance),
+                                        ReportField('Description', e.description),
+                                      ],
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return const LoadingWidget();
+          },
         );
       },
     );
-  }
-
-  Widget _buildBody(BuildContext context, ScrapRegrindState state) {
-    if (state is ScrapRegrindLoading) return const LoadingWidget();
-    if (state is ScrapHealthReportsLoaded) {
-      return PaginatedListView(
-        items: state.reports,
-        hasMore: state.hasMore,
-        isLoadingMore: state.isLoadingMore,
-        onLoadMore: () {
-          if (state.oldestLoadedStart == null || state.isLoadingMore) {
-            return;
-          }
-          final range = ReportWeekRange.previousWeek(state.oldestLoadedStart!);
-          context.read<ScrapRegrindBloc>().add(
-            LoadScrapHealthReports(
-              startDate: range.start,
-              endDate: range.end,
-              append: true,
-            ),
-          );
-        },
-        onRefresh: () async {
-          final range = ReportWeekRange.initial();
-          context.read<ScrapRegrindBloc>().add(
-            LoadScrapHealthReports(startDate: range.start, endDate: range.end),
-          );
-        },
-        emptyMessage: 'No health reports yet',
-        itemBuilder: (context, report, index) {
-          return ReportCard(
-            key: ValueKey(report.id),
-            title: report.machineNumber,
-            subtitle:
-                '${DateFormat('dd MMM yyyy').format(report.date)} — ${report.shift}',
-            trailing:
-                '${report.totalMaintenanceDurationHours.toStringAsFixed(1)}h',
-            statusColor: AppTheme.pendingBlue,
-            onDelete: report.id == null
-                ? null
-                : () => context.read<ScrapRegrindBloc>().add(
-                    DeleteScrapHealthReport(report.id!),
-                  ),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ReportDetailPage(
-                  title: 'Machine Health Report',
-                  fields: [
-                    ReportField(
-                      'Date',
-                      DateFormat('dd MMM yyyy').format(report.date),
-                    ),
-                    ReportField('Machine', report.machineNumber),
-                    ReportField('Shift', report.shift),
-                    ReportField(
-                      'Total Maintenance Hours',
-                      '${report.totalMaintenanceDurationHours.toStringAsFixed(2)}h',
-                    ),
-                  ],
-                  sections: [
-                    ReportSection(
-                      title: 'Maintenance Entries',
-                      itemLabel: 'Entry',
-                      items: report.entries
-                          .map(
-                            (e) => ReportSectionItem(
-                              heading: e.maintenanceItem,
-                              fields: [
-                                ReportField(
-                                  'Start',
-                                  DateFormat('hh:mm a').format(e.startTime),
-                                ),
-                                ReportField(
-                                  'End',
-                                  DateFormat('hh:mm a').format(e.endTime),
-                                ),
-                                ReportField(
-                                  'Duration',
-                                  '${e.durationHours.toStringAsFixed(2)}h',
-                                ),
-                                ReportField('Person', e.personDoingMaintenance),
-                                ReportField('Description', e.description),
-                              ],
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final range = ReportWeekRange.initial();
-      context.read<ScrapRegrindBloc>().add(
-        LoadScrapHealthReports(startDate: range.start, endDate: range.end),
-      );
-    });
-    return const LoadingWidget();
   }
 }
