@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../../../../core/widgets/report_list_page_shell.dart';
@@ -37,112 +36,97 @@ class FramePackingReportListPage extends StatelessWidget {
           builder: (context, state) {
             if (state is FrameReportsLoading) return const LoadingWidget();
             if (state is ShiftPackingReportsLoaded) {
-            return PaginatedListView(
-              items: state.reports,
-              hasMore: state.hasMore,
-              isLoadingMore: state.isLoadingMore,
-              onLoadMore: () {
-                if (state.oldestLoadedStart == null || state.isLoadingMore) {
-                  return;
-                }
-                final range = ReportWeekRange.previousWeek(
-                  state.oldestLoadedStart!,
-                );
-                context.read<FrameReportsBloc>().add(
-                  LoadShiftPackingReports(
-                    machineNumber: query.machineNumber,
-                    startDate: range.start,
-                    endDate: range.end,
-                    append: true,
-                  ),
-                );
-              },
-              onRefresh: () async {
-                context.read<FrameReportsBloc>().add(
-                  LoadShiftPackingReports(
-                    machineNumber: query.machineNumber,
-                    startDate: query.startDate,
-                    endDate: query.endDate,
-                  ),
-                );
-              },
-              emptyMessage: 'No packing reports yet',
-              itemBuilder: (context, report, index) {
-                return ReportCard(
-                  key: ValueKey(report.id),
-                  title: '${report.machineNumber} — ${report.shift}',
-                  subtitle:
-                      '${DateFormat('dd MMM yyyy').format(report.date)} — Quality: ${report.qualityAcceptancePercentage.toStringAsFixed(1)}%',
-                  trailing: '${report.packingEfficiency.toStringAsFixed(1)}%',
-                  statusColor: report.packingEfficiency >= 90
-                      ? AppTheme.successGreen
-                      : AppTheme.warningYellow,
-                  onDelete: report.id == null
-                      ? null
-                      : () => context.read<FrameReportsBloc>().add(
-                          DeleteShiftPackingReport(report.id!),
+              return PaginatedListView(
+                items: state.reports,
+                onRefresh: () async {
+                  context.read<FrameReportsBloc>().add(
+                    LoadShiftPackingReports(
+                      machineNumber: query.machineNumber,
+                      startDate: query.startDate,
+                      endDate: query.endDate,
+                    ),
+                  );
+                },
+                emptyMessage: 'No packing reports yet',
+                itemBuilder: (context, report, index) {
+                  return ReportCard(
+                    key: ValueKey(report.id),
+                    title: '${report.machineNumber} — ${report.shift}',
+                    subtitle:
+                        '${DateFormat('dd MMM yyyy').format(report.date)} — Quality: ${report.qualityAcceptancePercentage.toStringAsFixed(1)}%',
+                    trailing: '${report.packingEfficiency.toStringAsFixed(1)}%',
+                    statusColor: report.packingEfficiency >= 90
+                        ? AppTheme.successGreen
+                        : AppTheme.warningYellow,
+                    onDelete: report.id == null
+                        ? null
+                        : () => context.read<FrameReportsBloc>().add(
+                            DeleteShiftPackingReport(report.id!),
+                          ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ReportDetailPage(
+                          title: 'Packing Report',
+                          fields: [
+                            ReportField(
+                              'Date',
+                              DateFormat('dd MMM yyyy').format(report.date),
+                            ),
+                            ReportField('Machine', report.machineNumber),
+                            ReportField('Shift', report.shift),
+                            ReportField(
+                              'Total Rejected Weight',
+                              '${report.totalRejectedWeight.toStringAsFixed(3)} kg',
+                            ),
+                            ReportField(
+                              'Quality Acceptance',
+                              '${report.qualityAcceptancePercentage.toStringAsFixed(1)}%',
+                            ),
+                            ReportField(
+                              'Packing Efficiency',
+                              '${report.packingEfficiency.toStringAsFixed(1)}%',
+                            ),
+                          ],
+                          sections: [
+                            ReportSection(
+                              title: 'Packing Items',
+                              items: report.lineItems
+                                  .map(
+                                    (li) => ReportSectionItem(
+                                      fields: [
+                                        ReportField('Section', li.section),
+                                        ReportField('Density', li.density),
+                                        ReportField('Color', li.color),
+                                        ReportField(
+                                          'Length',
+                                          '${li.length} ft',
+                                        ),
+                                        ReportField(
+                                          'Production Qty',
+                                          '${li.productionQuantity}',
+                                        ),
+                                        ReportField('Packed', '${li.packed}'),
+                                        ReportField(
+                                          'Rejected (Quality)',
+                                          '${li.rejectedQuality}',
+                                        ),
+                                        ReportField(
+                                          'Rejected Weight',
+                                          '${li.rejectedWeight.toStringAsFixed(3)} kg',
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
                         ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ReportDetailPage(
-                        title: 'Packing Report',
-                        fields: [
-                          ReportField(
-                            'Date',
-                            DateFormat('dd MMM yyyy').format(report.date),
-                          ),
-                          ReportField('Machine', report.machineNumber),
-                          ReportField('Shift', report.shift),
-                          ReportField(
-                            'Total Rejected Weight',
-                            '${report.totalRejectedWeight.toStringAsFixed(3)} kg',
-                          ),
-                          ReportField(
-                            'Quality Acceptance',
-                            '${report.qualityAcceptancePercentage.toStringAsFixed(1)}%',
-                          ),
-                          ReportField(
-                            'Packing Efficiency',
-                            '${report.packingEfficiency.toStringAsFixed(1)}%',
-                          ),
-                        ],
-                        sections: [
-                          ReportSection(
-                            title: 'Packing Items',
-                            items: report.lineItems
-                                .map(
-                                  (li) => ReportSectionItem(
-                                    fields: [
-                                      ReportField('Section', li.section),
-                                      ReportField('Density', li.density),
-                                      ReportField('Color', li.color),
-                                      ReportField('Length', '${li.length} ft'),
-                                      ReportField(
-                                        'Production Qty',
-                                        '${li.productionQuantity}',
-                                      ),
-                                      ReportField('Packed', '${li.packed}'),
-                                      ReportField(
-                                        'Rejected (Quality)',
-                                        '${li.rejectedQuality}',
-                                      ),
-                                      ReportField(
-                                        'Rejected Weight',
-                                        '${li.rejectedWeight.toStringAsFixed(3)} kg',
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                );
-              },
-            );
+                  );
+                },
+              );
             }
             return const LoadingWidget();
           },

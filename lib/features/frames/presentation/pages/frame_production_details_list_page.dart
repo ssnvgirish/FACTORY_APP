@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/utils/report_edit_window.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_detail_page.dart';
 import '../../../../core/widgets/report_list_page_shell.dart';
@@ -41,24 +40,6 @@ class FrameProductionDetailsListPage extends StatelessWidget {
             if (state is ProductionDetailsReportsLoaded) {
               return PaginatedListView(
                 items: state.reports,
-                hasMore: state.hasMore,
-                isLoadingMore: state.isLoadingMore,
-                onLoadMore: () {
-                  if (state.oldestLoadedStart == null || state.isLoadingMore) {
-                    return;
-                  }
-                  final range = ReportWeekRange.previousWeek(
-                    state.oldestLoadedStart!,
-                  );
-                  context.read<FrameReportsBloc>().add(
-                    LoadProductionDetailsReports(
-                      machineNumber: query.machineNumber,
-                      startDate: range.start,
-                      endDate: range.end,
-                      append: true,
-                    ),
-                  );
-                },
                 onRefresh: () async {
                   context.read<FrameReportsBloc>().add(
                     LoadProductionDetailsReports(
@@ -123,7 +104,10 @@ class FrameProductionDetailsListPage extends StatelessWidget {
                                         ReportField('Section', li.section),
                                         ReportField('Density', li.density),
                                         ReportField('Color', li.color),
-                                        ReportField('Length', '${li.length} ft'),
+                                        ReportField(
+                                          'Length',
+                                          '${li.length} ft',
+                                        ),
                                         ReportField(
                                           'Quantity',
                                           '${li.quantity}',

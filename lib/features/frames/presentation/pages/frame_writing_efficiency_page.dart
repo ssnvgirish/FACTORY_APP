@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/dropdown_config_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/report_week_range.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/report_list_page_shell.dart';
 import '../bloc/frame_reports_bloc.dart';
@@ -17,10 +16,7 @@ class FrameWritingEfficiencyPage extends StatelessWidget {
       title: 'Report Writing Efficiency',
       machines: ddp.frameMachines,
       onQueryChanged: (q) => context.read<FrameReportsBloc>().add(
-        LoadFrameWritingEfficiency(
-          startDate: q.startDate,
-          endDate: q.endDate,
-        ),
+        LoadFrameWritingEfficiency(startDate: q.startDate, endDate: q.endDate),
       ),
       bodyBuilder: (context, query) {
         return BlocBuilder<FrameReportsBloc, FrameReportsState>(
@@ -34,23 +30,6 @@ class FrameWritingEfficiencyPage extends StatelessWidget {
                         .toList();
               return PaginatedListView(
                 items: records,
-                hasMore: state.hasMore,
-                isLoadingMore: state.isLoadingMore,
-                onLoadMore: () {
-                  if (state.oldestLoadedStart == null || state.isLoadingMore) {
-                    return;
-                  }
-                  final range = ReportWeekRange.previousWeek(
-                    state.oldestLoadedStart!,
-                  );
-                  context.read<FrameReportsBloc>().add(
-                    LoadFrameWritingEfficiency(
-                      startDate: range.start,
-                      endDate: range.end,
-                      append: true,
-                    ),
-                  );
-                },
                 onRefresh: () async {
                   context.read<FrameReportsBloc>().add(
                     LoadFrameWritingEfficiency(
