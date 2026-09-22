@@ -72,7 +72,7 @@ class _ScrapQualityReportFormPageState
               DropdownButtonFormField<String>(
                 initialValue: _selectedMachine,
                 decoration: const InputDecoration(labelText: 'Machine Number'),
-                items: ddp.allMachines
+                items: ddp.scrapMachines
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedMachine = v),

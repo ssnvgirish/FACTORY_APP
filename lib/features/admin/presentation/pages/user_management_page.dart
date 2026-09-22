@@ -86,6 +86,11 @@ class _UserCard extends StatelessWidget {
                   )
                   .toList(),
             ),
+            if (user.assignedMachines.isNotEmpty)
+              Text(
+                user.assignedMachines.join(', '),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -138,13 +143,34 @@ class _UserFormPageState extends State<_UserFormPage> {
   void initState() {
     super.initState();
     _nameCtrl = TextEditingController(text: widget.user?.name ?? '');
-    _phoneCtrl = TextEditingController(text: widget.user?.phone ?? '');
+    // Stored phones carry the +91 prefix shown by the field itself.
+    _phoneCtrl = TextEditingController(text: _localPhone(widget.user?.phone));
     _passwordCtrl = TextEditingController();
     _salaryCtrl = TextEditingController(
       text: widget.user?.fixedSalary.toStringAsFixed(0) ?? '',
     );
     _selectedRoles = List<String>.from(widget.user?.roles ?? []);
     _selectedMachines = List<String>.from(widget.user?.assignedMachines ?? []);
+  }
+
+  static String _localPhone(String? phone) {
+    final digits = (phone ?? '').replaceAll(RegExp(r'\D'), '');
+    return digits.length > 10 ? digits.substring(digits.length - 10) : digits;
+  }
+
+  /// Machines a user can be assigned to, across every production line, plus
+  /// any machine already on the user that is no longer in the master table so
+  /// it stays visible and removable.
+  List<String> get _machineOptions {
+    final options = [
+      ...ddp.frameMachines,
+      ...ddp.sheetMachines,
+      ...ddp.scrapMachines,
+    ];
+    for (final m in _selectedMachines) {
+      if (!options.contains(m)) options.add(m);
+    }
+    return options;
   }
 
   @override
@@ -233,7 +259,7 @@ class _UserFormPageState extends State<_UserFormPage> {
                     labelText: 'Fixed Salary (₹)',
                   ),
                   keyboardType: TextInputType.number,
-                  validator: (v) => (double.tryParse(v ?? '') ?? 0) <= 0
+                  validator: (v) => (double.tryParse(v ?? '') ?? -1) < 0
                       ? 'Enter valid salary'
                       : null,
                 ),
@@ -241,6 +267,7 @@ class _UserFormPageState extends State<_UserFormPage> {
                 const SectionHeader(title: 'Roles'),
                 Wrap(
                   spacing: 8,
+                  runSpacing: 4,
                   children: ddp.roles
                       .map(
                         (role) => FilterChip(
@@ -263,7 +290,8 @@ class _UserFormPageState extends State<_UserFormPage> {
                 const SectionHeader(title: 'Assigned Machines'),
                 Wrap(
                   spacing: 8,
-                  children: ddp.allMachines
+                  runSpacing: 4,
+                  children: _machineOptions
                       .map(
                         (m) => FilterChip(
                           label: Text(m),
