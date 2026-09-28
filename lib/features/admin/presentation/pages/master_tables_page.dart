@@ -185,7 +185,7 @@ class _MasterTableEditPageState extends State<_MasterTableEditPage> {
             return const EmptyStateWidget(message: 'No items yet');
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, kListBottomClearance),
             itemCount: items.length,
             itemBuilder: (context, i) => _ItemCard(
               item: items[i],

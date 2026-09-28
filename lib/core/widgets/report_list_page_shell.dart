@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../theme/app_theme.dart';
@@ -25,6 +28,10 @@ class ReportListPageShell extends StatefulWidget {
   final Widget Function(BuildContext context, ReportListQuery query)
   bodyBuilder;
 
+  /// When set, a successful save reloads the list with the filters on screen.
+  final BlocBase<dynamic>? refreshBloc;
+  final bool Function(dynamic state)? refreshWhen;
+
   const ReportListPageShell({
     super.key,
     required this.title,
@@ -32,6 +39,8 @@ class ReportListPageShell extends StatefulWidget {
     required this.onQueryChanged,
     required this.bodyBuilder,
     this.floatingActionButton,
+    this.refreshBloc,
+    this.refreshWhen,
   });
 
   @override
@@ -43,6 +52,7 @@ class _ReportListPageShellState extends State<ReportListPageShell> {
   late DateTime _fromDate;
   late DateTime _toDate;
   late ReportListQuery _activeQuery;
+  StreamSubscription<dynamic>? _refreshSub;
 
   @override
   void initState() {
@@ -51,8 +61,35 @@ class _ReportListPageShellState extends State<ReportListPageShell> {
     _fromDate = range.start;
     _toDate = range.end;
     _activeQuery = _buildQuery();
+    _subscribeRefresh();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) widget.onQueryChanged(_activeQuery);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ReportListPageShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.refreshBloc, widget.refreshBloc)) {
+      _subscribeRefresh();
+    }
+  }
+
+  @override
+  void dispose() {
+    _refreshSub?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeRefresh() {
+    _refreshSub?.cancel();
+    _refreshSub = null;
+    final bloc = widget.refreshBloc;
+    if (bloc == null || widget.refreshWhen == null) return;
+    _refreshSub = bloc.stream.listen((state) {
+      final when = widget.refreshWhen;
+      if (!mounted || when == null || !when(state) || !_isValidRange) return;
+      widget.onQueryChanged(_activeQuery);
     });
   }
 

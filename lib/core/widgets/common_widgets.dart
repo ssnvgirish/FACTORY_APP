@@ -289,6 +289,9 @@ class LoadingWidget extends StatelessWidget {
   }
 }
 
+/// Room under a list so the last row can scroll clear of the add button.
+const double kListBottomClearance = 96;
+
 class PaginatedListView<T> extends StatefulWidget {
   final List<T> items;
   final Future<void> Function()? onRefresh;
@@ -311,7 +314,7 @@ class PaginatedListView<T> extends StatefulWidget {
     this.onRefresh,
     this.emptyIcon = Icons.inbox_outlined,
     this.pageSize = 10,
-    this.padding = const EdgeInsets.all(8),
+    this.padding = const EdgeInsets.fromLTRB(8, 8, 8, kListBottomClearance),
     this.onLoadMore,
     this.hasMore = false,
     this.isLoadingMore = false,

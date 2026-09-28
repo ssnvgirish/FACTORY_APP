@@ -15,6 +15,8 @@ class ScrapProductionDetailsListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
+      refreshBloc: context.read<ScrapRegrindBloc>(),
+      refreshWhen: (state) => state is ScrapRegrindSubmitted,
       title: 'Production Details Reports',
       machines: ddp.scrapMachines,
       floatingActionButton: FloatingActionButton(

@@ -15,6 +15,8 @@ class FrameToolsCountListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
+      refreshBloc: context.read<FrameReportsBloc>(),
+      refreshWhen: (state) => state is FrameReportsSubmitted,
       title: 'Tools Count Reports',
       machines: ddp.frameMachines,
       floatingActionButton: FloatingActionButton(

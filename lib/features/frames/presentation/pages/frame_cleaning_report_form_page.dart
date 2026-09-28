@@ -93,7 +93,6 @@ class _FrameCleaningReportFormPageState
             ),
           );
           Navigator.pop(context);
-          context.read<FrameReportsBloc>().add(LoadMachineCleaningReports());
         }
         if (state is FrameReportsError) {
           debugPrint('FrameReportsError: ${state.message}');

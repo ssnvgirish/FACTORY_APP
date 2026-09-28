@@ -1,6 +1,7 @@
 import 'package:factory_app/core/utils/report_week_range.dart';
 import 'package:factory_app/core/widgets/report_list_page_shell.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -131,6 +132,47 @@ void main() {
       expect(lastBuiltQuery, same(queries.last));
     },
   );
+
+  testWidgets('reloads the current filters after a successful save', (
+    tester,
+  ) async {
+    final bloc = _SaveBloc();
+    addTearDown(bloc.close);
+    final queries = <ReportListQuery>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ReportListPageShell(
+          title: 'Reports',
+          refreshBloc: bloc,
+          refreshWhen: (state) => state == _SaveState.saved,
+          onQueryChanged: queries.add,
+          bodyBuilder: (_, query) => const SizedBox(),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(queries, hasLength(1));
+
+    bloc.add(const _SaveRequested());
+    await tester.pump();
+
+    expect(queries, hasLength(2));
+    expect(queries.last.startDate, queries.first.startDate);
+    expect(queries.last.endDate, queries.first.endDate);
+  });
+}
+
+enum _SaveState { idle, saved }
+
+class _SaveRequested {
+  const _SaveRequested();
+}
+
+class _SaveBloc extends Bloc<_SaveRequested, _SaveState> {
+  _SaveBloc() : super(_SaveState.idle) {
+    on<_SaveRequested>((event, emit) => emit(_SaveState.saved));
+  }
 }
 
 Future<void> _selectDate(

@@ -15,6 +15,8 @@ class FrameCustomerRejectionListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
+      refreshBloc: context.read<FrameReportsBloc>(),
+      refreshWhen: (state) => state is FrameReportsSubmitted,
       title: 'Customer Rejection Reports',
       machines: ddp.frameMachines,
       floatingActionButton: FloatingActionButton(

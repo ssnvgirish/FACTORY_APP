@@ -15,6 +15,8 @@ class ScrapToolsCountListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
+      refreshBloc: context.read<ScrapRegrindBloc>(),
+      refreshWhen: (state) => state is ScrapRegrindSubmitted,
       title: 'Tools Count Reports',
       machines: ddp.scrapMachines,
       floatingActionButton: FloatingActionButton(

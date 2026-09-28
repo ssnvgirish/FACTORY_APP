@@ -79,7 +79,6 @@ class _FrameToolsCountFormPageState extends State<FrameToolsCountFormPage> {
             ),
           );
           Navigator.pop(context);
-          context.read<FrameReportsBloc>().add(LoadToolsCountReports());
         }
         if (state is FrameReportsError) {
           debugPrint('FrameReportsError: ${state.message}');

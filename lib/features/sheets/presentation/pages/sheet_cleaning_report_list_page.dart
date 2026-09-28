@@ -15,6 +15,8 @@ class SheetCleaningReportListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
+      refreshBloc: context.read<SheetReportsBloc>(),
+      refreshWhen: (state) => state is SheetReportsSubmitted,
       title: 'Sheet Cleaning Reports',
       machines: ddp.sheetMachines,
       floatingActionButton: FloatingActionButton(

@@ -2,6 +2,22 @@ import '../../../../generated/dataconnect/default.dart';
 import '../../domain/entities/admin_entities.dart';
 import '../models/admin_models.dart';
 
+bool _isDuplicateKey(Object error) {
+  final message = error.toString().toLowerCase();
+  return message.contains('unique') ||
+      message.contains('duplicate') ||
+      message.contains('already exists');
+}
+
+bool _keysMatch(String a, String b) {
+  final left = a.trim();
+  final right = b.trim();
+  if (left == right) return true;
+  final na = double.tryParse(left);
+  final nb = double.tryParse(right);
+  return na != null && nb != null && na == nb;
+}
+
 class AdminRemoteDatasource {
   final DefaultConnector _connector;
 
@@ -538,27 +554,51 @@ class AdminRemoteDatasource {
     MasterLookupType type,
     MasterWeightEntry entry,
   ) async {
-    switch (type) {
-      case MasterLookupType.frameWeights:
-        await _connector
-            .insertMasterFrameWeight(
-              section: entry.key1,
-              density: entry.key2,
-              weightPerFoot: entry.weight,
-            )
-            .execute();
-        break;
-      case MasterLookupType.sheetWeights:
-        await _connector
-            .insertMasterSheetWeight(
-              thickness: entry.key1,
-              density: entry.key2,
-              weightPerSqft: entry.weight,
-            )
-            .execute();
-        break;
-      default:
-        break;
+    try {
+      switch (type) {
+        case MasterLookupType.frameWeights:
+          await _connector
+              .insertMasterFrameWeight(
+                section: entry.key1,
+                density: entry.key2,
+                weightPerFoot: entry.weight,
+              )
+              .execute();
+          break;
+        case MasterLookupType.sheetWeights:
+          await _connector
+              .insertMasterSheetWeight(
+                thickness: entry.key1,
+                density: entry.key2,
+                weightPerSqft: entry.weight,
+              )
+              .execute();
+          break;
+        default:
+          break;
+      }
+    } catch (e) {
+      // The cell already exists (often hidden by a 0.8 vs 0.80 key mismatch).
+      // Write the new weight onto that row instead of failing the insert.
+      if (!_isDuplicateKey(e)) rethrow;
+      final existing = await getWeightTable(type);
+      final match = existing
+          .where(
+            (row) =>
+                _keysMatch(row.key1, entry.key1) &&
+                _keysMatch(row.key2, entry.key2),
+          )
+          .firstOrNull;
+      if (match == null) rethrow;
+      await updateWeightEntry(
+        type,
+        MasterWeightEntry(
+          id: match.id,
+          key1: match.key1,
+          key2: match.key2,
+          weight: entry.weight,
+        ),
+      );
     }
   }
 

@@ -15,6 +15,8 @@ class FrameCleaningReportListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportListPageShell(
+      refreshBloc: context.read<FrameReportsBloc>(),
+      refreshWhen: (state) => state is FrameReportsSubmitted,
       title: 'Machine Cleaning Reports',
       machines: ddp.frameMachines,
       floatingActionButton: FloatingActionButton(

@@ -38,7 +38,7 @@ class UserManagementPage extends StatelessWidget {
               return const EmptyStateWidget(message: 'No users found');
             }
             return ListView.builder(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, kListBottomClearance),
               itemCount: state.users.length,
               itemBuilder: (context, i) => _UserCard(user: state.users[i]),
             );

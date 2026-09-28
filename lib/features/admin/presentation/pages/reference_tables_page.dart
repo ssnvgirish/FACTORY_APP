@@ -7,6 +7,26 @@ import '../../../../core/services/dropdown_config_provider.dart';
 import '../../domain/entities/admin_entities.dart';
 import '../bloc/admin_bloc.dart';
 
+String _weightSaveError(String raw) {
+  final lower = raw.toLowerCase();
+  if (lower.contains('unique') || lower.contains('duplicate')) {
+    return 'A weight for that section and density already exists.';
+  }
+  if (lower.contains('foreign key') || lower.contains('still referenced')) {
+    return 'That section or density is not in the master list, so the weight could not be saved.';
+  }
+  return raw;
+}
+
+bool _keysMatch(String a, String b) {
+  final left = a.trim();
+  final right = b.trim();
+  if (left == right) return true;
+  final na = double.tryParse(left);
+  final nb = double.tryParse(right);
+  return na != null && nb != null && na == nb;
+}
+
 int _dimensionCompare(String a, String b) {
   final na = double.tryParse(RegExp(r'^\d+(\.\d+)?').stringMatch(a) ?? '');
   final nb = double.tryParse(RegExp(r'^\d+(\.\d+)?').stringMatch(b) ?? '');
@@ -124,6 +144,9 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
   List<MasterWeightEntry>? _entries;
   String? _error;
 
+  /// Rows saved in this session that a reload has not echoed yet.
+  final List<MasterWeightEntry> _pending = [];
+
   bool get _isFrame => widget.lookupType == MasterLookupType.frameWeights;
 
   @override
@@ -147,11 +170,81 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
   }
 
   void _reloadEntries() {
-    setState(() {
-      _entries = null;
-      _error = null;
-    });
+    setState(() => _error = null);
     context.read<AdminBloc>().add(LoadMasterLookup(widget.lookupType));
+  }
+
+  MasterWeightEntry? _match(String key1, String key2) {
+    final entries = _entries;
+    if (entries == null) return null;
+    MasterWeightEntry? match;
+    for (final entry in entries) {
+      if (_keysMatch(entry.key1, key1) && _keysMatch(entry.key2, key2)) {
+        match = entry;
+        if (entry.key1 == key1 && entry.key2 == key2) return entry;
+      }
+    }
+    return match;
+  }
+
+  void _stageSavedEntry(MasterWeightEntry entry) {
+    final current = List<MasterWeightEntry>.from(_entries ?? const []);
+    final index = current.indexWhere(
+      (e) => _keysMatch(e.key1, entry.key1) && _keysMatch(e.key2, entry.key2),
+    );
+    final staged =
+        index >= 0 && entry.id.isEmpty && current[index].id.isNotEmpty
+        ? MasterWeightEntry(
+            id: current[index].id,
+            key1: current[index].key1,
+            key2: current[index].key2,
+            weight: entry.weight,
+          )
+        : entry;
+    if (index >= 0) {
+      current[index] = staged;
+    } else {
+      current.add(staged);
+    }
+    setState(() {
+      _entries = current;
+      _error = null;
+      _pending.removeWhere(
+        (e) =>
+            _keysMatch(e.key1, staged.key1) && _keysMatch(e.key2, staged.key2),
+      );
+      _pending.add(staged);
+    });
+  }
+
+  List<MasterWeightEntry> _mergeServerEntries(List<MasterWeightEntry> server) {
+    final merged = List<MasterWeightEntry>.from(server);
+    final stillPending = <MasterWeightEntry>[];
+    for (final pending in _pending) {
+      final index = merged.indexWhere(
+        (e) =>
+            _keysMatch(e.key1, pending.key1) &&
+            _keysMatch(e.key2, pending.key2),
+      );
+      if (index < 0) {
+        merged.add(pending);
+        stillPending.add(pending);
+        continue;
+      }
+      if (merged[index].weight != pending.weight) {
+        merged[index] = MasterWeightEntry(
+          id: merged[index].id,
+          key1: merged[index].key1,
+          key2: merged[index].key2,
+          weight: pending.weight,
+        );
+        stillPending.add(pending);
+      }
+    }
+    _pending
+      ..clear()
+      ..addAll(stillPending);
+    return merged;
   }
 
   void _onAdminState(BuildContext context, AdminState state) {
@@ -174,16 +267,25 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
     } else if (state is MasterWeightsLoaded &&
         state.lookupType == widget.lookupType) {
       setState(() {
-        _entries = state.entries;
+        _entries = _mergeServerEntries(state.entries);
         _error = null;
       });
     } else if (state is MasterLookupSaved) {
       _reloadEntries();
     } else if (state is AdminError) {
-      setState(() => _error = state.message);
+      final hadPending = _pending.isNotEmpty;
+      setState(() {
+        _pending.clear();
+        _entries = _entries?.where((e) => e.id.isNotEmpty).toList();
+        if (_entries == null) _error = state.message;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(_weightSaveError(state.message)),
+          backgroundColor: Colors.red,
+        ),
       );
+      if (hadPending) _reloadEntries();
     }
   }
 
@@ -230,17 +332,11 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
       ..._densities.where((d) => d.isActive).map((d) => d.value),
     };
     for (final e in entries) {
-      rowKeys.add(e.key1);
-      colKeys.add(e.key2);
+      if (!rowKeys.any((key) => _keysMatch(key, e.key1))) rowKeys.add(e.key1);
+      if (!colKeys.any((key) => _keysMatch(key, e.key2))) colKeys.add(e.key2);
     }
     final rows = rowKeys.toList()..sort(_dimensionCompare);
     final cols = colKeys.toList()..sort(_dimensionCompare);
-
-    // Build a lookup map for fast access.
-    final lookup = <String, MasterWeightEntry>{};
-    for (final e in entries) {
-      lookup['${e.key1}|${e.key2}'] = e;
-    }
 
     const double rowLabelWidth = 120;
     const double cellWidth = 80;
@@ -250,7 +346,7 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, kListBottomClearance),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -275,7 +371,7 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
                 children: [
                   _labelCell(rowKey, width: rowLabelWidth, height: cellHeight),
                   ...cols.map((colKey) {
-                    final entry = lookup['$rowKey|$colKey'];
+                    final entry = _match(rowKey, colKey);
                     return _dataCell(
                       context,
                       entry: entry,
@@ -406,31 +502,31 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
                   ),
                   items: _sections
                       .where((item) => item.isActive)
-                      .map((item) => DropdownMenuItem(
-                            value: item.value,
-                            child: Text(item.value),
-                          ))
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item.value,
+                          child: Text(item.value),
+                        ),
+                      )
                       .toList(),
                   onChanged: (value) => setState(() => selectedSection = value),
-                  validator: (value) =>
-                      value == null ? 'Please select' : null,
+                  validator: (value) => value == null ? 'Please select' : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: selectedDensity,
-                  decoration: const InputDecoration(
-                    labelText: 'Density *',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Density *'),
                   items: _densities
                       .where((item) => item.isActive)
-                      .map((item) => DropdownMenuItem(
-                            value: item.value,
-                            child: Text(item.value),
-                          ))
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item.value,
+                          child: Text(item.value),
+                        ),
+                      )
                       .toList(),
                   onChanged: (value) => setState(() => selectedDensity = value),
-                  validator: (value) =>
-                      value == null ? 'Please select' : null,
+                  validator: (value) => value == null ? 'Please select' : null,
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -456,9 +552,11 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
                 if (selectedSection == null) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     SnackBar(
-                      content: Text(_isFrame
-                          ? 'Please select a section'
-                          : 'Please select a thickness'),
+                      content: Text(
+                        _isFrame
+                            ? 'Please select a section'
+                            : 'Please select a thickness',
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -494,16 +592,19 @@ class _WeightMatrixPageState extends State<_WeightMatrixPage> {
                   return;
                 }
 
+                final existing = _match(selectedSection!, selectedDensity!);
+                final saved = MasterWeightEntry(
+                  id: existing?.id ?? '',
+                  key1: existing?.key1 ?? selectedSection!,
+                  key2: existing?.key2 ?? selectedDensity!,
+                  weight: weight,
+                );
+                _stageSavedEntry(saved);
                 context.read<AdminBloc>().add(
                   SaveMasterWeightEntry(
                     widget.lookupType,
-                    MasterWeightEntry(
-                      id: '',
-                      key1: selectedSection!,
-                      key2: selectedDensity!,
-                      weight: weight,
-                    ),
-                    isNew: true,
+                    saved,
+                    isNew: saved.id.isEmpty,
                   ),
                 );
                 Navigator.pop(ctx);
@@ -720,7 +821,7 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
     if (!hasDensity) {
       // Simple flat list (scrap targets style).
       return ListView.builder(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, kListBottomClearance),
         itemCount: entries.length,
         itemBuilder: (context, i) => _buildFlatRow(context, entries[i]),
       );
@@ -734,7 +835,7 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, kListBottomClearance),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -921,37 +1022,39 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
                   ),
                   items: _sections
                       .where((item) => item.isActive)
-                      .map((item) => DropdownMenuItem(
-                            value: item.value,
-                            child: Text(item.value),
-                          ))
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item.value,
+                          child: Text(item.value),
+                        ),
+                      )
                       .toList(),
                   onChanged: (value) => setState(() => selectedSection = value),
-                  validator: (value) =>
-                      value == null ? 'Please select' : null,
+                  validator: (value) => value == null ? 'Please select' : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: selectedDensity,
-                  decoration: const InputDecoration(
-                    labelText: 'Density *',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Density *'),
                   items: _densities
                       .where((item) => item.isActive)
-                      .map((item) => DropdownMenuItem(
-                            value: item.value,
-                            child: Text(item.value),
-                          ))
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item.value,
+                          child: Text(item.value),
+                        ),
+                      )
                       .toList(),
                   onChanged: (value) => setState(() => selectedDensity = value),
-                  validator: (value) =>
-                      value == null ? 'Please select' : null,
+                  validator: (value) => value == null ? 'Please select' : null,
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: vCtrl,
                   decoration: InputDecoration(
-                    labelText: _isFrame ? 'Target (kg/hr) *' : 'Target (ft/hr) *',
+                    labelText: _isFrame
+                        ? 'Target (kg/hr) *'
+                        : 'Target (ft/hr) *',
                     hintText: _isFrame ? 'e.g., 50.5' : 'e.g., 100.0',
                   ),
                   keyboardType: TextInputType.number,
@@ -969,9 +1072,11 @@ class _TargetMatrixPageState extends State<_TargetMatrixPage> {
                 if (selectedSection == null) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     SnackBar(
-                      content: Text(_isFrame
-                          ? 'Please select a section'
-                          : 'Please select a thickness'),
+                      content: Text(
+                        _isFrame
+                            ? 'Please select a section'
+                            : 'Please select a thickness',
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -1161,7 +1266,12 @@ class _ScrapTargetPageState extends State<_ScrapTargetPage> {
                 _tableHeader(),
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      12,
+                      0,
+                      12,
+                      kListBottomClearance,
+                    ),
                     itemCount: state.entries.length,
                     separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, i) =>
