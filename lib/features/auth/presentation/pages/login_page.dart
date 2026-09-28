@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Factory Manager',
+                            'PP Production Tracking',
                             style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(
                                   color: AppTheme.primaryNavy,
