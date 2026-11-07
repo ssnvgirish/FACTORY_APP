@@ -67,7 +67,7 @@ class _FactoryAppState extends State<FactoryApp> {
         BlocProvider(create: (_) => sl<ScrapRegrindBloc>()),
       ],
       child: MaterialApp.router(
-        title: 'PP Production Tracking',
+        title: 'Prabitha QC',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         routerConfig: _appRouter.router,

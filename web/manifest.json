@@ -1,11 +1,11 @@
 {
-    "name": "PP Production Tracking",
-    "short_name": "PP Production Tracking",
+    "name": "Prabitha QC",
+    "short_name": "Prabitha QC",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "PP Production Tracking",
+    "description": "Prabitha QC",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
