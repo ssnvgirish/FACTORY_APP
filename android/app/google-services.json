@@ -24,6 +24,25 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59537575004:android:75228764ebd0d302586a99",
+        "android_client_info": {
+          "package_name": "com.prabitha.qcap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbGp9eHyrsj0jfRlRN9uLu-P_xu91b2SE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"
