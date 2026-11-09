@@ -27,9 +27,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:59537575004:android:75228764ebd0d302586a99",
+        "mobilesdk_app_id": "1:59537575004:android:59741812f3cff817586a99",
         "android_client_info": {
-          "package_name": "com.prabitha.qcap"
+          "package_name": "com.prabitha.qcapp"
         }
       },
       "oauth_client": [],
