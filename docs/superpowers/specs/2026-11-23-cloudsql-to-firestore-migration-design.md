@@ -149,3 +149,7 @@ These refine the sections above after reading the datasource code.
 
 Redesigning the data model, new features, UI changes, password-change flows
 beyond what exists today.
+
+- **Migration source (2026-11-23):** the live Cloud SQL database cannot be reached directly (ports blocked), so the
+  data is exported through Data Connect (`firebase dataconnect:execute`) and imported from those JSON files.
+  The import authenticates with the signed-in Firebase CLI account, held in memory only.

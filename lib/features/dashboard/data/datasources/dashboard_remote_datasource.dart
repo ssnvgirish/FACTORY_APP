@@ -1,77 +1,55 @@
-import '../../../../generated/dataconnect/default.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../../../core/data/collections.dart';
+import '../../../../core/data/firestore_support.dart';
+import '../../../../core/data/stock_ledger.dart';
 import '../../domain/entities/dashboard_entities.dart';
 
 class DashboardRemoteDatasource {
-  final DefaultConnector _connector;
+  DashboardRemoteDatasource({required FirebaseFirestore firestore})
+    : _db = firestore,
+      _reports = Reports(firestore);
 
-  DashboardRemoteDatasource({DefaultConnector? connector})
-    : _connector = connector ?? DefaultConnector.instance;
+  final FirebaseFirestore _db;
+  final Reports _reports;
 
   Future<DashboardSummary> getDashboardSummary() async {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
     final weekAgo = todayStart.subtract(const Duration(days: 7));
 
-    // Operator counts
-    final usersResult = await _connector.listAllUsers().execute();
-    final totalOps = usersResult.data.users.length;
-    final activeOps = usersResult.data.users.where((u) => u.isActive).length;
+    // Operators
+    final users = (await _db.collection(Col.users).get()).docs
+        .map(DocRow.fromSnapshot)
+        .toList();
+    final totalOps = users.length;
+    final activeOps = users.where((u) => u.flag('isActive')).length;
 
-    // Health reports count (today) - use both frame + sheet
-    final frameHealthResult = await _connector
-        .listFrameHealthReports()
-        .startDate(todayStart)
-        .execute();
-    final sheetHealthResult = await _connector
-        .listSheetHealthReports()
-        .startDate(todayStart)
-        .execute();
-    final pendingCount =
-        frameHealthResult.data.frameHealthReports.length +
-        sheetHealthResult.data.sheetHealthReports.length;
+    // Reports submitted today (frame + sheet health)
+    final frameHealth = await _reports.list(Col.frameHealth, startDate: todayStart);
+    final sheetHealth = await _reports.list(Col.sheetHealth, startDate: todayStart);
+    final pendingCount = frameHealth.length + sheetHealth.length;
 
-    // Today's frame production
-    final todayFrameResult = await _connector
-        .listFrameProductionDetailsReports()
-        .startDate(todayStart)
-        .execute();
-    double todayFrameWeight = 0;
-    for (final r in todayFrameResult.data.frameProductionDetailsReports) {
-      todayFrameWeight += r.totalWeight;
-    }
+    // One week-range query per production collection; "today" is a subset.
+    final weekFrame = await _reports.list(Col.frameProductionDetails, startDate: weekAgo);
+    final weekSheet = await _reports.list(Col.sheetProductionDetails, startDate: weekAgo);
 
-    // Today's sheet production
-    final todaySheetResult = await _connector
-        .listSheetProductionDetailsReports()
-        .startDate(todayStart)
-        .execute();
-    double todaySheetFeet = 0;
-    for (final r in todaySheetResult.data.sheetProductionDetailsReports) {
-      todaySheetFeet += r.totalRunningFeet;
-    }
+    bool isToday(DocRow r) => !r.date('date').isBefore(todayStart);
+    final todayFrameWeight = weekFrame
+        .where(isToday)
+        .fold<double>(0, (s, r) => s + r.real('totalWeight'));
+    final todaySheetFeet = weekSheet
+        .where(isToday)
+        .fold<double>(0, (s, r) => s + r.real('totalRunningFeet'));
 
-    // Weekly frame production
-    final weekFrameResult = await _connector
-        .listFrameProductionDetailsReports()
-        .startDate(weekAgo)
-        .execute();
-    final Map<String, double> frameByDay = {};
-    for (final r in weekFrameResult.data.frameProductionDetailsReports) {
-      final date = r.date;
-      final key = '${date.year}-${date.month}-${date.day}';
-      frameByDay[key] = (frameByDay[key] ?? 0) + r.totalWeight;
-    }
-
-    // Weekly sheet production
-    final weekSheetResult = await _connector
-        .listSheetProductionDetailsReports()
-        .startDate(weekAgo)
-        .execute();
-    final Map<String, double> sheetByDay = {};
-    for (final r in weekSheetResult.data.sheetProductionDetailsReports) {
-      final date = r.date;
-      final key = '${date.year}-${date.month}-${date.day}';
-      sheetByDay[key] = (sheetByDay[key] ?? 0) + r.totalRunningFeet;
+    Map<String, double> byDay(List<DocRow> rows, String field) {
+      final out = <String, double>{};
+      for (final r in rows) {
+        final d = r.date('date');
+        final key = '${d.year}-${d.month}-${d.day}';
+        out[key] = (out[key] ?? 0) + r.real(field);
+      }
+      return out;
     }
 
     List<DailyProduction> toDailyList(Map<String, double> byDay) {
@@ -84,140 +62,15 @@ class DashboardRemoteDatasource {
       }).toList()..sort((a, b) => a.date.compareTo(b.date));
     }
 
-    // ─── Frame Stock ───
-    final allFrameProdResult = await _connector
-        .listFrameProductionDetailsReports()
-        .execute();
-    double totalFrameProduced = 0;
-    final Map<String, _VariantAcc> frameVariants = {};
-    for (final r in allFrameProdResult.data.frameProductionDetailsReports) {
-      totalFrameProduced += r.totalWeight;
-      for (final li in r.frameProductionLineItems_on_report) {
-        final key = '${li.section}|${li.density}|${li.color}';
-        final acc = frameVariants.putIfAbsent(key, _VariantAcc.new);
-        acc.produced += li.quantity;
-      }
-    }
+    final frameStock = await _stock(StockKind.frame);
+    final sheetStock = await _stock(StockKind.sheet);
 
-    final allFramePackResult = await _connector
-        .listFrameShiftPackingReports()
-        .execute();
-    double totalFramePacked = 0;
-    double totalFrameRejected = 0;
-    for (final r in allFramePackResult.data.frameShiftPackingReports) {
-      for (final li in r.framePackingLineItems_on_report) {
-        totalFramePacked += li.packed * li.perPieceWeight;
-        totalFrameRejected += li.rejectedQuality * li.perPieceWeight;
-        final key = '${li.section}|${li.density}|${li.color}';
-        final acc = frameVariants.putIfAbsent(key, _VariantAcc.new);
-        acc.packed += li.packed;
-        acc.rejected += li.rejectedQuality;
-      }
-    }
-
-    final frameBreakdown =
-        frameVariants.entries
-            .map((e) {
-              final parts = e.key.split('|');
-              return StockLineItem(
-                variant: parts[0],
-                density: parts[1],
-                color: parts[2],
-                produced: e.value.produced,
-                packed: e.value.packed,
-                rejected: e.value.rejected,
-              );
-            })
-            .where((item) => item.inStock != 0)
-            .toList()
-          ..sort((a, b) => b.inStock.compareTo(a.inStock));
-
-    final frameStock = StockSummary(
-      totalProduced: totalFrameProduced,
-      totalPacked: totalFramePacked,
-      totalRejected: totalFrameRejected,
-      stockInPlace: totalFrameProduced - totalFramePacked - totalFrameRejected,
-      breakdown: frameBreakdown,
-    );
-
-    // ─── Sheet Stock ───
-    final allSheetProdResult = await _connector
-        .listSheetProductionDetailsReports()
-        .execute();
-    double totalSheetProduced = 0;
-    final Map<String, _VariantAcc> sheetVariants = {};
-    for (final r in allSheetProdResult.data.sheetProductionDetailsReports) {
-      totalSheetProduced += r.totalRunningFeet;
-      for (final li in r.sheetProductionLineItems_on_report) {
-        final key = '${li.thickness}|${li.density}|${li.color}';
-        final acc = sheetVariants.putIfAbsent(key, _VariantAcc.new);
-        acc.produced += li.quantity;
-      }
-    }
-
-    final allSheetPackResult = await _connector
-        .listSheetShiftPackingReports()
-        .execute();
-    double totalSheetPacked = 0;
-    double totalSheetRejected = 0;
-    for (final r in allSheetPackResult.data.sheetShiftPackingReports) {
-      for (final li in r.sheetPackingLineItems_on_report) {
-        totalSheetPacked += li.packed * li.runningFeetPerItem;
-        totalSheetRejected += li.rejectedQuality * li.runningFeetPerItem;
-        final key = '${li.thickness}|${li.density}|${li.color}';
-        final acc = sheetVariants.putIfAbsent(key, _VariantAcc.new);
-        acc.packed += li.packed;
-        acc.rejected += li.rejectedQuality;
-      }
-    }
-
-    final sheetBreakdown =
-        sheetVariants.entries
-            .map((e) {
-              final parts = e.key.split('|');
-              return StockLineItem(
-                variant: parts[0],
-                density: parts[1],
-                color: parts[2],
-                produced: e.value.produced,
-                packed: e.value.packed,
-                rejected: e.value.rejected,
-              );
-            })
-            .where((item) => item.inStock != 0)
-            .toList()
-          ..sort((a, b) => b.inStock.compareTo(a.inStock));
-
-    final sheetStock = StockSummary(
-      totalProduced: totalSheetProduced,
-      totalPacked: totalSheetPacked,
-      totalRejected: totalSheetRejected,
-      stockInPlace: totalSheetProduced - totalSheetPacked - totalSheetRejected,
-      breakdown: sheetBreakdown,
-    );
-
-    // Avg efficiency from weight/running-feet reports
-    final frameWeightResult = await _connector
-        .listFrameProductionWeightReports()
-        .startDate(weekAgo)
-        .execute();
-    final frameEffs = frameWeightResult.data.frameProductionWeightReports
-        .map((r) => r.efficiencyPercentage)
-        .toList();
-    final avgFrameEff = frameEffs.isEmpty
+    double avg(List<DocRow> rows) => rows.isEmpty
         ? 0.0
-        : frameEffs.reduce((a, b) => a + b) / frameEffs.length;
-
-    final sheetFeetResult = await _connector
-        .listSheetRunningFeetReports()
-        .startDate(weekAgo)
-        .execute();
-    final sheetEffs = sheetFeetResult.data.sheetRunningFeetReports
-        .map((r) => r.efficiencyPercentage)
-        .toList();
-    final avgSheetEff = sheetEffs.isEmpty
-        ? 0.0
-        : sheetEffs.reduce((a, b) => a + b) / sheetEffs.length;
+        : rows.map((r) => r.real('efficiencyPercentage')).reduce((a, b) => a + b) /
+              rows.length;
+    final avgFrameEff = avg(await _reports.list(Col.frameProductionWeight, startDate: weekAgo));
+    final avgSheetEff = avg(await _reports.list(Col.sheetRunningFeet, startDate: weekAgo));
 
     return DashboardSummary(
       totalOperators: totalOps,
@@ -227,16 +80,35 @@ class DashboardRemoteDatasource {
       todaySheetRunningFeet: todaySheetFeet,
       avgFrameEfficiency: avgFrameEff,
       avgSheetEfficiency: avgSheetEff,
-      weeklyFrameProduction: toDailyList(frameByDay),
-      weeklySheetProduction: toDailyList(sheetByDay),
+      weeklyFrameProduction: toDailyList(byDay(weekFrame, 'totalWeight')),
+      weeklySheetProduction: toDailyList(byDay(weekSheet, 'totalRunningFeet')),
       frameStock: frameStock,
       sheetStock: sheetStock,
     );
   }
-}
 
-class _VariantAcc {
-  int produced = 0;
-  int packed = 0;
-  int rejected = 0;
+  Future<StockSummary> _stock(String kind) async {
+    final data = await StockLedger.read(_db, kind);
+    final breakdown = data.variants
+        .map(
+          (v) => StockLineItem(
+            variant: v.variant,
+            density: v.density,
+            color: v.color,
+            produced: v.produced,
+            packed: v.packed,
+            rejected: v.rejected,
+          ),
+        )
+        .where((item) => item.inStock != 0)
+        .toList()
+      ..sort((a, b) => b.inStock.compareTo(a.inStock));
+    return StockSummary(
+      totalProduced: data.totalProduced,
+      totalPacked: data.totalPacked,
+      totalRejected: data.totalRejected,
+      stockInPlace: data.totalProduced - data.totalPacked - data.totalRejected,
+      breakdown: breakdown,
+    );
+  }
 }

@@ -1,0 +1,14 @@
+{
+  "name": "factory-app-migrate",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "export": "node export.js",
+    "migrate": "node index.js"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^7.11.0",
+    "firebase-admin": "^12.1.0",
+    "google-auth-library": "^9.15.0"
+  }
+}

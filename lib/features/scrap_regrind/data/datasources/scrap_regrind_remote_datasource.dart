@@ -1,6 +1,7 @@
-import 'package:firebase_data_connect/firebase_data_connect.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../../generated/dataconnect/default.dart';
+import '../../../../core/data/collections.dart';
+import '../../../../core/data/firestore_support.dart';
 import '../../domain/entities/scrap_regrind_entities.dart';
 
 abstract class ScrapRegrindRemoteDataSource {
@@ -97,9 +98,36 @@ abstract class ScrapRegrindRemoteDataSource {
 }
 
 class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
-  final DefaultConnector connector;
+  ScrapRegrindRemoteDataSourceImpl({required FirebaseFirestore firestore})
+    : _db = firestore,
+      _reports = Reports(firestore);
 
-  ScrapRegrindRemoteDataSourceImpl({required this.connector});
+  final FirebaseFirestore _db;
+  final Reports _reports;
+
+  Future<List<DocRow>> _list(
+    String collection, {
+    String? machineNumber,
+    DateTime? startDate,
+    DateTime? endDate,
+    String equalsField = 'machineNumber',
+    String? equalsValue,
+  }) => _reports.list(
+    collection,
+    equalsField: equalsField,
+    equalsValue: equalsValue ?? machineNumber,
+    startDate: startDate,
+    endDate: endDate,
+  );
+
+  Future<DocRow?> _userByUid(String operatorId) async {
+    final snap = await _db
+        .collection(Col.users)
+        .where('uid', isEqualTo: operatorId)
+        .limit(1)
+        .get();
+    return snap.docs.isEmpty ? null : DocRow.fromSnapshot(snap.docs.first);
+  }
 
   // ═══════════════════════════════════════
   // MACHINE CLEANING REPORT
@@ -107,17 +135,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
 
   @override
   Future<void> submitCleaningReport(ScrapCleaningReport report) async {
-    await connector
-        .createScrapCleaningReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          machineCondition: report.machineCondition,
-          groundCondition: report.groundCondition,
-          totalScore: report.totalScore,
-          percentage: report.percentage,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.scrapCleaning, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'machineCondition': report.machineCondition,
+      'groundCondition': report.groundCondition,
+      'totalScore': report.totalScore,
+      'percentage': report.percentage,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -126,36 +152,32 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapCleaningReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapCleaningReports
+    final rows = await _list(
+      Col.scrapCleaning,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ScrapCleaningReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            machineCondition: r.machineCondition,
-            groundCondition: r.groundCondition,
-            totalScore: r.totalScore,
-            percentage: r.percentage,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            machineCondition: r.integer('machineCondition'),
+            groundCondition: r.integer('groundCondition'),
+            totalScore: r.integer('totalScore'),
+            percentage: r.real('percentage'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteCleaningReport(String id) async {
-    await connector
-        .deleteScrapCleaningReport(
-          id: DeleteScrapCleaningReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteCleaningReport(String id) =>
+      _reports.delete(Col.scrapCleaning, id);
 
   // ═══════════════════════════════════════
   // TOOLS COUNT REPORT
@@ -163,16 +185,14 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
 
   @override
   Future<void> submitToolsCountReport(ScrapToolsCountReport report) async {
-    await connector
-        .createScrapToolsCountReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          totalToolsGiven: report.totalToolsGiven,
-          totalToolsAvailable: report.totalToolsAvailable,
-          percentageAvailable: report.percentageAvailable,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.scrapToolsCount, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'totalToolsGiven': report.totalToolsGiven,
+      'totalToolsAvailable': report.totalToolsAvailable,
+      'percentageAvailable': report.percentageAvailable,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -181,78 +201,79 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapToolsCountReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapToolsCountReports
+    final rows = await _list(
+      Col.scrapToolsCount,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ScrapToolsCountReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            totalToolsGiven: r.totalToolsGiven,
-            totalToolsAvailable: r.totalToolsAvailable,
-            percentageAvailable: r.percentageAvailable,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            totalToolsGiven: r.integer('totalToolsGiven'),
+            totalToolsAvailable: r.integer('totalToolsAvailable'),
+            percentageAvailable: r.real('percentageAvailable'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteToolsCountReport(String id) async {
-    await connector
-        .deleteScrapToolsCountReport(
-          id: DeleteScrapToolsCountReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteToolsCountReport(String id) =>
+      _reports.delete(Col.scrapToolsCount, id);
 
   // ═══════════════════════════════════════
   // MACHINE HEALTH REPORT
   // ═══════════════════════════════════════
 
+  Map<String, dynamic> _entryToMap(ScrapMaintenanceEntry e) => {
+    'maintenanceItem': e.maintenanceItem,
+    'startTime': toTimestamp(e.startTime),
+    'endTime': toTimestamp(e.endTime),
+    'personDoingMaintenance': e.personDoingMaintenance,
+    'description': e.description,
+    'durationHours': e.durationHours,
+  };
+
+  ScrapMaintenanceEntry _entry(DocRow e) => ScrapMaintenanceEntry(
+    maintenanceItem: e.str('maintenanceItem'),
+    startTime: e.timestamp('startTime')!,
+    endTime: e.timestamp('endTime')!,
+    personDoingMaintenance: e.str('personDoingMaintenance'),
+    description: e.str('description'),
+    durationHours: e.real('durationHours'),
+  );
+
+  ScrapMachineHealthReport _healthReport(DocRow r) => ScrapMachineHealthReport(
+    id: r.id,
+    date: r.date('date'),
+    machineNumber: r.str('machineNumber'),
+    shift: r.str('shift'),
+    entries: r.children('entries').map(_entry).toList(),
+    totalMaintenanceDurationHours: r.real('totalMaintenanceDurationHours'),
+    createdBy: r.str('createdBy'),
+    timestamp: r.timestamp('timestamp'),
+    submittedAt: r.timestamp('submittedAt'),
+  );
+
   @override
   Future<void> submitMachineHealthReport(
     ScrapMachineHealthReport report,
   ) async {
-    final result = await connector
-        .createScrapMachineHealthReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalMaintenanceDurationHours: report.totalMaintenanceDurationHours,
-          createdBy: report.createdBy,
-        )
-        .submittedAt(
-          report.submittedAt != null
-              ? Timestamp(0, report.submittedAt!.millisecondsSinceEpoch ~/ 1000)
-              : null,
-        )
-        .execute();
-
-    final reportId = result.data.scrapMachineHealthReport_insert.id;
-    for (final entry in report.entries) {
-      await connector
-          .createScrapMaintenanceEntry(
-            reportId: CreateScrapMaintenanceEntryVariablesReportId(
-              id: reportId,
-            ),
-            maintenanceItem: entry.maintenanceItem,
-            startTime: Timestamp(
-              0,
-              entry.startTime.millisecondsSinceEpoch ~/ 1000,
-            ),
-            endTime: Timestamp(0, entry.endTime.millisecondsSinceEpoch ~/ 1000),
-            personDoingMaintenance: entry.personDoingMaintenance,
-            description: entry.description,
-            durationHours: entry.durationHours,
-          )
-          .execute();
-    }
+    await _reports.add(Col.scrapHealth, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalMaintenanceDurationHours': report.totalMaintenanceDurationHours,
+      'createdBy': report.createdBy,
+      'submittedAt': toTimestamp(report.submittedAt),
+      'entries': report.entries.map(_entryToMap).toList(),
+    });
   }
 
   @override
@@ -261,36 +282,13 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapMachineHealthReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapMachineHealthReports.map((r) {
-      final entries = r.scrapMaintenanceEntries_on_report
-          .map(
-            (e) => ScrapMaintenanceEntry(
-              maintenanceItem: e.maintenanceItem,
-              startTime: e.startTime.toDateTime(),
-              endTime: e.endTime.toDateTime(),
-              personDoingMaintenance: e.personDoingMaintenance,
-              description: e.description,
-              durationHours: e.durationHours,
-            ),
-          )
-          .toList();
-      return ScrapMachineHealthReport(
-        id: r.id,
-        date: r.date,
-        machineNumber: r.machineNumber,
-        shift: r.shift,
-        entries: entries,
-        totalMaintenanceDurationHours: r.totalMaintenanceDurationHours,
-        createdBy: r.createdBy,
-        timestamp: r.timestamp?.toDateTime(),
-        submittedAt: r.submittedAt?.toDateTime(),
-      );
-    }).toList();
+    final rows = await _list(
+      Col.scrapHealth,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows.map(_healthReport).toList();
   }
 
   @override
@@ -299,59 +297,62 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime date,
     String shift,
   ) async {
-    final reports = await getMachineHealthReports(
-      machineNumber: machineNumber,
-      startDate: date,
-      endDate: date,
-    );
-    return reports.cast<ScrapMachineHealthReport?>().firstWhere(
-      (r) => r!.shift == shift,
-      orElse: () => null,
-    );
+    final row = await _reports.findOne(Col.scrapHealth, {
+      'machineNumber': machineNumber,
+      'date': dateKey(date),
+      'shift': shift,
+    });
+    return row == null ? null : _healthReport(row);
   }
 
   @override
-  Future<void> deleteMachineHealthReport(String id) async {
-    await connector.deleteScrapMachineHealthReport(id: id).execute();
-  }
+  Future<void> deleteMachineHealthReport(String id) =>
+      _reports.delete(Col.scrapHealth, id);
 
   // ═══════════════════════════════════════
   // PRODUCTION DETAILS REPORT
   // ═══════════════════════════════════════
 
+  Map<String, dynamic> _lineItemToMap(ScrapProductionLineItem i) => {
+    'product': i.product,
+    'weightPerBag': i.weightPerBag,
+    'totalBags': i.totalBags,
+    'totalWeight': i.totalWeight,
+  };
+
+  ScrapProductionLineItem _lineItem(DocRow i) => ScrapProductionLineItem(
+    product: i.str('product'),
+    weightPerBag: i.real('weightPerBag'),
+    totalBags: i.integer('totalBags'),
+    totalWeight: i.real('totalWeight'),
+  );
+
+  ScrapProductionDetailsReport _productionReport(DocRow r) =>
+      ScrapProductionDetailsReport(
+        id: r.id,
+        date: r.date('date'),
+        machineNumber: r.str('machineNumber'),
+        shift: r.str('shift'),
+        lineItems: r.children('lineItems').map(_lineItem).toList(),
+        totalProductionWeight: r.real('totalProductionWeight'),
+        createdBy: r.str('createdBy'),
+        timestamp: r.timestamp('timestamp'),
+        submittedAt: r.timestamp('submittedAt'),
+      );
+
   @override
   Future<void> submitProductionDetailsReport(
     ScrapProductionDetailsReport report,
   ) async {
-    final result = await connector
-        .createScrapProductionDetailsReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalProductionWeight: report.totalProductionWeight,
-          createdBy: report.createdBy,
-        )
-        .submittedAt(
-          report.submittedAt != null
-              ? Timestamp(0, report.submittedAt!.millisecondsSinceEpoch ~/ 1000)
-              : null,
-        )
-        .execute();
-
-    final reportId = result.data.scrapProductionDetailsReport_insert.id;
-    for (final item in report.lineItems) {
-      await connector
-          .createScrapProductionLineItem(
-            reportId: CreateScrapProductionLineItemVariablesReportId(
-              id: reportId,
-            ),
-            product: item.product,
-            weightPerBag: item.weightPerBag,
-            totalBags: item.totalBags,
-            totalWeight: item.totalWeight,
-          )
-          .execute();
-    }
+    await _reports.add(Col.scrapProductionDetails, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalProductionWeight': report.totalProductionWeight,
+      'createdBy': report.createdBy,
+      'submittedAt': toTimestamp(report.submittedAt),
+      'lineItems': report.lineItems.map(_lineItemToMap).toList(),
+    });
   }
 
   @override
@@ -360,34 +361,13 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapProductionDetailsReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapProductionDetailsReports.map((r) {
-      final lineItems = r.scrapProductionLineItems_on_report
-          .map(
-            (item) => ScrapProductionLineItem(
-              product: item.product,
-              weightPerBag: item.weightPerBag,
-              totalBags: item.totalBags,
-              totalWeight: item.totalWeight,
-            ),
-          )
-          .toList();
-      return ScrapProductionDetailsReport(
-        id: r.id,
-        date: r.date,
-        machineNumber: r.machineNumber,
-        shift: r.shift,
-        lineItems: lineItems,
-        totalProductionWeight: r.totalProductionWeight,
-        createdBy: r.createdBy,
-        timestamp: r.timestamp?.toDateTime(),
-        submittedAt: r.submittedAt?.toDateTime(),
-      );
-    }).toList();
+    final rows = await _list(
+      Col.scrapProductionDetails,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows.map(_productionReport).toList();
   }
 
   @override
@@ -396,21 +376,17 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime date,
     String shift,
   ) async {
-    final reports = await getProductionDetailsReports(
-      machineNumber: machineNumber,
-      startDate: date,
-      endDate: date,
-    );
-    return reports.cast<ScrapProductionDetailsReport?>().firstWhere(
-      (r) => r!.shift == shift,
-      orElse: () => null,
-    );
+    final row = await _reports.findOne(Col.scrapProductionDetails, {
+      'machineNumber': machineNumber,
+      'date': dateKey(date),
+      'shift': shift,
+    });
+    return row == null ? null : _productionReport(row);
   }
 
   @override
-  Future<void> deleteProductionDetailsReport(String id) async {
-    await connector.deleteScrapProductionDetailsReport(id: id).execute();
-  }
+  Future<void> deleteProductionDetailsReport(String id) =>
+      _reports.delete(Col.scrapProductionDetails, id);
 
   // ═══════════════════════════════════════
   // PRODUCTION WEIGHT REPORT
@@ -420,19 +396,17 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
   Future<void> submitProductionWeightReport(
     ScrapProductionWeightReport report,
   ) async {
-    await connector
-        .createScrapProductionWeightReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalProductionWeight: report.totalProductionWeight,
-          maintenanceWeight: report.maintenanceWeight,
-          totalWeight: report.totalWeight,
-          targetWeight: report.targetWeight,
-          efficiencyPercentage: report.efficiencyPercentage,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.scrapProductionWeight, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalProductionWeight': report.totalProductionWeight,
+      'maintenanceWeight': report.maintenanceWeight,
+      'totalWeight': report.totalWeight,
+      'targetWeight': report.targetWeight,
+      'efficiencyPercentage': report.efficiencyPercentage,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -441,38 +415,34 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapProductionWeightReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapProductionWeightReports
+    final rows = await _list(
+      Col.scrapProductionWeight,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ScrapProductionWeightReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            totalProductionWeight: r.totalProductionWeight,
-            maintenanceWeight: r.maintenanceWeight,
-            totalWeight: r.totalWeight,
-            targetWeight: r.targetWeight,
-            efficiencyPercentage: r.efficiencyPercentage,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            totalProductionWeight: r.real('totalProductionWeight'),
+            maintenanceWeight: r.real('maintenanceWeight'),
+            totalWeight: r.real('totalWeight'),
+            targetWeight: r.real('targetWeight'),
+            efficiencyPercentage: r.real('efficiencyPercentage'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteProductionWeightReport(String id) async {
-    await connector
-        .deleteScrapProductionWeightReport(
-          id: DeleteScrapProductionWeightReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteProductionWeightReport(String id) =>
+      _reports.delete(Col.scrapProductionWeight, id);
 
   // ═══════════════════════════════════════
   // REPORT WRITING EFFICIENCY
@@ -484,57 +454,48 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapReportWritingEfficiency();
-    if (operatorId != null) builder.machineNumber(operatorId);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapWritingEfficiencies
+    // Preserved quirk: the old query filtered `machineNumber` using the
+    // `operatorId` argument.
+    final rows = await _list(
+      Col.scrapWritingEfficiency,
+      equalsField: 'machineNumber',
+      equalsValue: operatorId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ScrapReportWritingEfficiency(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            submittedAt: r.submittedAt?.toDateTime(),
-            shiftEndTime: r.shiftEndTime.toDateTime(),
-            score: r.score,
-            operatorId: r.operatorId,
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            submittedAt: r.timestamp('submittedAt'),
+            shiftEndTime: r.timestamp('shiftEndTime')!,
+            score: r.integer('score'),
+            operatorId: r.str('operatorId'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteWritingEfficiency(String id) async {
-    await connector
-        .deleteScrapWritingEfficiency(
-          id: DeleteScrapWritingEfficiencyVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteWritingEfficiency(String id) =>
+      _reports.delete(Col.scrapWritingEfficiency, id);
 
   @override
   Future<void> submitWritingEfficiency(
     ScrapReportWritingEfficiency record,
   ) async {
-    final submittedAt = record.submittedAt ?? DateTime.now();
-    await connector
-        .createScrapWritingEfficiency(
-          date: record.date,
-          machineNumber: record.machineNumber,
-          shift: record.shift,
-          shiftEndTime: Timestamp(
-            0,
-            record.shiftEndTime.millisecondsSinceEpoch ~/ 1000,
-          ),
-          score: record.score,
-          operatorId: record.operatorId,
-        )
-        .submittedAt(
-          Timestamp(0, submittedAt.millisecondsSinceEpoch ~/ 1000),
-        )
-        .execute();
+    await _reports.add(Col.scrapWritingEfficiency, {
+      'date': dateKey(record.date),
+      'machineNumber': record.machineNumber,
+      'shift': record.shift,
+      'shiftEndTime': toTimestamp(record.shiftEndTime),
+      'score': record.score,
+      'operatorId': record.operatorId,
+      'submittedAt': toTimestamp(record.submittedAt ?? DateTime.now()),
+    });
   }
 
   // ═══════════════════════════════════════
@@ -543,17 +504,15 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
 
   @override
   Future<void> submitScrapQualityReport(ScrapQualityReport report) async {
-    final builder = connector.createScrapQualityReport(
-      date: report.date,
-      machineNumber: report.machineNumber,
-      shift: report.shift,
-      product: report.product,
-      qualityRating: report.qualityRating,
-      createdBy: report.createdBy,
-    );
-    // TODO: uncomment after running `flutterfire dataconnect:sdk:generate`
-    // if (report.comments != null) builder.comments(report.comments!);
-    await builder.execute();
+    await _reports.add(Col.scrapQuality, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'product': report.product,
+      'qualityRating': report.qualityRating,
+      'comments': report.comments,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -562,37 +521,32 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listScrapQualityReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.scrapQualityReports
+    final rows = await _list(
+      Col.scrapQuality,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ScrapQualityReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            product: r.product,
-            qualityRating: r.qualityRating,
-            // TODO: uncomment after running `flutterfire dataconnect:sdk:generate`
-            // comments: r.comments,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            product: r.str('product'),
+            qualityRating: r.integer('qualityRating'),
+            comments: r.strOrNull('comments'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteScrapQualityReport(String id) async {
-    await connector
-        .deleteScrapQualityReport(
-          id: DeleteScrapQualityReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteScrapQualityReport(String id) =>
+      _reports.delete(Col.scrapQuality, id);
 
   // ═══════════════════════════════════════
   // SALARY
@@ -600,8 +554,11 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
 
   @override
   Future<ScrapSalaryWeightages> getSalaryWeightages() async {
-    final result = await connector.getScrapSalaryWeightages().execute();
-    final items = result.data.masterSalaryWeightages;
+    final snap = await _db
+        .collection(Col.masterSalaryWeightages)
+        .where('category', isEqualTo: 'scrap')
+        .get();
+    final items = snap.docs.map(DocRow.fromSnapshot).toList();
     if (items.isEmpty) {
       return const ScrapSalaryWeightages(
         wA: 20,
@@ -612,7 +569,11 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
       );
     }
     double val(String variable) =>
-        items.where((w) => w.variable == variable).firstOrNull?.percentage ?? 0;
+        items
+            .where((w) => w.str('variable') == variable)
+            .firstOrNull
+            ?.real('percentage') ??
+        0;
     return ScrapSalaryWeightages(
       wA: val('wA'),
       wB: val('wB'),
@@ -628,36 +589,35 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     int year,
     int month,
   ) async {
-    final users = await connector.listAllUsers().execute();
-    final user = users.data.users.where((u) => u.uid == operatorId).firstOrNull;
-    final machineNumber = user?.assignedMachines.isNotEmpty == true
-        ? user!.assignedMachines.first
-        : operatorId;
+    final user = await _userByUid(operatorId);
+    final assigned = user?.strings('assignedMachines') ?? const <String>[];
+    final machineNumber = assigned.isNotEmpty ? assigned.first : operatorId;
 
     final startDate = DateTime(year, month, 1);
     final endDate = DateTime(year, month + 1, 0, 23, 59, 59);
-    final result = await connector
-        .getScrapMonthlyAggregates(
-          machineNumber: machineNumber,
-          startDate: startDate,
-          endDate: endDate,
-        )
-        .execute();
-    final data = result.data;
 
-    final aScores = data.scrapCleaningReports.map((r) => r.percentage).toList();
-    final bScores = data.scrapToolsCountReports
-        .map((r) => r.percentageAvailable)
-        .toList();
-    final eScores = data.scrapProductionWeightReports
-        .map((r) => r.efficiencyPercentage)
-        .toList();
-    final fScores = data.scrapWritingEfficiencies
-        .map((r) => r.score.toDouble())
-        .toList();
-    final gScores = data.scrapQualityReports
-        .map((r) => r.qualityRating.toDouble())
-        .toList();
+    Future<List<DocRow>> inRange(String collection) => _list(
+      collection,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
+    final aScores = (await inRange(
+      Col.scrapCleaning,
+    )).map((r) => r.real('percentage')).toList();
+    final bScores = (await inRange(
+      Col.scrapToolsCount,
+    )).map((r) => r.real('percentageAvailable')).toList();
+    final eScores = (await inRange(
+      Col.scrapProductionWeight,
+    )).map((r) => r.real('efficiencyPercentage')).toList();
+    final fScores = (await inRange(
+      Col.scrapWritingEfficiency,
+    )).map((r) => r.integer('score').toDouble()).toList();
+    final gScores = (await inRange(
+      Col.scrapQuality,
+    )).map((r) => r.integer('qualityRating').toDouble()).toList();
 
     double average(List<double> values) =>
         values.isEmpty ? 0.0 : values.reduce((x, y) => x + y) / values.length;
@@ -675,45 +635,37 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
 
   @override
   Future<double> getFixedSalary(String operatorId) async {
-    final result = await connector.listAllUsers().execute();
-    final user = result.data.users
-        .where((u) => u.uid == operatorId)
-        .firstOrNull;
-    return user?.fixedSalary ?? 0.0;
+    final user = await _userByUid(operatorId);
+    return user?.real('fixedSalary') ?? 0.0;
   }
 
   @override
   Future<String> getOperatorName(String operatorId) async {
-    final result = await connector.listAllUsers().execute();
-    final user = result.data.users
-        .where((u) => u.uid == operatorId)
-        .firstOrNull;
-    return user?.name ?? 'Unknown';
+    final user = await _userByUid(operatorId);
+    return user?.strOrNull('name') ?? 'Unknown';
   }
 
   @override
   Future<void> saveSalaryCalculation(ScrapSalaryCalculation calculation) async {
-    await connector
-        .createScrapSalaryCalculation(
-          operatorId: calculation.operatorId,
-          operatorName: calculation.operatorName,
-          year: calculation.year,
-          month: calculation.month,
-          a: calculation.a,
-          b: calculation.b,
-          e: calculation.e,
-          f: calculation.f,
-          g: calculation.g,
-          wA: calculation.wA,
-          wB: calculation.wB,
-          wE: calculation.wE,
-          wF: calculation.wF,
-          wG: calculation.wG,
-          multiplier: calculation.multiplier,
-          fixedSalary: calculation.fixedSalary,
-          calculatedSalary: calculation.calculatedSalary,
-        )
-        .execute();
+    await _reports.add(Col.scrapSalaryCalculations, {
+      'operatorId': calculation.operatorId,
+      'operatorName': calculation.operatorName,
+      'year': calculation.year,
+      'month': calculation.month,
+      'a': calculation.a,
+      'b': calculation.b,
+      'e': calculation.e,
+      'f': calculation.f,
+      'g': calculation.g,
+      'wA': calculation.wA,
+      'wB': calculation.wB,
+      'wE': calculation.wE,
+      'wF': calculation.wF,
+      'wG': calculation.wG,
+      'multiplier': calculation.multiplier,
+      'fixedSalary': calculation.fixedSalary,
+      'calculatedSalary': calculation.calculatedSalary,
+    });
   }
 
   @override
@@ -722,35 +674,31 @@ class ScrapRegrindRemoteDataSourceImpl implements ScrapRegrindRemoteDataSource {
     int year,
     int month,
   ) async {
-    final result = await connector
-        .getScrapSalaryCalculation(
-          operatorId: operatorId,
-          year: year,
-          month: month,
-        )
-        .execute();
-    final calcs = result.data.scrapSalaryCalculations;
-    if (calcs.isEmpty) return null;
-    final data = calcs.first;
+    final data = await _reports.findOne(Col.scrapSalaryCalculations, {
+      'operatorId': operatorId,
+      'year': year,
+      'month': month,
+    });
+    if (data == null) return null;
     return ScrapSalaryCalculation(
       id: data.id,
-      operatorId: data.operatorId,
-      operatorName: data.operatorName,
-      year: data.year,
-      month: data.month,
-      a: data.a,
-      b: data.b,
-      e: data.e,
-      f: data.f,
-      g: data.g,
-      wA: data.wA,
-      wB: data.wB,
-      wE: data.wE,
-      wF: data.wF,
-      wG: data.wG,
-      multiplier: data.multiplier,
-      fixedSalary: data.fixedSalary,
-      calculatedSalary: data.calculatedSalary,
+      operatorId: data.str('operatorId'),
+      operatorName: data.str('operatorName'),
+      year: data.integer('year'),
+      month: data.integer('month'),
+      a: data.real('a'),
+      b: data.real('b'),
+      e: data.real('e'),
+      f: data.real('f'),
+      g: data.real('g'),
+      wA: data.real('wA'),
+      wB: data.real('wB'),
+      wE: data.real('wE'),
+      wF: data.real('wF'),
+      wG: data.real('wG'),
+      multiplier: data.real('multiplier'),
+      fixedSalary: data.real('fixedSalary'),
+      calculatedSalary: data.real('calculatedSalary'),
     );
   }
 }

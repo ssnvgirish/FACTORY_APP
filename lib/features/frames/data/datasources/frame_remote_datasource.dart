@@ -1,5 +1,7 @@
-import 'package:firebase_data_connect/firebase_data_connect.dart';
-import '../../../../generated/dataconnect/default.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../core/data/collections.dart';
+import '../../../../core/data/firestore_support.dart';
+import '../../../../core/data/stock_ledger.dart';
 import '../../domain/entities/frame_entities.dart';
 
 abstract class FrameRemoteDataSource {
@@ -72,24 +74,140 @@ abstract class FrameRemoteDataSource {
 }
 
 class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
-  final DefaultConnector connector;
+  FrameRemoteDataSourceImpl({required FirebaseFirestore firestore})
+    : _db = firestore,
+      _reports = Reports(firestore);
 
-  FrameRemoteDataSourceImpl({required this.connector});
+  final FirebaseFirestore _db;
+  final Reports _reports;
+
+  Future<List<DocRow>> _list(
+    String collection, {
+    String? machineNumber,
+    DateTime? startDate,
+    DateTime? endDate,
+    String equalsField = 'machineNumber',
+    String? equalsValue,
+    String dateField = 'date',
+  }) => _reports.list(
+    collection,
+    equalsField: equalsField,
+    equalsValue: equalsValue ?? machineNumber,
+    dateField: dateField,
+    startDate: startDate,
+    endDate: endDate,
+  );
+
+  // ── embedded item mapping ──
+
+  Map<String, dynamic> _productionItemToMap(FrameProductionLineItem i) => {
+    'section': i.section,
+    'density': i.density,
+    'color': i.color,
+    'length': i.length,
+    'quantity': i.quantity,
+    'perPieceWeight': i.perPieceWeight,
+    'totalWeight': i.totalWeight,
+    'manualWeightPerFoot': i.manualWeightPerFoot,
+  };
+
+  FrameProductionLineItem _productionItem(DocRow li) => FrameProductionLineItem(
+    section: li.str('section'),
+    density: li.str('density'),
+    color: li.str('color'),
+    length: li.real('length'),
+    quantity: li.integer('quantity'),
+    perPieceWeight: li.real('perPieceWeight'),
+    totalWeight: li.real('totalWeight'),
+    manualWeightPerFoot: li.realOrNull('manualWeightPerFoot'),
+  );
+
+  Map<String, dynamic> _packingItemToMap(FramePackingLineItem i) => {
+    'section': i.section,
+    'density': i.density,
+    'color': i.color,
+    'length': i.length,
+    'productionQuantity': i.productionQuantity,
+    'perPieceWeight': i.perPieceWeight,
+    'packed': i.packed,
+    'rejectedQuality': i.rejectedQuality,
+  };
+
+  FramePackingLineItem _packingItem(DocRow li) => FramePackingLineItem(
+    section: li.str('section'),
+    density: li.str('density'),
+    color: li.str('color'),
+    length: li.real('length'),
+    productionQuantity: li.integer('productionQuantity'),
+    perPieceWeight: li.real('perPieceWeight'),
+    packed: li.integer('packed'),
+    rejectedQuality: li.integer('rejectedQuality'),
+  );
+
+  Map<String, dynamic> _entryToMap(FrameMaintenanceEntry e) => {
+    'maintenanceItem': e.maintenanceItem,
+    'startTime': toTimestamp(e.startTime),
+    'endTime': toTimestamp(e.endTime),
+    'personDoingMaintenance': e.personDoingMaintenance,
+    'description': e.description,
+    'durationHours': e.durationHours,
+  };
+
+  FrameMaintenanceEntry _entry(DocRow e) => FrameMaintenanceEntry(
+    maintenanceItem: e.str('maintenanceItem'),
+    startTime: e.timestamp('startTime')!,
+    endTime: e.timestamp('endTime')!,
+    personDoingMaintenance: e.str('personDoingMaintenance'),
+    description: e.str('description'),
+    durationHours: e.real('durationHours'),
+  );
+
+  // ── stock helpers (operate on stored maps so submit and delete share them) ──
+
+  List<StockLine> _productionStock(List<Map<String, dynamic>> items) => items
+      .map((m) => DocRow('', m))
+      .map(
+        (i) => StockLine(
+          variant: i.str('section'),
+          density: i.str('density'),
+          color: i.str('color'),
+          produced: i.integer('quantity'),
+        ),
+      )
+      .toList();
+
+  List<StockLine> _packingStock(List<Map<String, dynamic>> items) => items
+      .map((m) => DocRow('', m))
+      .map(
+        (i) => StockLine(
+          variant: i.str('section'),
+          density: i.str('density'),
+          color: i.str('color'),
+          packed: i.integer('packed'),
+          rejected: i.integer('rejectedQuality'),
+          packedAmount: i.integer('packed') * i.real('perPieceWeight'),
+          rejectedAmount: i.integer('rejectedQuality') * i.real('perPieceWeight'),
+        ),
+      )
+      .toList();
+
+  List<Map<String, dynamic>> _rawChildren(DocRow row, String key) =>
+      row.children(key).map((c) => c.data).toList();
+
+  // ── Cleaning ──
 
   @override
   Future<void> submitMachineCleaningReport(MachineCleaningReport report) async {
-    await connector
-        .createFrameCleaningReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          machineCondition: report.machineCondition,
-          groundCondition: report.groundCondition,
-          mouldCondition: report.mouldCondition,
-          totalScore: report.totalScore,
-          percentage: report.percentage,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.frameCleaning, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'machineCondition': report.machineCondition,
+      'groundCondition': report.groundCondition,
+      'mouldCondition': report.mouldCondition,
+      'totalScore': report.totalScore,
+      'percentage': report.percentage,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -98,41 +216,46 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameCleaningReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameCleaningReports
+    final rows = await _list(
+      Col.frameCleaning,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => MachineCleaningReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            machineCondition: r.machineCondition,
-            groundCondition: r.groundCondition,
-            mouldCondition: r.mouldCondition,
-            totalScore: r.totalScore,
-            percentage: r.percentage,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            machineCondition: r.integer('machineCondition'),
+            groundCondition: r.integer('groundCondition'),
+            mouldCondition: r.integer('mouldCondition'),
+            totalScore: r.integer('totalScore'),
+            percentage: r.real('percentage'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
+  Future<void> deleteMachineCleaningReport(String id) =>
+      _reports.delete(Col.frameCleaning, id);
+
+  // ── Tools count ──
+
+  @override
   Future<void> submitToolsCountReport(ToolsCountReport report) async {
-    await connector
-        .createFrameToolsCountReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          totalToolsGiven: report.totalToolsGiven,
-          totalToolsAvailable: report.totalToolsAvailable,
-          percentageAvailable: report.percentageAvailable,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.frameToolsCount, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'totalToolsGiven': report.totalToolsGiven,
+      'totalToolsAvailable': report.totalToolsAvailable,
+      'percentageAvailable': report.percentageAvailable,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -141,63 +264,45 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameToolsCountReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameToolsCountReports
+    final rows = await _list(
+      Col.frameToolsCount,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ToolsCountReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            totalToolsGiven: r.totalToolsGiven,
-            totalToolsAvailable: r.totalToolsAvailable,
-            percentageAvailable: r.percentageAvailable,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            totalToolsGiven: r.integer('totalToolsGiven'),
+            totalToolsAvailable: r.integer('totalToolsAvailable'),
+            percentageAvailable: r.real('percentageAvailable'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> submitMachineHealthReport(MachineHealthReport report) async {
-    final result = await connector
-        .createFrameHealthReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalMaintenanceDurationHours: report.totalMaintenanceDurationHours,
-          createdBy: report.createdBy,
-        )
-        .submittedAt(
-          report.submittedAt != null
-              ? Timestamp(0, report.submittedAt!.millisecondsSinceEpoch ~/ 1000)
-              : null,
-        )
-        .execute();
+  Future<void> deleteToolsCountReport(String id) =>
+      _reports.delete(Col.frameToolsCount, id);
 
-    final reportId = result.data.frameHealthReport_insert.id;
-    for (final entry in report.entries) {
-      await connector
-          .createFrameMaintenanceEntry(
-            reportId: CreateFrameMaintenanceEntryVariablesReportId(
-              id: reportId,
-            ),
-            maintenanceItem: entry.maintenanceItem,
-            startTime: Timestamp(
-              0,
-              entry.startTime.millisecondsSinceEpoch ~/ 1000,
-            ),
-            endTime: Timestamp(0, entry.endTime.millisecondsSinceEpoch ~/ 1000),
-            personDoingMaintenance: entry.personDoingMaintenance,
-            description: entry.description,
-            durationHours: entry.durationHours,
-          )
-          .execute();
-    }
+  // ── Machine health ──
+
+  @override
+  Future<void> submitMachineHealthReport(MachineHealthReport report) async {
+    await _reports.add(Col.frameHealth, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalMaintenanceDurationHours': report.totalMaintenanceDurationHours,
+      'createdBy': report.createdBy,
+      'submittedAt': toTimestamp(report.submittedAt),
+      'entries': report.entries.map(_entryToMap).toList(),
+    });
   }
 
   @override
@@ -206,83 +311,82 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameHealthReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameHealthReports
+    final rows = await _list(
+      Col.frameHealth,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => MachineHealthReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            entries: r.frameMaintenanceEntries_on_report
-                .map(
-                  (e) => FrameMaintenanceEntry(
-                    maintenanceItem: e.maintenanceItem,
-                    startTime: e.startTime.toDateTime(),
-                    endTime: e.endTime.toDateTime(),
-                    personDoingMaintenance: e.personDoingMaintenance,
-                    description: e.description,
-                    durationHours: e.durationHours,
-                  ),
-                )
-                .toList(),
-            totalMaintenanceDurationHours: r.totalMaintenanceDurationHours,
-            createdBy: r.createdBy,
-            submittedAt: r.submittedAt?.toDateTime(),
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            entries: r.children('entries').map(_entry).toList(),
+            totalMaintenanceDurationHours: r.real('totalMaintenanceDurationHours'),
+            createdBy: r.str('createdBy'),
+            submittedAt: r.timestamp('submittedAt'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<List<MachineHealthReport>> getPendingApprovals() async {
-    return getMachineHealthReports();
-  }
+  Future<List<MachineHealthReport>> getPendingApprovals() =>
+      getMachineHealthReports();
+
+  @override
+  Future<void> deleteMachineHealthReport(String id) =>
+      _reports.delete(Col.frameHealth, id);
+
+  // ── Production details (maintains stock) ──
 
   @override
   Future<void> submitProductionDetailsReport(
     FrameProductionDetailsReport report,
   ) async {
-    final result = await connector
-        .createFrameProductionDetailsReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalQuantity: report.totalQuantity,
-          totalWeight: report.totalWeight,
-          createdBy: report.createdBy,
-        )
-        .submittedAt(
-          report.submittedAt != null
-              ? Timestamp(0, report.submittedAt!.millisecondsSinceEpoch ~/ 1000)
-              : null,
-        )
-        .execute();
-
-    final reportId = result.data.frameProductionDetailsReport_insert.id;
-    for (final item in report.lineItems) {
-      await connector
-          .createFrameProductionLineItem(
-            reportId: CreateFrameProductionLineItemVariablesReportId(
-              id: reportId,
-            ),
-            section: item.section,
-            density: item.density,
-            color: item.color,
-            length: item.length,
-            quantity: item.quantity,
-            perPieceWeight: item.perPieceWeight,
-            totalWeight: item.totalWeight,
-          )
-          .manualWeightPerFoot(item.manualWeightPerFoot)
-          .execute();
-    }
+    final items = report.lineItems.map(_productionItemToMap).toList();
+    final ref = _db.collection(Col.frameProductionDetails).doc();
+    final batch = _db.batch();
+    batch.set(
+      ref,
+      _reports.stamp({
+        'date': dateKey(report.date),
+        'machineNumber': report.machineNumber,
+        'shift': report.shift,
+        'totalQuantity': report.totalQuantity,
+        'totalWeight': report.totalWeight,
+        'createdBy': report.createdBy,
+        'submittedAt': toTimestamp(report.submittedAt),
+        'lineItems': items,
+      }),
+    );
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.frame,
+      lines: _productionStock(items),
+      producedAmount: report.totalWeight,
+    );
+    await batch.commit();
   }
+
+  FrameProductionDetailsReport _productionReport(DocRow r) =>
+      FrameProductionDetailsReport(
+        id: r.id,
+        date: r.date('date'),
+        machineNumber: r.str('machineNumber'),
+        shift: r.str('shift'),
+        lineItems: r.children('lineItems').map(_productionItem).toList(),
+        totalQuantity: r.integer('totalQuantity'),
+        totalWeight: r.real('totalWeight'),
+        createdBy: r.str('createdBy'),
+        submittedAt: r.timestamp('submittedAt'),
+        timestamp: r.timestamp('timestamp'),
+      );
 
   @override
   Future<List<FrameProductionDetailsReport>> getProductionDetailsReports({
@@ -290,40 +394,13 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameProductionDetailsReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameProductionDetailsReports
-        .map(
-          (r) => FrameProductionDetailsReport(
-            id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            lineItems: r.frameProductionLineItems_on_report
-                .map(
-                  (li) => FrameProductionLineItem(
-                    section: li.section,
-                    density: li.density,
-                    color: li.color,
-                    length: li.length,
-                    quantity: li.quantity,
-                    perPieceWeight: li.perPieceWeight,
-                    totalWeight: li.totalWeight,
-                    manualWeightPerFoot: li.manualWeightPerFoot,
-                  ),
-                )
-                .toList(),
-            totalQuantity: r.totalQuantity,
-            totalWeight: r.totalWeight,
-            createdBy: r.createdBy,
-            submittedAt: r.submittedAt?.toDateTime(),
-            timestamp: r.timestamp?.toDateTime(),
-          ),
-        )
-        .toList();
+    final rows = await _list(
+      Col.frameProductionDetails,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows.map(_productionReport).toList();
   }
 
   @override
@@ -332,59 +409,50 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime date,
     String shift,
   ) async {
-    final result = await connector
-        .getFrameProductionDetailsReport(
-          machineNumber: machineNumber,
-          date: DateTime(date.year, date.month, date.day),
-          shift: shift,
-        )
-        .execute();
-
-    final reports = result.data.frameProductionDetailsReports;
-    if (reports.isEmpty) return null;
-    final r = reports.first;
-    return FrameProductionDetailsReport(
-      id: r.id,
-      date: r.date,
-      machineNumber: r.machineNumber,
-      shift: r.shift,
-      lineItems: r.frameProductionLineItems_on_report
-          .map(
-            (li) => FrameProductionLineItem(
-              section: li.section,
-              density: li.density,
-              color: li.color,
-              length: li.length,
-              quantity: li.quantity,
-              perPieceWeight: li.perPieceWeight,
-              totalWeight: li.totalWeight,
-            ),
-          )
-          .toList(),
-      totalQuantity: r.totalQuantity,
-      totalWeight: r.totalWeight,
-      createdBy: r.createdBy,
-      submittedAt: r.submittedAt?.toDateTime(),
-    );
+    final row = await _reports.findOne(Col.frameProductionDetails, {
+      'machineNumber': machineNumber,
+      'date': dateKey(date),
+      'shift': shift,
+    });
+    return row == null ? null : _productionReport(row);
   }
+
+  @override
+  Future<void> deleteProductionDetailsReport(String id) async {
+    final ref = _db.collection(Col.frameProductionDetails).doc(id);
+    final snap = await ref.get();
+    if (!snap.exists) return;
+    final row = DocRow.fromSnapshot(snap);
+    final batch = _db.batch();
+    batch.delete(ref);
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.frame,
+      lines: _productionStock(_rawChildren(row, 'lineItems')),
+      producedAmount: row.real('totalWeight'),
+      sign: -1,
+    );
+    await batch.commit();
+  }
+
+  // ── Production weight ──
 
   @override
   Future<void> submitProductionWeightReport(
     FrameProductionWeightReport report,
   ) async {
-    await connector
-        .createFrameProductionWeightReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          productionWeight: report.productionWeight,
-          maintenanceWeight: report.maintenanceWeight,
-          totalProductionWeight: report.totalProductionWeight,
-          targetWeight: report.targetWeight,
-          efficiencyPercentage: report.efficiencyPercentage,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.frameProductionWeight, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'productionWeight': report.productionWeight,
+      'maintenanceWeight': report.maintenanceWeight,
+      'totalProductionWeight': report.totalProductionWeight,
+      'targetWeight': report.targetWeight,
+      'efficiencyPercentage': report.efficiencyPercentage,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -393,60 +461,62 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameProductionWeightReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameProductionWeightReports
+    final rows = await _list(
+      Col.frameProductionWeight,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => FrameProductionWeightReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            productionWeight: r.productionWeight,
-            maintenanceWeight: r.maintenanceWeight,
-            totalProductionWeight: r.totalProductionWeight,
-            targetWeight: r.targetWeight,
-            efficiencyPercentage: r.efficiencyPercentage,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            productionWeight: r.real('productionWeight'),
+            maintenanceWeight: r.real('maintenanceWeight'),
+            totalProductionWeight: r.real('totalProductionWeight'),
+            targetWeight: r.real('targetWeight'),
+            efficiencyPercentage: r.real('efficiencyPercentage'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> submitShiftPackingReport(FrameShiftPackingReport report) async {
-    final result = await connector
-        .createFrameShiftPackingReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalRejectedWeight: report.totalRejectedWeight,
-          qualityAcceptancePercentage: report.qualityAcceptancePercentage,
-          packingEfficiency: report.packingEfficiency,
-          createdBy: report.createdBy,
-        )
-        .execute();
+  Future<void> deleteProductionWeightReport(String id) =>
+      _reports.delete(Col.frameProductionWeight, id);
 
-    final reportId = result.data.frameShiftPackingReport_insert.id;
-    for (final item in report.lineItems) {
-      await connector
-          .createFramePackingLineItem(
-            reportId: CreateFramePackingLineItemVariablesReportId(id: reportId),
-            section: item.section,
-            density: item.density,
-            color: item.color,
-            length: item.length,
-            productionQuantity: item.productionQuantity,
-            perPieceWeight: item.perPieceWeight,
-            packed: item.packed,
-            rejectedQuality: item.rejectedQuality,
-          )
-          .execute();
-    }
+  // ── Shift packing (maintains stock) ──
+
+  @override
+  Future<void> submitShiftPackingReport(FrameShiftPackingReport report) async {
+    final items = report.lineItems.map(_packingItemToMap).toList();
+    final ref = _db.collection(Col.frameShiftPacking).doc();
+    final batch = _db.batch();
+    batch.set(
+      ref,
+      _reports.stamp({
+        'date': dateKey(report.date),
+        'machineNumber': report.machineNumber,
+        'shift': report.shift,
+        'totalRejectedWeight': report.totalRejectedWeight,
+        'qualityAcceptancePercentage': report.qualityAcceptancePercentage,
+        'packingEfficiency': report.packingEfficiency,
+        'createdBy': report.createdBy,
+        'lineItems': items,
+      }),
+    );
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.frame,
+      lines: _packingStock(items),
+    );
+    await batch.commit();
   }
 
   @override
@@ -455,41 +525,49 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameShiftPackingReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameShiftPackingReports
+    final rows = await _list(
+      Col.frameShiftPacking,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => FrameShiftPackingReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            lineItems: r.framePackingLineItems_on_report
-                .map(
-                  (li) => FramePackingLineItem(
-                    section: li.section,
-                    density: li.density,
-                    color: li.color,
-                    length: li.length,
-                    productionQuantity: li.productionQuantity,
-                    perPieceWeight: li.perPieceWeight,
-                    packed: li.packed,
-                    rejectedQuality: li.rejectedQuality,
-                  ),
-                )
-                .toList(),
-            totalRejectedWeight: r.totalRejectedWeight,
-            qualityAcceptancePercentage: r.qualityAcceptancePercentage,
-            packingEfficiency: r.packingEfficiency,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            lineItems: r.children('lineItems').map(_packingItem).toList(),
+            totalRejectedWeight: r.real('totalRejectedWeight'),
+            qualityAcceptancePercentage: r.real('qualityAcceptancePercentage'),
+            packingEfficiency: r.real('packingEfficiency'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
+
+  @override
+  Future<void> deleteShiftPackingReport(String id) async {
+    final ref = _db.collection(Col.frameShiftPacking).doc(id);
+    final snap = await ref.get();
+    if (!snap.exists) return;
+    final row = DocRow.fromSnapshot(snap);
+    final batch = _db.batch();
+    batch.delete(ref);
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.frame,
+      lines: _packingStock(_rawChildren(row, 'lineItems')),
+      sign: -1,
+    );
+    await batch.commit();
+  }
+
+  // ── Writing efficiency ──
 
   @override
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
@@ -497,59 +575,61 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameWritingEfficiency();
-    if (operatorId != null) builder.operatorId(operatorId);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameWritingEfficiencies
+    final rows = await _list(
+      Col.frameWritingEfficiency,
+      equalsField: 'operatorId',
+      equalsValue: operatorId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ReportWritingEfficiencyRecord(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            submittedAt: r.submittedAt?.toDateTime(),
-            shiftEndTime: r.shiftEndTime.toDateTime(),
-            score: r.score,
-            operatorId: r.operatorId,
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            submittedAt: r.timestamp('submittedAt'),
+            shiftEndTime: r.timestamp('shiftEndTime')!,
+            score: r.integer('score'),
+            operatorId: r.str('operatorId'),
           ),
         )
         .toList();
   }
 
   @override
+  Future<void> submitWritingEfficiency(ReportWritingEfficiencyRecord record) async {
+    await _reports.add(Col.frameWritingEfficiency, {
+      'date': dateKey(record.date),
+      'machineNumber': record.machineNumber,
+      'shift': record.shift,
+      'shiftEndTime': toTimestamp(record.shiftEndTime),
+      'score': record.score,
+      'operatorId': record.operatorId,
+      'submittedAt': toTimestamp(record.submittedAt ?? DateTime.now()),
+    });
+  }
+
+  @override
+  Future<void> deleteWritingEfficiency(String id) =>
+      _reports.delete(Col.frameWritingEfficiency, id);
+
+  // ── Customer rejection ──
+
+  @override
   Future<void> submitCustomerRejectionReport(
     FrameCustomerRejectionReport report,
   ) async {
-    final result = await connector
-        .createFrameCustomerRejectionReport(
-          originalProductionDate: report.originalProductionDate,
-          rejectionDate: report.rejectionDate,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalRejectedWeight: report.totalRejectedWeight,
-          createdBy: report.createdBy,
-        )
-        .execute();
-
-    final reportId = result.data.frameCustomerRejectionReport_insert.id;
-    for (final item in report.rejectedItems) {
-      await connector
-          .createFrameCustomerRejectionItem(
-            reportId: CreateFrameCustomerRejectionItemVariablesReportId(
-              id: reportId,
-            ),
-            section: item.section,
-            density: item.density,
-            color: item.color,
-            length: item.length,
-            quantity: item.quantity,
-            perPieceWeight: item.perPieceWeight,
-            totalWeight: item.totalWeight,
-          )
-          .execute();
-    }
+    await _reports.add(Col.frameCustomerRejection, {
+      'originalProductionDate': dateKey(report.originalProductionDate),
+      'rejectionDate': dateKey(report.rejectionDate),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalRejectedWeight': report.totalRejectedWeight,
+      'createdBy': report.createdBy,
+      'rejectedItems': report.rejectedItems.map(_productionItemToMap).toList(),
+    });
   }
 
   @override
@@ -558,116 +638,31 @@ class FrameRemoteDataSourceImpl implements FrameRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listFrameCustomerRejectionReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.frameCustomerRejectionReports
+    final rows = await _list(
+      Col.frameCustomerRejection,
+      machineNumber: machineNumber,
+      dateField: 'originalProductionDate',
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => FrameCustomerRejectionReport(
             id: r.id,
-            originalProductionDate: r.originalProductionDate,
-            rejectionDate: r.rejectionDate,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            rejectedItems: r.frameCustomerRejectionItems_on_report
-                .map(
-                  (li) => FrameProductionLineItem(
-                    section: li.section,
-                    density: li.density,
-                    color: li.color,
-                    length: li.length,
-                    quantity: li.quantity,
-                    perPieceWeight: li.perPieceWeight,
-                    totalWeight: li.totalWeight,
-                  ),
-                )
-                .toList(),
-            totalRejectedWeight: r.totalRejectedWeight,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            originalProductionDate: r.date('originalProductionDate'),
+            rejectionDate: r.date('rejectionDate'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            rejectedItems: r.children('rejectedItems').map(_productionItem).toList(),
+            totalRejectedWeight: r.real('totalRejectedWeight'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteMachineCleaningReport(String id) async {
-    await connector
-        .deleteFrameCleaningReport(
-          id: DeleteFrameCleaningReportVariablesId(id: id),
-        )
-        .execute();
-  }
-
-  @override
-  Future<void> deleteToolsCountReport(String id) async {
-    await connector
-        .deleteFrameToolsCountReport(
-          id: DeleteFrameToolsCountReportVariablesId(id: id),
-        )
-        .execute();
-  }
-
-  @override
-  Future<void> deleteMachineHealthReport(String id) async {
-    await connector.deleteFrameHealthReport(id: id).execute();
-  }
-
-  @override
-  Future<void> deleteProductionDetailsReport(String id) async {
-    await connector.deleteFrameProductionDetailsReport(id: id).execute();
-  }
-
-  @override
-  Future<void> deleteProductionWeightReport(String id) async {
-    await connector
-        .deleteFrameProductionWeightReport(
-          id: DeleteFrameProductionWeightReportVariablesId(id: id),
-        )
-        .execute();
-  }
-
-  @override
-  Future<void> deleteShiftPackingReport(String id) async {
-    await connector.deleteFrameShiftPackingReport(id: id).execute();
-  }
-
-  @override
-  Future<void> deleteWritingEfficiency(String id) async {
-    await connector
-        .deleteFrameWritingEfficiency(
-          id: DeleteFrameWritingEfficiencyVariablesId(id: id),
-        )
-        .execute();
-  }
-
-  @override
-  Future<void> submitWritingEfficiency(
-    ReportWritingEfficiencyRecord record,
-  ) async {
-    final submittedAt = record.submittedAt ?? DateTime.now();
-    await connector
-        .createFrameWritingEfficiency(
-          date: record.date,
-          machineNumber: record.machineNumber,
-          shift: record.shift,
-          shiftEndTime: Timestamp(
-            0,
-            record.shiftEndTime.millisecondsSinceEpoch ~/ 1000,
-          ),
-          score: record.score,
-          operatorId: record.operatorId,
-        )
-        .submittedAt(
-          Timestamp(0, submittedAt.millisecondsSinceEpoch ~/ 1000),
-        )
-        .execute();
-  }
-
-  @override
-  Future<void> deleteCustomerRejectionReport(String id) async {
-    await connector.deleteFrameCustomerRejectionReport(id: id).execute();
-  }
+  Future<void> deleteCustomerRejectionReport(String id) =>
+      _reports.delete(Col.frameCustomerRejection, id);
 }

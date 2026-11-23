@@ -1,6 +1,9 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/config/dev_flags.dart';
-import '../../../../generated/dataconnect/default.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../../../core/data/collections.dart';
+import '../../../../core/data/firestore_support.dart';
+import '../auth_identity.dart';
 import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -10,104 +13,85 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final DefaultConnector connector;
-  final SharedPreferences sharedPreferences;
-
-  static const _keyLoggedInUserId = 'logged_in_user_id';
-
   AuthRemoteDataSourceImpl({
-    required this.connector,
-    required this.sharedPreferences,
-  });
+    required FirebaseAuth auth,
+    required FirebaseFirestore firestore,
+  }) : _auth = auth,
+       _db = firestore;
+
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _db;
 
   @override
   Future<UserModel> signIn(String phone, String password) async {
-    final normalizedPhone = _normalizePhone(phone);
-    final result = await connector
-        .getUserByPhone(phone: normalizedPhone)
-        .execute();
-    final users = result.data.users;
-    if (users.isEmpty) {
-      // Also try the raw phone in case it was stored without +91.
-      final fallback = await connector.getUserByPhone(phone: phone).execute();
-      if (fallback.data.users.isEmpty) {
-        throw Exception('No account found for this phone number');
-      }
-      return _authenticate(fallback.data.users.first, password);
+    final UserCredential credential;
+    try {
+      credential = await _auth.signInWithEmailAndPassword(
+        email: AuthIdentity.emailFor(phone),
+        password: AuthIdentity.passwordFor(password),
+      );
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageFor(e));
     }
-    return _authenticate(users.first, password);
-  }
 
-  Future<UserModel> _authenticate(
-    GetUserByPhoneUsers user,
-    String password,
-  ) async {
-    if (!DevFlags.bypassPasswordCheck && user.password != password) {
-      throw Exception('Incorrect password');
+    final user = await _loadProfile(credential.user!.uid);
+    if (user == null) {
+      await _auth.signOut();
+      throw Exception('No account found for this phone number');
     }
     if (!user.isActive) {
+      await _auth.signOut();
       throw Exception('Account is deactivated');
     }
-
-    await sharedPreferences.setString(_keyLoggedInUserId, user.id);
-    return _toModel(user);
+    return user;
   }
 
   @override
-  Future<void> signOut() async {
-    await sharedPreferences.remove(_keyLoggedInUserId);
-  }
+  Future<void> signOut() => _auth.signOut();
 
   @override
   Future<UserModel?> getCurrentUser() async {
-    // Clear legacy bypass session key if present.
-    await sharedPreferences.remove('logged_in_uid');
-
-    final id = sharedPreferences.getString(_keyLoggedInUserId);
-    if (id == null || id.isEmpty) return null;
-
+    final current = _auth.currentUser;
+    if (current == null) return null;
     try {
-      final result = await connector
-          .getUserById(id: GetUserByIdVariablesId(id: id))
-          .execute();
-      final user = result.data.user;
+      final user = await _loadProfile(current.uid);
       if (user == null || !user.isActive) {
-        await sharedPreferences.remove(_keyLoggedInUserId);
+        await _auth.signOut();
         return null;
       }
-      return UserModel(
-        uid: user.uid,
-        name: user.name,
-        phone: user.phone,
-        email: user.email,
-        roles: List<String>.from(user.roles),
-        assignedMachines: List<String>.from(user.assignedMachines),
-        fixedSalary: user.fixedSalary,
-        isActive: user.isActive,
-      );
+      return user;
     } catch (_) {
-      await sharedPreferences.remove(_keyLoggedInUserId);
       return null;
     }
   }
 
-  UserModel _toModel(GetUserByPhoneUsers user) {
+  Future<UserModel?> _loadProfile(String authUid) async {
+    final snap = await _db.collection(Col.users).doc(authUid).get();
+    if (!snap.exists) return null;
+    final row = DocRow.fromSnapshot(snap);
     return UserModel(
-      uid: user.uid,
-      name: user.name,
-      phone: user.phone,
-      email: user.email,
-      roles: List<String>.from(user.roles),
-      assignedMachines: List<String>.from(user.assignedMachines),
-      fixedSalary: user.fixedSalary,
-      isActive: user.isActive,
+      uid: row.str('uid'),
+      name: row.str('name'),
+      phone: row.str('phone'),
+      email: row.str('email'),
+      roles: row.strings('roles'),
+      assignedMachines: row.strings('assignedMachines'),
+      fixedSalary: row.real('fixedSalary'),
+      isActive: row.flag('isActive'),
     );
   }
 
-  String _normalizePhone(String phone) {
-    final trimmed = phone.trim();
-    if (trimmed.startsWith('+')) return trimmed;
-    if (trimmed.length == 10) return '+91$trimmed';
-    return trimmed;
+  String _messageFor(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No account found for this phone number';
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'Incorrect phone number or password';
+      case 'too-many-requests':
+        return 'Too many attempts. Try again later.';
+      default:
+        return e.message ?? 'Sign in failed';
+    }
   }
 }

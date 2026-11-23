@@ -1,13 +1,13 @@
-import '../../generated/dataconnect/default.dart';
+import '../../features/admin/data/datasources/admin_remote_datasource.dart';
+import '../../features/admin/domain/entities/admin_entities.dart';
 import '../constants/app_constants.dart';
 
 /// Seeds all master tables with data from [AppConstants].
-/// Safe to run multiple times — duplicates are skipped (unique constraints).
+/// Safe to run multiple times — duplicates are skipped.
 class MasterTableSeeder {
   MasterTableSeeder._();
 
-  static Future<String> seed() async {
-    final c = DefaultConnector.instance;
+  static Future<String> seed(AdminRemoteDatasource ds) async {
     var inserted = 0;
     var skipped = 0;
 
@@ -20,268 +20,141 @@ class MasterTableSeeder {
       }
     }
 
-    // ── Machines ──
+    Future<void> items(
+      MasterTableType type,
+      Iterable<String> values, {
+      String? itemType,
+      String Function(String)? displayName,
+    }) async {
+      var order = 0;
+      for (final v in values) {
+        await run(
+          () => ds.insertMasterItem(
+            type,
+            MasterTableItem(
+              id: '',
+              value: v,
+              type: itemType,
+              displayName: displayName?.call(v),
+              sortOrder: ++order,
+              isActive: true,
+            ),
+          ),
+        );
+      }
+    }
+
+    // ── Machines (one running sort order across kinds) ──
     var order = 0;
-    for (final m in AppConstants.frameMachines) {
-      await run(
-        () => c
-            .insertMasterMachine(
-              name: m,
-              type: 'frame',
+    for (final entry in [
+      ('frame', AppConstants.frameMachines),
+      ('sheet', AppConstants.sheetMachines),
+      ('scrap', AppConstants.scrapAllMachines),
+    ]) {
+      for (final m in entry.$2) {
+        await run(
+          () => ds.insertMasterItem(
+            MasterTableType.machines,
+            MasterTableItem(
+              id: '',
+              value: m,
+              type: entry.$1,
               sortOrder: ++order,
               isActive: true,
-            )
-            .execute(),
-      );
-    }
-    for (final m in AppConstants.sheetMachines) {
-      await run(
-        () => c
-            .insertMasterMachine(
-              name: m,
-              type: 'sheet',
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-    for (final m in AppConstants.scrapAllMachines) {
-      await run(
-        () => c
-            .insertMasterMachine(
-              name: m,
-              type: 'scrap',
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
+            ),
+          ),
+        );
+      }
     }
 
-    // ── Shifts ──
-    order = 0;
-    for (final s in AppConstants.shifts) {
-      await run(
-        () => c
-            .insertMasterShift(name: s, sortOrder: ++order, isActive: true)
-            .execute(),
-      );
-    }
+    await items(MasterTableType.shifts, AppConstants.shifts);
+    await items(
+      MasterTableType.roles,
+      AppConstants.allRoles,
+      displayName: (c) => AppConstants.roleDisplayNames[c] ?? c,
+    );
+    await items(MasterTableType.frameSections, AppConstants.defaultFrameSections);
+    await items(MasterTableType.frameDensities, AppConstants.defaultFrameDensities);
+    await items(MasterTableType.frameColors, AppConstants.defaultFrameColors);
+    await items(MasterTableType.sheetThicknesses, AppConstants.defaultSheetThicknesses);
+    await items(MasterTableType.sheetDensities, AppConstants.defaultSheetDensities);
+    await items(MasterTableType.sheetColors, AppConstants.defaultSheetColors);
 
-    // ── Roles ──
+    // Maintenance items share one table; frame and scrap rows keep one running order.
     order = 0;
-    for (final code in AppConstants.allRoles) {
-      final display = AppConstants.roleDisplayNames[code] ?? code;
-      await run(
-        () => c
-            .insertMasterRole(
-              code: code,
-              displayName: display,
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-
-    // ── Frame Sections ──
-    order = 0;
-    for (final v in AppConstants.defaultFrameSections) {
-      await run(
-        () => c
-            .insertMasterFrameSection(
-              name: v,
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-
-    // ── Frame Densities ──
-    order = 0;
-    for (final v in AppConstants.defaultFrameDensities) {
-      await run(
-        () => c
-            .insertMasterFrameDensity(
+    for (final entry in [
+      ('frame', AppConstants.defaultMaintenanceItems),
+      ('scrap', AppConstants.scrapMaintenanceItems),
+    ]) {
+      for (final v in entry.$2) {
+        await run(
+          () => ds.insertMasterItem(
+            MasterTableType.maintenanceItems,
+            MasterTableItem(
+              id: '',
               value: v,
+              type: entry.$1,
               sortOrder: ++order,
               isActive: true,
-            )
-            .execute(),
-      );
+            ),
+          ),
+        );
+      }
     }
+    await items(MasterTableType.scrapProducts, AppConstants.scrapProducts);
 
-    // ── Frame Colors ──
-    order = 0;
-    for (final v in AppConstants.defaultFrameColors) {
-      await run(
-        () => c
-            .insertMasterFrameColor(name: v, sortOrder: ++order, isActive: true)
-            .execute(),
-      );
-    }
-
-    // ── Sheet Thicknesses ──
-    order = 0;
-    for (final v in AppConstants.defaultSheetThicknesses) {
-      await run(
-        () => c
-            .insertMasterSheetThickness(
-              value: v,
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-
-    // ── Sheet Densities ──
-    order = 0;
-    for (final v in AppConstants.defaultSheetDensities) {
-      await run(
-        () => c
-            .insertMasterSheetDensity(
-              value: v,
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-
-    // ── Sheet Colors ──
-    order = 0;
-    for (final v in AppConstants.defaultSheetColors) {
-      await run(
-        () => c
-            .insertMasterSheetColor(name: v, sortOrder: ++order, isActive: true)
-            .execute(),
-      );
-    }
-
-    // ── Maintenance Items ──
-    order = 0;
-    for (final v in AppConstants.defaultMaintenanceItems) {
-      await run(
-        () => c
-            .insertMasterMaintenanceItem(
-              name: v,
-              category: 'frame',
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-    for (final v in AppConstants.scrapMaintenanceItems) {
-      await run(
-        () => c
-            .insertMasterMaintenanceItem(
-              name: v,
-              category: 'scrap',
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-
-    // ── Scrap Products ──
-    order = 0;
-    for (final v in AppConstants.scrapProducts) {
-      await run(
-        () => c
-            .insertMasterScrapProduct(
-              name: v,
-              sortOrder: ++order,
-              isActive: true,
-            )
-            .execute(),
-      );
-    }
-
-    // ══════════════════════════════════════
-    // LOOKUP TABLES
-    // ══════════════════════════════════════
-
-    // ── Frame Weights ──
+    // ── Lookup tables ──
     for (final section in AppConstants.defaultFrameWeights.entries) {
       for (final density in section.value.entries) {
         await run(
-          () => c
-              .insertMasterFrameWeight(
-                section: section.key,
-                density: density.key,
-                weightPerFoot: density.value,
-              )
-              .execute(),
+          () => ds.insertWeightEntry(
+            MasterLookupType.frameWeights,
+            MasterWeightEntry(id: '', key1: section.key, key2: density.key, weight: density.value),
+          ),
         );
       }
     }
-
-    // ── Sheet Weights ──
     for (final thickness in AppConstants.defaultSheetWeights.entries) {
       for (final density in thickness.value.entries) {
         await run(
-          () => c
-              .insertMasterSheetWeight(
-                thickness: thickness.key,
-                density: density.key,
-                weightPerSqft: density.value,
-              )
-              .execute(),
+          () => ds.insertWeightEntry(
+            MasterLookupType.sheetWeights,
+            MasterWeightEntry(id: '', key1: thickness.key, key2: density.key, weight: density.value),
+          ),
         );
       }
     }
-
-    // ── Frame Targets ──
-    // One row per section × density combination.
     for (final section in AppConstants.defaultFrameTargets.entries) {
       for (final density in section.value.entries) {
         await run(
-          () => c
-              .insertMasterFrameTarget(
-                section: section.key,
-                density: density.key,
-                targetKgPerHour: density.value,
-              )
-              .execute(),
+          () => ds.insertTargetEntry(
+            MasterLookupType.frameTargets,
+            MasterTargetEntry(id: '', key: section.key, density: density.key, target: density.value),
+          ),
         );
       }
     }
-
-    // ── Sheet Targets ──
-    // One row per thickness × density combination.
     for (final thickness in AppConstants.defaultSheetTargets.entries) {
       for (final density in thickness.value.entries) {
         await run(
-          () => c
-              .insertMasterSheetTarget(
-                thickness: thickness.key,
-                density: density.key,
-                targetFeetPerHour: density.value,
-              )
-              .execute(),
+          () => ds.insertTargetEntry(
+            MasterLookupType.sheetTargets,
+            MasterTargetEntry(id: '', key: thickness.key, density: density.key, target: density.value),
+          ),
         );
       }
     }
-
-    // ── Scrap Targets ──
     for (final entry in AppConstants.scrapTargetWeightPerHour.entries) {
       await run(
-        () => c
-            .insertMasterScrapTarget(
-              product: entry.key,
-              targetKgPerHour: entry.value,
-            )
-            .execute(),
+        () => ds.insertTargetEntry(
+          MasterLookupType.scrapTargets,
+          MasterTargetEntry(id: '', key: entry.key, target: entry.value),
+        ),
       );
     }
 
-    // ── Salary Weightages (frame_sheet) ──
-    final salaryLabels = {
+    // ── Salary weightages ──
+    const salaryLabels = {
       'wA': 'Machine Cleaning',
       'wB': 'Tools Count',
       'wC': 'Machine Health',
@@ -289,45 +162,37 @@ class MasterTableSeeder {
       'wE': 'Report Writing',
       'wF': 'Quality / Packing',
     };
-    for (final entry in AppConstants.defaultSalaryWeightages.entries) {
+    final existing = {
+      'frame_sheet': (await ds.getSalaryWeightages()).map((e) => e.variable).toSet(),
+      'scrap': (await ds.getSalaryWeightages(category: 'scrap')).map((e) => e.variable).toSet(),
+    };
+    Future<void> weightage(String category, String variable, String label, double pct) async {
+      if (existing[category]!.contains(variable)) {
+        skipped++;
+        return;
+      }
       await run(
-        () => c
-            .insertMasterSalaryWeightage(
-              variable: entry.key,
-              label: salaryLabels[entry.key] ?? entry.key,
-              category: 'frame_sheet',
-              percentage: entry.value,
-            )
-            .execute(),
+        () => ds.insertSalaryWeightage(
+          MasterSalaryWeightageEntry(
+            id: '', variable: variable, label: label, category: category, percentage: pct,
+          ),
+        ),
       );
     }
 
-    // ── Salary Weightages (scrap) ──
-    final scrapSalary = <String, double>{
-      'wA': 15.0,
-      'wB': 10.0,
-      'wE': 30.0,
-      'wF': 20.0,
-      'wG': 25.0,
-    };
-    final scrapLabels = {
+    for (final e in AppConstants.defaultSalaryWeightages.entries) {
+      await weightage('frame_sheet', e.key, salaryLabels[e.key] ?? e.key, e.value);
+    }
+    const scrapSalary = {'wA': 15.0, 'wB': 10.0, 'wE': 30.0, 'wF': 20.0, 'wG': 25.0};
+    const scrapLabels = {
       'wA': 'Machine Cleaning %',
       'wB': 'Tools Count %',
       'wE': 'Production Efficiency %',
       'wF': 'Report Writing Efficiency %',
       'wG': 'Scrap Quality Rating %',
     };
-    for (final entry in scrapSalary.entries) {
-      await run(
-        () => c
-            .insertMasterSalaryWeightage(
-              variable: entry.key,
-              label: scrapLabels[entry.key] ?? entry.key,
-              category: 'scrap',
-              percentage: entry.value,
-            )
-            .execute(),
-      );
+    for (final e in scrapSalary.entries) {
+      await weightage('scrap', e.key, scrapLabels[e.key] ?? e.key, e.value);
     }
 
     return 'Inserted: $inserted, Skipped (duplicates): $skipped';

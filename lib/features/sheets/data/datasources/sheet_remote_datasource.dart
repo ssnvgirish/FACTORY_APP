@@ -1,5 +1,7 @@
-import 'package:firebase_data_connect/firebase_data_connect.dart';
-import '../../../../generated/dataconnect/default.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../core/data/collections.dart';
+import '../../../../core/data/firestore_support.dart';
+import '../../../../core/data/stock_ledger.dart';
 import '../../../frames/domain/entities/frame_entities.dart';
 import '../../domain/entities/sheet_entities.dart';
 
@@ -76,24 +78,157 @@ abstract class SheetRemoteDataSource {
 }
 
 class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
-  final DefaultConnector connector;
+  SheetRemoteDataSourceImpl({required FirebaseFirestore firestore})
+    : _db = firestore,
+      _reports = Reports(firestore);
 
-  SheetRemoteDataSourceImpl({required this.connector});
+  final FirebaseFirestore _db;
+  final Reports _reports;
+
+  Future<List<DocRow>> _list(
+    String collection, {
+    String? machineNumber,
+    DateTime? startDate,
+    DateTime? endDate,
+    String equalsField = 'machineNumber',
+    String? equalsValue,
+    String dateField = 'date',
+  }) => _reports.list(
+    collection,
+    equalsField: equalsField,
+    equalsValue: equalsValue ?? machineNumber,
+    dateField: dateField,
+    startDate: startDate,
+    endDate: endDate,
+  );
+
+  // ── embedded item mapping ──
+
+  Map<String, dynamic> _productionItemToMap(SheetProductionLineItem i) => {
+    'thickness': i.thickness,
+    'density': i.density,
+    'color': i.color,
+    'length': i.length,
+    'width': i.width,
+    'quantity': i.quantity,
+    'sqft': i.sqft,
+    'perPieceWeight': i.perPieceWeight,
+    'totalWeight': i.totalWeight,
+    'totalRunningFeet': i.totalRunningFeet,
+    'timeOfChange': toTimestamp(i.timeOfChange),
+    'manualWeightPerSqft': i.manualWeightPerSqft,
+  };
+
+  SheetProductionLineItem _productionItem(DocRow li) => SheetProductionLineItem(
+    thickness: li.str('thickness'),
+    density: li.str('density'),
+    color: li.str('color'),
+    length: li.real('length'),
+    width: li.real('width'),
+    quantity: li.integer('quantity'),
+    sqft: li.real('sqft'),
+    perPieceWeight: li.real('perPieceWeight'),
+    totalWeight: li.real('totalWeight'),
+    totalRunningFeet: li.real('totalRunningFeet'),
+    timeOfChange: li.timestamp('timeOfChange'),
+    manualWeightPerSqft: li.realOrNull('manualWeightPerSqft'),
+  );
+
+  Map<String, dynamic> _packingItemToMap(SheetPackingLineItem i) => {
+    'thickness': i.thickness,
+    'density': i.density,
+    'color': i.color,
+    'length': i.length,
+    'width': i.width,
+    'productionQuantity': i.productionQuantity,
+    'perPieceWeight': i.perPieceWeight,
+    'runningFeetPerItem': i.runningFeetPerItem,
+    'packed': i.packed,
+    'onlySanding': i.onlySanding,
+    'sandingAndPacked': i.sandingAndPacked,
+    'rejectedQuality': i.rejectedQuality,
+  };
+
+  SheetPackingLineItem _packingItem(DocRow li) => SheetPackingLineItem(
+    thickness: li.str('thickness'),
+    density: li.str('density'),
+    color: li.str('color'),
+    length: li.real('length'),
+    width: li.real('width'),
+    productionQuantity: li.integer('productionQuantity'),
+    perPieceWeight: li.real('perPieceWeight'),
+    runningFeetPerItem: li.real('runningFeetPerItem'),
+    packed: li.integer('packed'),
+    onlySanding: li.integer('onlySanding'),
+    sandingAndPacked: li.integer('sandingAndPacked'),
+    rejectedQuality: li.integer('rejectedQuality'),
+  );
+
+  Map<String, dynamic> _entryToMap(FrameMaintenanceEntry e) => {
+    'maintenanceItem': e.maintenanceItem,
+    'startTime': toTimestamp(e.startTime),
+    'endTime': toTimestamp(e.endTime),
+    'personDoingMaintenance': e.personDoingMaintenance,
+    'description': e.description,
+    'durationHours': e.durationHours,
+  };
+
+  FrameMaintenanceEntry _entry(DocRow e) => FrameMaintenanceEntry(
+    maintenanceItem: e.str('maintenanceItem'),
+    startTime: e.timestamp('startTime')!,
+    endTime: e.timestamp('endTime')!,
+    personDoingMaintenance: e.str('personDoingMaintenance'),
+    description: e.str('description'),
+    durationHours: e.real('durationHours'),
+  );
+
+  // ── stock helpers (operate on stored maps so submit and delete share them) ──
+
+  List<StockLine> _productionStock(List<Map<String, dynamic>> items) => items
+      .map((m) => DocRow('', m))
+      .map(
+        (i) => StockLine(
+          variant: i.str('thickness'),
+          density: i.str('density'),
+          color: i.str('color'),
+          produced: i.integer('quantity'),
+        ),
+      )
+      .toList();
+
+  List<StockLine> _packingStock(List<Map<String, dynamic>> items) => items
+      .map((m) => DocRow('', m))
+      .map(
+        (i) => StockLine(
+          variant: i.str('thickness'),
+          density: i.str('density'),
+          color: i.str('color'),
+          packed: i.integer('packed'),
+          rejected: i.integer('rejectedQuality'),
+          packedAmount: i.integer('packed') * i.real('runningFeetPerItem'),
+          rejectedAmount:
+              i.integer('rejectedQuality') * i.real('runningFeetPerItem'),
+        ),
+      )
+      .toList();
+
+  List<Map<String, dynamic>> _rawChildren(DocRow row, String key) =>
+      row.children(key).map((c) => c.data).toList();
+
+  // ── Cleaning ──
 
   @override
   Future<void> submitMachineCleaningReport(MachineCleaningReport report) async {
-    await connector
-        .createSheetCleaningReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          machineCondition: report.machineCondition,
-          groundCondition: report.groundCondition,
-          mouldCondition: report.mouldCondition,
-          totalScore: report.totalScore,
-          percentage: report.percentage,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.sheetCleaning, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'machineCondition': report.machineCondition,
+      'groundCondition': report.groundCondition,
+      'mouldCondition': report.mouldCondition,
+      'totalScore': report.totalScore,
+      'percentage': report.percentage,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -102,50 +237,46 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetCleaningReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetCleaningReports
+    final rows = await _list(
+      Col.sheetCleaning,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => MachineCleaningReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            machineCondition: r.machineCondition,
-            groundCondition: r.groundCondition,
-            mouldCondition: r.mouldCondition,
-            totalScore: r.totalScore,
-            percentage: r.percentage,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            machineCondition: r.integer('machineCondition'),
+            groundCondition: r.integer('groundCondition'),
+            mouldCondition: r.integer('mouldCondition'),
+            totalScore: r.integer('totalScore'),
+            percentage: r.real('percentage'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteMachineCleaningReport(String id) async {
-    await connector
-        .deleteSheetCleaningReport(
-          id: DeleteSheetCleaningReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteMachineCleaningReport(String id) =>
+      _reports.delete(Col.sheetCleaning, id);
+
+  // ── Tools count ──
 
   @override
   Future<void> submitToolsCountReport(ToolsCountReport report) async {
-    await connector
-        .createSheetToolsCountReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          totalToolsGiven: report.totalToolsGiven,
-          totalToolsAvailable: report.totalToolsAvailable,
-          percentageAvailable: report.percentageAvailable,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.sheetToolsCount, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'totalToolsGiven': report.totalToolsGiven,
+      'totalToolsAvailable': report.totalToolsAvailable,
+      'percentageAvailable': report.percentageAvailable,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -154,72 +285,45 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetToolsCountReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetToolsCountReports
+    final rows = await _list(
+      Col.sheetToolsCount,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ToolsCountReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            totalToolsGiven: r.totalToolsGiven,
-            totalToolsAvailable: r.totalToolsAvailable,
-            percentageAvailable: r.percentageAvailable,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            totalToolsGiven: r.integer('totalToolsGiven'),
+            totalToolsAvailable: r.integer('totalToolsAvailable'),
+            percentageAvailable: r.real('percentageAvailable'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteToolsCountReport(String id) async {
-    await connector
-        .deleteSheetToolsCountReport(
-          id: DeleteSheetToolsCountReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteToolsCountReport(String id) =>
+      _reports.delete(Col.sheetToolsCount, id);
+
+  // ── Machine health ──
 
   @override
   Future<void> submitMachineHealthReport(MachineHealthReport report) async {
-    final result = await connector
-        .createSheetHealthReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalMaintenanceDurationHours: report.totalMaintenanceDurationHours,
-          createdBy: report.createdBy,
-        )
-        .submittedAt(
-          report.submittedAt != null
-              ? Timestamp(0, report.submittedAt!.millisecondsSinceEpoch ~/ 1000)
-              : null,
-        )
-        .execute();
-
-    final reportId = result.data.sheetHealthReport_insert.id;
-    for (final entry in report.entries) {
-      await connector
-          .createSheetMaintenanceEntry(
-            reportId: CreateSheetMaintenanceEntryVariablesReportId(
-              id: reportId,
-            ),
-            maintenanceItem: entry.maintenanceItem,
-            startTime: Timestamp(
-              0,
-              entry.startTime.millisecondsSinceEpoch ~/ 1000,
-            ),
-            endTime: Timestamp(0, entry.endTime.millisecondsSinceEpoch ~/ 1000),
-            personDoingMaintenance: entry.personDoingMaintenance,
-            description: entry.description,
-            durationHours: entry.durationHours,
-          )
-          .execute();
-    }
+    await _reports.add(Col.sheetHealth, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalMaintenanceDurationHours': report.totalMaintenanceDurationHours,
+      'createdBy': report.createdBy,
+      'submittedAt': toTimestamp(report.submittedAt),
+      'entries': report.entries.map(_entryToMap).toList(),
+    });
   }
 
   @override
@@ -228,100 +332,86 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetHealthReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetHealthReports
+    final rows = await _list(
+      Col.sheetHealth,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => MachineHealthReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            entries: r.sheetMaintenanceEntries_on_report
-                .map(
-                  (e) => FrameMaintenanceEntry(
-                    maintenanceItem: e.maintenanceItem,
-                    startTime: e.startTime.toDateTime(),
-                    endTime: e.endTime.toDateTime(),
-                    personDoingMaintenance: e.personDoingMaintenance,
-                    description: e.description,
-                    durationHours: e.durationHours,
-                  ),
-                )
-                .toList(),
-            totalMaintenanceDurationHours: r.totalMaintenanceDurationHours,
-            createdBy: r.createdBy,
-            submittedAt: r.submittedAt?.toDateTime(),
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            entries: r.children('entries').map(_entry).toList(),
+            totalMaintenanceDurationHours: r.real(
+              'totalMaintenanceDurationHours',
+            ),
+            createdBy: r.str('createdBy'),
+            submittedAt: r.timestamp('submittedAt'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<List<MachineHealthReport>> getPendingApprovals() async {
-    return getMachineHealthReports();
-  }
+  Future<List<MachineHealthReport>> getPendingApprovals() =>
+      getMachineHealthReports();
 
   @override
-  Future<void> deleteMachineHealthReport(String id) async {
-    await connector.deleteSheetHealthReport(id: id).execute();
-  }
+  Future<void> deleteMachineHealthReport(String id) =>
+      _reports.delete(Col.sheetHealth, id);
+
+  // ── Production details (maintains stock) ──
 
   @override
   Future<void> submitProductionDetailsReport(
     SheetProductionDetailsReport report,
   ) async {
-    final result = await connector
-        .createSheetProductionDetailsReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalQuantity: report.totalQuantity,
-          totalWeight: report.totalWeight,
-          totalRunningFeet: report.totalRunningFeet,
-          createdBy: report.createdBy,
-        )
-        .submittedAt(
-          report.submittedAt != null
-              ? Timestamp(0, report.submittedAt!.millisecondsSinceEpoch ~/ 1000)
-              : null,
-        )
-        .execute();
-
-    final reportId = result.data.sheetProductionDetailsReport_insert.id;
-    for (final item in report.lineItems) {
-      await connector
-          .createSheetProductionLineItem(
-            reportId: CreateSheetProductionLineItemVariablesReportId(
-              id: reportId,
-            ),
-            thickness: item.thickness,
-            density: item.density,
-            color: item.color,
-            length: item.length,
-            width: item.width,
-            quantity: item.quantity,
-            sqft: item.sqft,
-            perPieceWeight: item.perPieceWeight,
-            totalWeight: item.totalWeight,
-            totalRunningFeet: item.totalRunningFeet,
-          )
-          .timeOfChange(
-            item.timeOfChange != null
-                ? Timestamp(
-                    0,
-                    item.timeOfChange!.millisecondsSinceEpoch ~/ 1000,
-                  )
-                : null,
-          )
-          .manualWeightPerSqft(item.manualWeightPerSqft)
-          .execute();
-    }
+    final items = report.lineItems.map(_productionItemToMap).toList();
+    final ref = _db.collection(Col.sheetProductionDetails).doc();
+    final batch = _db.batch();
+    batch.set(
+      ref,
+      _reports.stamp({
+        'date': dateKey(report.date),
+        'machineNumber': report.machineNumber,
+        'shift': report.shift,
+        'totalQuantity': report.totalQuantity,
+        'totalWeight': report.totalWeight,
+        'totalRunningFeet': report.totalRunningFeet,
+        'createdBy': report.createdBy,
+        'submittedAt': toTimestamp(report.submittedAt),
+        'lineItems': items,
+      }),
+    );
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.sheet,
+      lines: _productionStock(items),
+      producedAmount: report.totalRunningFeet,
+    );
+    await batch.commit();
   }
+
+  SheetProductionDetailsReport _productionReport(DocRow r) =>
+      SheetProductionDetailsReport(
+        id: r.id,
+        date: r.date('date'),
+        machineNumber: r.str('machineNumber'),
+        shift: r.str('shift'),
+        lineItems: r.children('lineItems').map(_productionItem).toList(),
+        totalQuantity: r.integer('totalQuantity'),
+        totalWeight: r.real('totalWeight'),
+        totalRunningFeet: r.real('totalRunningFeet'),
+        createdBy: r.str('createdBy'),
+        submittedAt: r.timestamp('submittedAt'),
+        timestamp: r.timestamp('timestamp'),
+      );
 
   @override
   Future<List<SheetProductionDetailsReport>> getProductionDetailsReports({
@@ -329,45 +419,13 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetProductionDetailsReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetProductionDetailsReports
-        .map(
-          (r) => SheetProductionDetailsReport(
-            id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            lineItems: r.sheetProductionLineItems_on_report
-                .map(
-                  (li) => SheetProductionLineItem(
-                    thickness: li.thickness,
-                    density: li.density,
-                    color: li.color,
-                    length: li.length,
-                    width: li.width,
-                    quantity: li.quantity,
-                    sqft: li.sqft,
-                    perPieceWeight: li.perPieceWeight,
-                    totalWeight: li.totalWeight,
-                    totalRunningFeet: li.totalRunningFeet,
-                    timeOfChange: li.timeOfChange?.toDateTime(),
-                    manualWeightPerSqft: li.manualWeightPerSqft,
-                  ),
-                )
-                .toList(),
-            totalQuantity: r.totalQuantity,
-            totalWeight: r.totalWeight,
-            totalRunningFeet: r.totalRunningFeet,
-            createdBy: r.createdBy,
-            submittedAt: r.submittedAt?.toDateTime(),
-            timestamp: r.timestamp?.toDateTime(),
-          ),
-        )
-        .toList();
+    final rows = await _list(
+      Col.sheetProductionDetails,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows.map(_productionReport).toList();
   }
 
   @override
@@ -376,68 +434,50 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime date,
     String shift,
   ) async {
-    final result = await connector
-        .getSheetProductionDetailsReport(
-          machineNumber: machineNumber,
-          date: DateTime(date.year, date.month, date.day),
-          shift: shift,
-        )
-        .execute();
-
-    final reports = result.data.sheetProductionDetailsReports;
-    if (reports.isEmpty) return null;
-    final r = reports.first;
-    return SheetProductionDetailsReport(
-      id: r.id,
-      date: r.date,
-      machineNumber: r.machineNumber,
-      shift: r.shift,
-      lineItems: r.sheetProductionLineItems_on_report
-          .map(
-            (li) => SheetProductionLineItem(
-              thickness: li.thickness,
-              density: li.density,
-              color: li.color,
-              length: li.length,
-              width: li.width,
-              quantity: li.quantity,
-              sqft: li.sqft,
-              perPieceWeight: li.perPieceWeight,
-              totalWeight: li.totalWeight,
-              totalRunningFeet: li.totalRunningFeet,
-            ),
-          )
-          .toList(),
-      totalQuantity: r.totalQuantity,
-      totalWeight: r.totalWeight,
-      totalRunningFeet: r.totalRunningFeet,
-      createdBy: r.createdBy,
-      submittedAt: r.submittedAt?.toDateTime(),
-    );
+    final row = await _reports.findOne(Col.sheetProductionDetails, {
+      'machineNumber': machineNumber,
+      'date': dateKey(date),
+      'shift': shift,
+    });
+    return row == null ? null : _productionReport(row);
   }
 
   @override
   Future<void> deleteProductionDetailsReport(String id) async {
-    await connector.deleteSheetProductionDetailsReport(id: id).execute();
+    final ref = _db.collection(Col.sheetProductionDetails).doc(id);
+    final snap = await ref.get();
+    if (!snap.exists) return;
+    final row = DocRow.fromSnapshot(snap);
+    final batch = _db.batch();
+    batch.delete(ref);
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.sheet,
+      lines: _productionStock(_rawChildren(row, 'lineItems')),
+      producedAmount: row.real('totalRunningFeet'),
+      sign: -1,
+    );
+    await batch.commit();
   }
+
+  // ── Running feet ──
 
   @override
   Future<void> submitProductionRunningFeetReport(
     SheetProductionRunningFeetReport report,
   ) async {
-    await connector
-        .createSheetRunningFeetReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          productionRunningFeet: report.productionRunningFeet,
-          maintenanceRunningFeet: report.maintenanceRunningFeet,
-          totalProductionRunningFeet: report.totalProductionRunningFeet,
-          targetRunningFeet: report.targetRunningFeet,
-          efficiencyPercentage: report.efficiencyPercentage,
-          createdBy: report.createdBy,
-        )
-        .execute();
+    await _reports.add(Col.sheetRunningFeet, {
+      'date': dateKey(report.date),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'productionRunningFeet': report.productionRunningFeet,
+      'maintenanceRunningFeet': report.maintenanceRunningFeet,
+      'totalProductionRunningFeet': report.totalProductionRunningFeet,
+      'targetRunningFeet': report.targetRunningFeet,
+      'efficiencyPercentage': report.efficiencyPercentage,
+      'createdBy': report.createdBy,
+    });
   }
 
   @override
@@ -447,73 +487,62 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetRunningFeetReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetRunningFeetReports
+    final rows = await _list(
+      Col.sheetRunningFeet,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => SheetProductionRunningFeetReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            productionRunningFeet: r.productionRunningFeet,
-            maintenanceRunningFeet: r.maintenanceRunningFeet,
-            totalProductionRunningFeet: r.totalProductionRunningFeet,
-            targetRunningFeet: r.targetRunningFeet,
-            efficiencyPercentage: r.efficiencyPercentage,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            productionRunningFeet: r.real('productionRunningFeet'),
+            maintenanceRunningFeet: r.real('maintenanceRunningFeet'),
+            totalProductionRunningFeet: r.real('totalProductionRunningFeet'),
+            targetRunningFeet: r.real('targetRunningFeet'),
+            efficiencyPercentage: r.real('efficiencyPercentage'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteProductionRunningFeetReport(String id) async {
-    await connector
-        .deleteSheetRunningFeetReport(
-          id: DeleteSheetRunningFeetReportVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteProductionRunningFeetReport(String id) =>
+      _reports.delete(Col.sheetRunningFeet, id);
+
+  // ── Shift packing (maintains stock) ──
 
   @override
   Future<void> submitShiftPackingReport(SheetShiftPackingReport report) async {
-    final result = await connector
-        .createSheetShiftPackingReport(
-          date: report.date,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalRejectedRunningFeet: report.totalRejectedRunningFeet,
-          qualityAcceptancePercentage: report.qualityAcceptancePercentage,
-          packingEfficiency: report.packingEfficiency,
-          createdBy: report.createdBy,
-        )
-        .execute();
-
-    final reportId = result.data.sheetShiftPackingReport_insert.id;
-    for (final item in report.lineItems) {
-      await connector
-          .createSheetPackingLineItem(
-            reportId: CreateSheetPackingLineItemVariablesReportId(id: reportId),
-            thickness: item.thickness,
-            density: item.density,
-            color: item.color,
-            length: item.length,
-            width: item.width,
-            productionQuantity: item.productionQuantity,
-            perPieceWeight: item.perPieceWeight,
-            runningFeetPerItem: item.runningFeetPerItem,
-            packed: item.packed,
-            onlySanding: item.onlySanding,
-            sandingAndPacked: item.sandingAndPacked,
-            rejectedQuality: item.rejectedQuality,
-          )
-          .execute();
-    }
+    final items = report.lineItems.map(_packingItemToMap).toList();
+    final ref = _db.collection(Col.sheetShiftPacking).doc();
+    final batch = _db.batch();
+    batch.set(
+      ref,
+      _reports.stamp({
+        'date': dateKey(report.date),
+        'machineNumber': report.machineNumber,
+        'shift': report.shift,
+        'totalRejectedRunningFeet': report.totalRejectedRunningFeet,
+        'qualityAcceptancePercentage': report.qualityAcceptancePercentage,
+        'packingEfficiency': report.packingEfficiency,
+        'createdBy': report.createdBy,
+        'lineItems': items,
+      }),
+    );
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.sheet,
+      lines: _packingStock(items),
+    );
+    await batch.commit();
   }
 
   @override
@@ -522,41 +551,25 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetShiftPackingReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetShiftPackingReports
+    final rows = await _list(
+      Col.sheetShiftPacking,
+      machineNumber: machineNumber,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => SheetShiftPackingReport(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            lineItems: r.sheetPackingLineItems_on_report
-                .map(
-                  (li) => SheetPackingLineItem(
-                    thickness: li.thickness,
-                    density: li.density,
-                    color: li.color,
-                    length: li.length,
-                    width: li.width,
-                    productionQuantity: li.productionQuantity,
-                    perPieceWeight: li.perPieceWeight,
-                    runningFeetPerItem: li.runningFeetPerItem,
-                    packed: li.packed,
-                    onlySanding: li.onlySanding,
-                    sandingAndPacked: li.sandingAndPacked,
-                    rejectedQuality: li.rejectedQuality,
-                  ),
-                )
-                .toList(),
-            totalRejectedRunningFeet: r.totalRejectedRunningFeet,
-            qualityAcceptancePercentage: r.qualityAcceptancePercentage,
-            packingEfficiency: r.packingEfficiency,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            lineItems: r.children('lineItems').map(_packingItem).toList(),
+            totalRejectedRunningFeet: r.real('totalRejectedRunningFeet'),
+            qualityAcceptancePercentage: r.real('qualityAcceptancePercentage'),
+            packingEfficiency: r.real('packingEfficiency'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
@@ -564,8 +577,23 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
 
   @override
   Future<void> deleteShiftPackingReport(String id) async {
-    await connector.deleteSheetShiftPackingReport(id: id).execute();
+    final ref = _db.collection(Col.sheetShiftPacking).doc(id);
+    final snap = await ref.get();
+    if (!snap.exists) return;
+    final row = DocRow.fromSnapshot(snap);
+    final batch = _db.batch();
+    batch.delete(ref);
+    StockLedger.apply(
+      batch,
+      _db,
+      kind: StockKind.sheet,
+      lines: _packingStock(_rawChildren(row, 'lineItems')),
+      sign: -1,
+    );
+    await batch.commit();
   }
+
+  // ── Writing efficiency ──
 
   @override
   Future<List<ReportWritingEfficiencyRecord>> getReportWritingEfficiency({
@@ -573,93 +601,62 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetWritingEfficiency();
-    if (operatorId != null) builder.operatorId(operatorId);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetWritingEfficiencies
+    final rows = await _list(
+      Col.sheetWritingEfficiency,
+      equalsField: 'operatorId',
+      equalsValue: operatorId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => ReportWritingEfficiencyRecord(
             id: r.id,
-            date: r.date,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            submittedAt: r.submittedAt?.toDateTime(),
-            shiftEndTime: r.shiftEndTime.toDateTime(),
-            score: r.score,
-            operatorId: r.operatorId,
+            date: r.date('date'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            submittedAt: r.timestamp('submittedAt'),
+            shiftEndTime: r.timestamp('shiftEndTime')!,
+            score: r.integer('score'),
+            operatorId: r.str('operatorId'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteWritingEfficiency(String id) async {
-    await connector
-        .deleteSheetWritingEfficiency(
-          id: DeleteSheetWritingEfficiencyVariablesId(id: id),
-        )
-        .execute();
-  }
+  Future<void> deleteWritingEfficiency(String id) =>
+      _reports.delete(Col.sheetWritingEfficiency, id);
 
   @override
   Future<void> submitWritingEfficiency(
     ReportWritingEfficiencyRecord record,
   ) async {
-    final submittedAt = record.submittedAt ?? DateTime.now();
-    await connector
-        .createSheetWritingEfficiency(
-          date: record.date,
-          machineNumber: record.machineNumber,
-          shift: record.shift,
-          shiftEndTime: Timestamp(
-            0,
-            record.shiftEndTime.millisecondsSinceEpoch ~/ 1000,
-          ),
-          score: record.score,
-          operatorId: record.operatorId,
-        )
-        .submittedAt(
-          Timestamp(0, submittedAt.millisecondsSinceEpoch ~/ 1000),
-        )
-        .execute();
+    await _reports.add(Col.sheetWritingEfficiency, {
+      'date': dateKey(record.date),
+      'machineNumber': record.machineNumber,
+      'shift': record.shift,
+      'shiftEndTime': toTimestamp(record.shiftEndTime),
+      'score': record.score,
+      'operatorId': record.operatorId,
+      'submittedAt': toTimestamp(record.submittedAt ?? DateTime.now()),
+    });
   }
+
+  // ── Customer rejection ──
 
   @override
   Future<void> submitCustomerRejectionReport(
     SheetCustomerRejectionReport report,
   ) async {
-    final result = await connector
-        .createSheetCustomerRejectionReport(
-          originalProductionDate: report.originalProductionDate,
-          machineNumber: report.machineNumber,
-          shift: report.shift,
-          totalRejectedRunningFeet: report.totalRejectedRunningFeet,
-          createdBy: report.createdBy,
-        )
-        .execute();
-
-    final reportId = result.data.sheetCustomerRejectionReport_insert.id;
-    for (final item in report.rejectedItems) {
-      await connector
-          .createSheetCustomerRejectionItem(
-            reportId: CreateSheetCustomerRejectionItemVariablesReportId(
-              id: reportId,
-            ),
-            thickness: item.thickness,
-            density: item.density,
-            color: item.color,
-            length: item.length,
-            width: item.width,
-            quantity: item.quantity,
-            sqft: item.sqft,
-            perPieceWeight: item.perPieceWeight,
-            totalWeight: item.totalWeight,
-            totalRunningFeet: item.totalRunningFeet,
-          )
-          .execute();
-    }
+    await _reports.add(Col.sheetCustomerRejection, {
+      'originalProductionDate': dateKey(report.originalProductionDate),
+      'machineNumber': report.machineNumber,
+      'shift': report.shift,
+      'totalRejectedRunningFeet': report.totalRejectedRunningFeet,
+      'createdBy': report.createdBy,
+      'rejectedItems': report.rejectedItems.map(_productionItemToMap).toList(),
+    });
   }
 
   @override
@@ -668,44 +665,33 @@ class SheetRemoteDataSourceImpl implements SheetRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final builder = connector.listSheetCustomerRejectionReports();
-    if (machineNumber != null) builder.machineNumber(machineNumber);
-    if (startDate != null) builder.startDate(startDate);
-    if (endDate != null) builder.endDate(endDate);
-    final result = await builder.execute();
-    return result.data.sheetCustomerRejectionReports
+    final rows = await _list(
+      Col.sheetCustomerRejection,
+      machineNumber: machineNumber,
+      dateField: 'originalProductionDate',
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return rows
         .map(
           (r) => SheetCustomerRejectionReport(
             id: r.id,
-            originalProductionDate: r.originalProductionDate,
-            machineNumber: r.machineNumber,
-            shift: r.shift,
-            rejectedItems: r.sheetCustomerRejectionItems_on_report
-                .map(
-                  (li) => SheetProductionLineItem(
-                    thickness: li.thickness,
-                    density: li.density,
-                    color: li.color,
-                    length: li.length,
-                    width: li.width,
-                    quantity: li.quantity,
-                    sqft: li.sqft,
-                    perPieceWeight: li.perPieceWeight,
-                    totalWeight: li.totalWeight,
-                    totalRunningFeet: li.totalRunningFeet,
-                  ),
-                )
+            originalProductionDate: r.date('originalProductionDate'),
+            machineNumber: r.str('machineNumber'),
+            shift: r.str('shift'),
+            rejectedItems: r
+                .children('rejectedItems')
+                .map(_productionItem)
                 .toList(),
-            totalRejectedRunningFeet: r.totalRejectedRunningFeet,
-            createdBy: r.createdBy,
-            timestamp: r.timestamp?.toDateTime(),
+            totalRejectedRunningFeet: r.real('totalRejectedRunningFeet'),
+            createdBy: r.str('createdBy'),
+            timestamp: r.timestamp('timestamp'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> deleteCustomerRejectionReport(String id) async {
-    await connector.deleteSheetCustomerRejectionReport(id: id).execute();
-  }
+  Future<void> deleteCustomerRejectionReport(String id) =>
+      _reports.delete(Col.sheetCustomerRejection, id);
 }
