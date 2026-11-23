@@ -1,0 +1,4 @@
+node_modules
+# Exports contain user passwords in clear text. Never commit them.
+.tmp
+export
