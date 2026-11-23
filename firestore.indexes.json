@@ -1,0 +1,327 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "frame_cleaning_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_tools_count_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_health_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_production_details_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_production_weight_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_shift_packing_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_cleaning_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_tools_count_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_health_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_production_details_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_running_feet_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_shift_packing_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_cleaning_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_tools_count_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_machine_health_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_production_details_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_production_weight_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_quality_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scrap_writing_efficiencies",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_writing_efficiencies",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "operatorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_writing_efficiencies",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "operatorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "frame_customer_rejection_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "originalProductionDate",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sheet_customer_rejection_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "machineNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "originalProductionDate",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
