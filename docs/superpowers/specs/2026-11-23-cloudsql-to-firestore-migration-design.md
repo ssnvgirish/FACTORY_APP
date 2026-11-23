@@ -99,6 +99,41 @@ Take a final export, then delete the Cloud SQL instance.
   lookups and salary data.
 - Manual smoke test of login and each report flow before cutover.
 
+## Amendments (2026-11-23, during planning)
+
+These refine the sections above after reading the datasource code.
+
+1. **Line items are embedded, not separate collections.** Section 1 said
+   parent/line-item pairs stay as separate collections. Instead, children are
+   embedded as arrays in the parent document (`lineItems`, `entries`,
+   `rejectedItems`). A report is then 1 read instead of 1 + N, which matters
+   for the 50K reads/day quota. Migration merges child rows into parents.
+2. **Stock totals are maintained, not recomputed.** The dashboard currently
+   reads every production and packing report ever written. On Firestore that
+   would burn the free quota. Instead `stock_totals/{frame|sheet}` and
+   `stock_variants/*` hold running counters, updated with
+   `FieldValue.increment` in the same write batch as each submit/delete of a
+   production or packing report. The migration script rebuilds them from
+   history.
+3. **Dates are stored as `yyyy-MM-dd` strings** (not Timestamps), so range
+   queries are timezone-proof and match the old `Date` semantics. Instants
+   (`submittedAt`, `shiftEndTime`, entry start/end) are Timestamps.
+4. **User documents are keyed by Firebase Auth UID** (`users/{authUid}`) and
+   keep the legacy `uid` field (the phone), because reports reference
+   operators by that legacy value. Auth email is `<digits of normalized phone>@prabitha.app`.
+   Firebase Auth requires passwords of 6+ characters and existing passwords
+   are 4 characters (`1234`), so the Auth password is `prb#` + the password the
+   user types. Users still just type their normal password.
+5. **Changing a user's phone is not supported** after migration (it would
+   change the Auth login email, which needs the Admin SDK). The admin screen
+   rejects it with a clear message; deactivate and re-create instead.
+6. **Datasource tests use `fake_cloud_firestore`** instead of the emulator.
+   Security rules are tested separately with the Firestore emulator.
+7. **Renaming a master value** (section, density, thickness) is an in-place
+   update plus a batch update of the weight/target rows that reference it,
+   rather than the old insert → retarget → delete dance (which only existed
+   to satisfy SQL foreign keys).
+
 ## Risks
 
 - Biggest effort is rewriting ~10 datasources and the seeders.
