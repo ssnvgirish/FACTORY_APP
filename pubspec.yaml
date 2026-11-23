@@ -60,6 +60,8 @@ flutter:
 
   assets:
     - assets/images/wudsy_nfc_logo.png
+    # Bundled so text renders correctly offline (google_fonts finds these by name).
+    - google_fonts/
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
