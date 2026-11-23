@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/utils/master_table_seeder.dart';
+import '../../data/datasources/admin_remote_datasource.dart';
 import '../bloc/admin_bloc.dart';
 import 'user_management_page.dart';
 import 'reference_tables_page.dart';
@@ -85,7 +87,7 @@ class AdminPanelPage extends StatelessWidget {
       const SnackBar(content: Text('Seeding master tables...')),
     );
     try {
-      final result = await MasterTableSeeder.seed();
+      final result = await MasterTableSeeder.seed(sl<AdminRemoteDatasource>());
       messenger.clearSnackBars();
       messenger.showSnackBar(
         SnackBar(

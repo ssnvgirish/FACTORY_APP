@@ -1,7 +1,8 @@
 import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../generated/dataconnect/default.dart';
+import '../../features/admin/data/datasources/user_account_creator.dart';
 import '../../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
@@ -36,27 +37,27 @@ final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
   // External
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
-  sl.registerLazySingleton(() => DefaultConnector.instance);
+  sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+  sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  sl.registerLazySingleton<UserAccountCreator>(() => SecondaryAppAccountCreator());
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(connector: sl(), sharedPreferences: sl()),
+    () => AuthRemoteDataSourceImpl(auth: sl(), firestore: sl()),
   );
   sl.registerLazySingleton<FrameRemoteDataSource>(
-    () => FrameRemoteDataSourceImpl(connector: sl()),
+    () => FrameRemoteDataSourceImpl(firestore: sl()),
   );
   sl.registerLazySingleton<SheetRemoteDataSource>(
-    () => SheetRemoteDataSourceImpl(connector: sl()),
+    () => SheetRemoteDataSourceImpl(firestore: sl()),
   );
   sl.registerLazySingleton<SalaryRemoteDataSource>(
-    () => SalaryRemoteDataSourceImpl(connector: sl()),
+    () => SalaryRemoteDataSourceImpl(firestore: sl()),
   );
-  sl.registerLazySingleton(() => AdminRemoteDatasource(connector: sl()));
-  sl.registerLazySingleton(() => DashboardRemoteDatasource(connector: sl()));
+  sl.registerLazySingleton(() => AdminRemoteDatasource(firestore: sl(), accounts: sl()));
+  sl.registerLazySingleton(() => DashboardRemoteDatasource(firestore: sl()));
   sl.registerLazySingleton<ScrapRegrindRemoteDataSource>(
-    () => ScrapRegrindRemoteDataSourceImpl(connector: sl()),
+    () => ScrapRegrindRemoteDataSourceImpl(firestore: sl()),
   );
 
   // Repositories
